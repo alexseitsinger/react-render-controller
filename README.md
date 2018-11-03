@@ -12,6 +12,7 @@ A render controller for components that use data.
 -   unloadData - (Function / Optional ) - The function to invoke, when the component is unmounted, to unload the data if it's not empty.
 -   renderWithoutData - (Function / Optional) - The function to invoke, to render the component, when the data is empty. If not provided, will render null.
 -   renderWithData - (Function / Optional) - The function to invoke, to render the component, when the data is not empty. If not provided, will render children.
+-   name - (String / Optional) - Each time an instance of this component is mounted, a counter will be incremented under this name. When the component is unmounted, if the count is 0, it will invoke unloadData. Otherwise, the data will remain. If no name is provided, an unloadData is provided, it will invoke it every time.
 
 ## Usage
 
@@ -34,6 +35,7 @@ class ExampleApp extends React.Component {
 		const { firstData, secondData } = this.props
 		return (
 			<DataController
+				name={"example"}
 				data={[firstData, secondData]}
 				loadData={() => {
 					dispatch(loadFirstData())
