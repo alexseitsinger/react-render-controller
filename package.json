@@ -1,6 +1,6 @@
 {
 	"name": "@alexseitsinger/data-controller",
-	"version": "0.1.2",
+	"version": "0.1.3",
 	"description": "A render controller for components that use data.",
 	"main": "dist/main.js",
 	"homepage": "https://github.com/alexseitsinger/data-controller#readme",

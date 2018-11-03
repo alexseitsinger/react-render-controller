@@ -33,6 +33,15 @@ class DataController extends React.Component {
 			}
 		}
 	}
+	componentDidUpdate(prevProps, prevState) {
+		const { loadData } = this.props
+		const dataLoaded = this.dataLoaded()
+		if (!dataLoaded) {
+			if (_.isFunction(loadData)) {
+				loadData()
+			}
+		}
+	}
 	dataLoaded = () => {
 		const { data } = this.props
 		const result = isEmpty(data)
