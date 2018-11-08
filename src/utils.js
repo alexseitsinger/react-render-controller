@@ -1,6 +1,9 @@
 import _ from "underscore"
 
 export function isEmpty(data) {
+	if (!data) {
+		return true
+	}
 	var result = null
 	if (_.isArray(data)) {
 		// If its an empty array, set true

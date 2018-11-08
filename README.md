@@ -7,7 +7,7 @@ A render controller for components that use data.
 ## Props
 
 -   children - (Node, Array of Nodes / Optional ) - The children to render when the data is present.
--   data - ( Object, Array of Objects / Required ) - The data to check is not empty before rendering.
+-   data - ( Object, Array of Objects / Optional ) - The data to check is not empty before rendering.
 -   loadData - (Function / Optional) - The function to invoke, when the component is mounted, to load the data if it's empty.
 -   unloadData - (Function / Optional ) - The function to invoke, when the component is unmounted, to unload the data if it's not empty.
 -   renderWithoutData - (Function / Optional) - The function to invoke, to render the component, when the data is empty. If not provided, will render null.

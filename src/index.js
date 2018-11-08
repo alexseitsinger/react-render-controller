@@ -31,8 +31,9 @@ class DataController extends React.Component {
 		]),
 		data: PropTypes.oneOfType([
 			PropTypes.arrayOf(PropTypes.object),
-			PropTypes.object
-		]).isRequired,
+			PropTypes.object,
+			PropTypes.array
+		]),
 		loadData: PropTypes.func,
 		unloadData: PropTypes.func,
 		renderWithoutData: PropTypes.func,

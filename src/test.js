@@ -1,106 +1,95 @@
 import React from "react"
 import DataController from "./index"
 
-describe("<DataController/>", () => {
-	const filledData = [{ name: "a" }, { name: "b" }]
-	const emptyData = [{}, {}]
-	const withDataDiv = <div>With Data</div>
-	const withoutDataDiv = <div>Without Data</div>
-	const renderWithoutData = () => {
-		return withoutDataDiv
-	}
-	const renderWithData = () => {
-		return withDataDiv
-	}
+const arrayData = [{ name: "a" }, { name: "b" }]
+const objectData = { name: "a" }
+const emptyObjectData = {}
+const emptyArrayData = []
+const nullData = null
 
-	it("renders data with function", () => {
-		const mockLoadData = jest.fn()
-		const mockUnloadData = jest.fn()
-		const wrapper = shallow(
+describe("<DataController/>", () => {
+	it("invokes renderWithData with array data", () => {
+		const wrapper = mount(
 			<DataController
-				data={filledData}
-				loadData={() => {
-					mockLoadData()
+				data={arrayData}
+				renderWithData={() => {
+					return <div className={"withData"}>With Data</div>
 				}}
-				unloadData={() => {
-					mockUnloadData()
-				}}
-				renderWithoutData={renderWithoutData}
-				renderWithData={renderWithData}
 			/>
 		)
-
-		expect(wrapper.contains(withDataDiv)).toBeTruthy()
-		expect(mockLoadData.mock.calls.length).toBe(0)
-		wrapper.unmount()
-		expect(mockUnloadData.mock.calls.length).toBe(1)
+		expect(wrapper.find(".withData")).toHaveLength(1)
+		expect(wrapper.find(".withData").text()).toBe("With Data")
 	})
 
-	it("renders data without function and with children", () => {
-		const mockLoadData = jest.fn()
-		const mockUnloadData = jest.fn()
-		const wrapper = shallow(
+	it("invokes renderWithData with object data", () => {
+		const wrapper = mount(
 			<DataController
-				data={filledData}
-				loadData={() => {
-					mockLoadData()
+				data={objectData}
+				renderWithData={() => {
+					return <div className={"withData"}>With Data</div>
 				}}
-				unloadData={() => {
-					mockUnloadData()
-				}}
-				renderWithoutData={renderWithoutData}>
-				{withDataDiv}
+			/>
+		)
+		expect(wrapper.find(".withData")).toHaveLength(1)
+		expect(wrapper.find(".withData").text()).toBe("With Data")
+	})
+
+	it("renders children with data", () => {
+		const wrapper = mount(
+			<DataController data={objectData}>
+				<div className={"withData"}>With Data</div>
 			</DataController>
 		)
-
-		expect(wrapper.contains(withDataDiv)).toBeTruthy()
-		expect(mockLoadData.mock.calls.length).toBe(0)
-		wrapper.unmount()
-		expect(mockUnloadData.mock.calls.length).toBe(1)
+		expect(wrapper.find(".withData")).toHaveLength(1)
+		expect(wrapper.find(".withData").text()).toBe("With Data")
 	})
 
-	it("renders without data with function", () => {
-		const mockLoadData = jest.fn()
-		const mockUnloadData = jest.fn()
-		const wrapper = shallow(
+	it("invokes renderWithoutData with empty array data", () => {
+		const wrapper = mount(
 			<DataController
-				data={emptyData}
-				loadData={() => {
-					mockLoadData()
+				data={emptyArrayData}
+				renderWithoutData={() => {
+					return <div className={"withoutData"}>Without Data</div>
 				}}
-				unloadData={() => {
-					mockUnloadData()
-				}}
-				renderWithoutData={renderWithoutData}
-				renderWithData={renderWithData}
 			/>
 		)
-
-		expect(wrapper.contains(withoutDataDiv)).toBeTruthy()
-		expect(mockLoadData.mock.calls.length).toBe(1)
-		wrapper.unmount()
-		expect(mockUnloadData.mock.calls.length).toBe(1)
+		expect(wrapper.find(".withoutData")).toHaveLength(1)
+		expect(wrapper.find(".withoutData").text()).toBe("Without Data")
 	})
 
-	it("renders without data without function", () => {
-		const mockLoadData = jest.fn()
-		const mockUnloadData = jest.fn()
-		const wrapper = shallow(
+	it("invokes renderWithoutData with empty object data", () => {
+		const wrapper = mount(
 			<DataController
-				data={emptyData}
-				loadData={() => {
-					mockLoadData()
+				data={emptyObjectData}
+				renderWithoutData={() => {
+					return <div className={"withoutData"}>Without Data</div>
 				}}
-				unloadData={() => {
-					mockUnloadData()
-				}}
-				renderWithData={renderWithData}
 			/>
 		)
+		expect(wrapper.find(".withoutData")).toHaveLength(1)
+		expect(wrapper.find(".withoutData").text()).toBe("Without Data")
+	})
 
-		expect(wrapper.equals(null)).toBe(true)
-		expect(mockLoadData.mock.calls.length).toBe(1)
-		wrapper.unmount()
-		expect(mockUnloadData.mock.calls.length).toBe(1)
+	it("invokes renderWithoutData with null data", () => {
+		const wrapper = mount(
+			<DataController
+				data={nullData}
+				renderWithoutData={() => {
+					return <div className={"withoutData"}>Without Data</div>
+				}}
+			/>
+		)
+		expect(wrapper.find(".withoutData")).toHaveLength(1)
+		expect(wrapper.find(".withoutData").text()).toBe("Without Data")
+	})
+
+	it("renders nothing with null data, and no renderWithoutData method", () => {
+		const wrapper = mount(<DataController data={nullData} />)
+		expect(wrapper.children()).toHaveLength(0)
+	})
+
+	it("renders nothing with no props", () => {
+		const wrapper = mount(<DataController />)
+		expect(wrapper.children()).toHaveLength(0)
 	})
 })
