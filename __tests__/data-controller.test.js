@@ -1,5 +1,5 @@
 import React from "react"
-import DataController from "./index"
+import DataController from "../src/index"
 
 const arrayData = [{ name: "a" }, { name: "b" }]
 const objectData = { name: "a" }
