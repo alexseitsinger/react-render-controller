@@ -1,6 +1,6 @@
 {
   "name": "@alexseitsinger/react-render-controller",
-  "version": "0.1.7",
+  "version": "1.0.0",
   "description": "A render controller for components that use data.",
   "main": "dist/main.js",
   "homepage": "https://www.alexseitsinger.com/packages/node/react-render-controller",
