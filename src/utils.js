@@ -1,5 +1,25 @@
 import _ from "underscore"
 
+let count = {}
+
+export function incrementCount(name) {
+	if (!(name in count)) {
+		count[name] = 0
+	}
+	count[name] = ++count[name]
+	return count[name]
+}
+
+export function decrementCount(name) {
+	if (!(name in count)) {
+		count[name] = 0
+	}
+	// Decrement the count by 1
+	count[name] = --count[name]
+	count[name] = Math.max(0, count[name])
+	return count[name]
+}
+
 export function isEmpty(data) {
 	if (!data) {
 		return true
