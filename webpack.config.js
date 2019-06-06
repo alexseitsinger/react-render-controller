@@ -9,7 +9,6 @@ module.exports = {
     path: path.resolve("./dist"),
     filename: "[name].js",
     libraryTarget: "commonjs2",
-    libraryExport: "default"
   },
   module: {
     rules: [
