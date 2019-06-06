@@ -1,5 +1,5 @@
 import React from "react"
-import DataController from "../src/index"
+import { RenderController } from "../src"
 
 const arrayData = [{ name: "a" }, { name: "b" }]
 const objectData = { name: "a" }
@@ -7,12 +7,12 @@ const emptyObjectData = {}
 const emptyArrayData = []
 const nullData = null
 
-describe("<DataController/>", () => {
-	it("invokes renderWithData with array data", () => {
+describe("<RenderController/>", () => {
+	it("invokes renderWith with array data", () => {
 		const wrapper = mount(
-			<DataController
+			<RenderController
 				data={arrayData}
-				renderWithData={() => {
+				renderWith={() => {
 					return <div className={"withData"}>With Data</div>
 				}}
 			/>
@@ -21,11 +21,11 @@ describe("<DataController/>", () => {
 		expect(wrapper.find(".withData").text()).toBe("With Data")
 	})
 
-	it("invokes renderWithData with object data", () => {
+	it("invokes renderWith with object data", () => {
 		const wrapper = mount(
-			<DataController
+			<RenderController
 				data={objectData}
-				renderWithData={() => {
+				renderWith={() => {
 					return <div className={"withData"}>With Data</div>
 				}}
 			/>
@@ -36,19 +36,19 @@ describe("<DataController/>", () => {
 
 	it("renders children with data", () => {
 		const wrapper = mount(
-			<DataController data={objectData}>
+			<RenderController data={objectData}>
 				<div className={"withData"}>With Data</div>
-			</DataController>
+			</RenderController>
 		)
 		expect(wrapper.find(".withData")).toHaveLength(1)
 		expect(wrapper.find(".withData").text()).toBe("With Data")
 	})
 
-	it("invokes renderWithoutData with empty array data", () => {
+	it("invokes renderWithout with empty array data", () => {
 		const wrapper = mount(
-			<DataController
+			<RenderController
 				data={emptyArrayData}
-				renderWithoutData={() => {
+				renderWithout={() => {
 					return <div className={"withoutData"}>Without Data</div>
 				}}
 			/>
@@ -57,11 +57,11 @@ describe("<DataController/>", () => {
 		expect(wrapper.find(".withoutData").text()).toBe("Without Data")
 	})
 
-	it("invokes renderWithoutData with empty object data", () => {
+	it("invokes renderWithout with empty object data", () => {
 		const wrapper = mount(
-			<DataController
+			<RenderController
 				data={emptyObjectData}
-				renderWithoutData={() => {
+				renderWithout={() => {
 					return <div className={"withoutData"}>Without Data</div>
 				}}
 			/>
@@ -70,11 +70,11 @@ describe("<DataController/>", () => {
 		expect(wrapper.find(".withoutData").text()).toBe("Without Data")
 	})
 
-	it("invokes renderWithoutData with null data", () => {
+	it("invokes renderWithout with null data", () => {
 		const wrapper = mount(
-			<DataController
+			<RenderController
 				data={nullData}
-				renderWithoutData={() => {
+				renderWithout={() => {
 					return <div className={"withoutData"}>Without Data</div>
 				}}
 			/>
@@ -83,13 +83,13 @@ describe("<DataController/>", () => {
 		expect(wrapper.find(".withoutData").text()).toBe("Without Data")
 	})
 
-	it("renders nothing with null data, and no renderWithoutData method", () => {
-		const wrapper = mount(<DataController data={nullData} />)
+	it("renders nothing with null data, and no renderWithout method", () => {
+		const wrapper = mount(<RenderController data={nullData} />)
 		expect(wrapper.children()).toHaveLength(0)
 	})
 
 	it("renders nothing with no props", () => {
-		const wrapper = mount(<DataController />)
+		const wrapper = mount(<RenderController />)
 		expect(wrapper.children()).toHaveLength(0)
 	})
 })
