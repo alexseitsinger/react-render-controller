@@ -55,68 +55,79 @@ import { isEmpty, incrementCount, decrementCount } from "./utils"
  * export default connect(mapState, mapDispatch)(App)
  */
 export class RenderController extends PureComponent {
-	static propTypes = {
-		children: PropTypes.oneOfType([
-			PropTypes.arrayOf(PropTypes.node),
-			PropTypes.node
-		]),
-		data: PropTypes.oneOfType([
-			PropTypes.arrayOf(PropTypes.object),
-			PropTypes.object,
-			PropTypes.array
-		]),
-		load: PropTypes.func,
-		unload: PropTypes.func,
-		renderWithout: PropTypes.func,
-		renderWith: PropTypes.func,
-		name: PropTypes.string
-	}
-	componentWillUnmount() {
+  static propTypes = {
+    children: PropTypes.oneOfType([
+      PropTypes.arrayOf(PropTypes.node),
+      PropTypes.node
+    ]),
+    data: PropTypes.oneOfType([
+      PropTypes.arrayOf(PropTypes.object),
+      PropTypes.object,
+      PropTypes.array
+    ]),
+    load: PropTypes.func,
+    unload: PropTypes.func,
+    renderWithout: PropTypes.func,
+    renderWith: PropTypes.func,
+    name: PropTypes.string
+  }
+  doUnload = () => {
     const { unload, name } = this.props
-    if(_.isFunction(unload)){
-      if(name) {
-        if(decrementCount(name) === 0){
+    if (_.isFunction(unload)) {
+      if (name) {
+        if (decrementCount(name) === 0) {
           unload()
         }
-      } 
+      }
       else {
         unload()
       }
     }
-	}
-	componentDidMount() {
-		const { load, name } = this.props
-		if (name) {
-			incrementCount(name)
-		}
-    if(this.isLoaded() === true){
+  }
+  doLoad = () => {
+    const { load, name } = this.props
+    // If this is already loaded, then don't continue.
+    if (this.isLoaded() === true) {
       return
     }
-    if(_.isFunction(load)){
+    if (_.isFunction(load)) {
+      // If we got a name, then increment the count for it.
+      if (name) {
+        incrementCount(name)
+      }
       load()
     }
-	}
-	isLoaded = () => {
-		const { data } = this.props
-    if(isEmpty(data) === true){
+  }
+  isLoaded = () => {
+    const { data } = this.props
+    if (isEmpty(data) === true) {
       return false
     }
     return true
-	}
-	render() {
-		const { children, renderWithout, renderWith } = this.props
-    if(this.isLoaded() === true){
-      if(_.isFunction(renderWith)){
+  }
+  componentWillUnmount() {
+    this.doUnload()
+  }
+  componentDidUpdate() {
+    this.doLoad()
+  }
+  componentDidMount() {
+    this.doLoad()
+  }
+  render() {
+    const { children, renderWithout, renderWith } = this.props
+    if (this.isLoaded() === true) {
+      if (_.isFunction(renderWith)) {
         return renderWith()
       }
       return children
     }
     else {
-      if(_.isFunction(renderWithout)){
+      if (_.isFunction(renderWithout)) {
         return renderWithout()
       }
       return null
     }
-	}
+  }
 }
 
