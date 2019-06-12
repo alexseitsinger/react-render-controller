@@ -1,3 +1,10 @@
+<a name="v1.0.1"></a>
+## [v1.0.1](https://github.com/alexseitsinger/react-render-controller/compare/v1.0.0...v1.0.1) (2019-06-12)
+
+### Features
+- Makes load/unload methods w/didUpdate. ([1cc96d0](https://github.com/alexseitsinger/react-render-controller/commit/1cc96d016581e16e197f6c02155f4af3c2703155))
+
+
 <a name="v1.0.0"></a>
 ## [v1.0.0](https://github.com/alexseitsinger/react-render-controller/compare/v0.1.7...v1.0.0) (2019-06-06)
 
