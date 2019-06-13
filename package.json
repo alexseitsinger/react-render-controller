@@ -1,33 +1,19 @@
 {
-  "name": "@alexseitsinger/react-render-controller",
-  "version": "1.0.1",
-  "description": "A render controller for components that use data.",
-  "main": "dist/main.js",
-  "homepage": "https://www.alexseitsinger.com/packages/node/react-render-controller",
   "author": {
-    "name": "Alex Seitsinger",
     "email": "software@alexseitsinger.com",
+    "name": "Alex Seitsinger",
     "url": "https://www.alexseitsinger.com"
   },
-  "license": "BSD-2-Clause",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/alexseitsinger/react-render-controller.git"
+  "dependencies": {
+    "@babel/runtime-corejs3": "7.4.5",
+    "core-js": "3",
+    "prop-types": "15.7.2",
+    "underscore": "1.9.1"
   },
-  "files": [
-    "dist/main.js",
-    "package.json",
-    "README.md",
-    "LICENSE"
-  ],
-  "keywords": [
-    "react",
-    "render",
-    "data"
-  ],
+  "description": "A render controller for components that use data.",
   "devDependencies": {
     "@babel/core": "7.4.5",
-    "@babel/plugin-proposal-class-properties": "^7.4.4",
+    "@babel/plugin-proposal-class-properties": "7.4.4",
     "@babel/plugin-transform-runtime": "7.4.4",
     "@babel/preset-env": "7.4.5",
     "@babel/preset-react": "7.0.0",
@@ -42,19 +28,33 @@
     "react-test-renderer": "16.8.6",
     "webpack": "4.33.0",
     "webpack-cli": "3.3.2",
-    "webpack-node-externals": "^1.7.2"
+    "webpack-node-externals": "1.7.2"
   },
-  "dependencies": {
-    "@babel/runtime-corejs3": "7.4.5",
-    "core-js": "3",
-    "prop-types": "15.7.2",
-    "underscore": "1.9.1"
-  },
+  "files": [
+    "dist/main.js",
+    "package.json",
+    "README.md",
+    "LICENSE"
+  ],
+  "homepage": "https://www.alexseitsinger.com/packages/node/react-render-controller",
+  "keywords": [
+    "react",
+    "render",
+    "data"
+  ],
+  "license": "BSD-2-Clause",
+  "main": "dist/main.js",
+  "name": "@alexseitsinger/react-render-controller",
   "peerDependencies": {
     "react": "^16.8.6"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/alexseitsinger/react-render-controller.git"
   },
   "scripts": {
     "build": "./node_modules/.bin/webpack",
     "test": "./node_modules/.bin/jest test"
-  }
+  },
+  "version": "1.0.1"
 }
