@@ -14,12 +14,14 @@ Controls what to render based on data being empty or not.
 
 ### Parameters
 
+-   `props`  
 -   `data` **([Object][4] \| [Array][5])** Checked for emptiness.
 -   `load` **[Function][6]** Invoked to make the data non-empty.
 -   `unload` **[Function][6]** Invoked to make the data empty.
 -   `renderWithout` **[Function][6]** Invoked when rendering with empty data.
 -   `renderWith` **[Function][6]** Invoked when rendering with non-empty data.
 -   `name` **[String][7]** A name to use to count this data type.
+-   `maxLoads` **[Number][8]** The number of times load can re-try before stopping.
 
 ### Examples
 
@@ -81,3 +83,5 @@ Returns **Component**
 [6]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Statements/function
 
 [7]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String
+
+[8]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number
