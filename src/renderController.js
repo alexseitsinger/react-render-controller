@@ -1,7 +1,11 @@
 import React, { PureComponent } from "react"
 import PropTypes from "prop-types"
 import _ from "underscore"
-import { isEmpty, incrementCount, decrementCount } from "./utils"
+import { debounce } from "debounce"
+
+import {
+  isEmpty, setAttempted, getAttempted, incrementCount, decrementCount
+} from "./utils"
 
 /**
  * @description Controls what to render based on data being empty or not.
@@ -11,6 +15,7 @@ import { isEmpty, incrementCount, decrementCount } from "./utils"
  * @param {Function} renderWithout Invoked when rendering with empty data.
  * @param {Function} renderWith Invoked when rendering with non-empty data.
  * @param {String} name A name to use to count this data type.
+ * @param {Number} maxLoads The number of times load can re-try before stopping.
  * @return {Component}
  * @example
  * import React from "react"
@@ -69,50 +74,77 @@ export class RenderController extends PureComponent {
     unload: PropTypes.func,
     renderWithout: PropTypes.func,
     renderWith: PropTypes.func,
-    name: PropTypes.string
+    name: PropTypes.string,
+    maxCount: PropTypes.number,
   }
-  doUnload = () => {
-    const { unload, name } = this.props
-    if (_.isFunction(unload)) {
-      if (name) {
-        if (decrementCount(name) === 0) {
-          unload()
-        }
-      }
-      else {
-        unload()
-      }
-    }
+  static defaultProps = {
+    maxCount: 3,
   }
-  doLoad = () => {
-    const { load, name } = this.props
-    // If this is already loaded, then don't continue.
-    if (this.isLoaded() === true) {
-      return
-    }
-    if (_.isFunction(load)) {
-      // If we got a name, then increment the count for it.
-      if (name) {
-        incrementCount(name)
-      }
-      load()
-    }
+  constructor(props) {
+    super(props)
+    this.debouncedDoLoad = debounce(this.doLoad)
+    this.debouncedDoUnload = debounce(this.doUnload)
   }
   isLoaded = () => {
     const { data } = this.props
-    if (isEmpty(data) === true) {
+    const result = isEmpty(data)
+    if(result === true) {
       return false
     }
     return true
   }
-  componentWillUnmount() {
-    this.doUnload()
+  doLoad = (count, callback) => {
+    const { load, name, maxCount } = this.props
+    if(this.isLoaded() === false) {
+      if(_.isFunction(load)) {
+        if(count) {
+          const currentCount = name ? incrementCount(name) : 0
+          if (currentCount <= maxCount) {
+            load()
+            if (_.isFunction(callback)) {
+              callback()
+            }
+          }
+        }
+        else {
+          load()
+          if (_.isFunction(callback)) {
+            callback()
+          }
+        }
+      }
+    }
+  }
+  doUnload = (callback) => {
+    const { unload, name } = this.props
+    if (_.isFunction(unload)) {
+      const currentCount = name ? decrementCount(name) : 0
+      if (currentCount === 0) {
+        unload()
+        if (_.isFunction(callback)) {
+          callback()
+        }
+      }
+    }
   }
   componentDidUpdate() {
-    this.doLoad()
+    const { name } = this.props
+    if(getAttempted(name) === false) {
+      this.debouncedDoLoad(false, () => {
+        if(this.isLoaded() === false) {
+          setAttempted(name, true)
+        }
+      })
+    }
   }
   componentDidMount() {
-    this.doLoad()
+    this.debouncedDoLoad()
+  }
+  componentWillUnmount() {
+    const { name } = this.props
+    this.debouncedDoUnload(() => {
+      setAttempted(name, false)
+    })
   }
   render() {
     const { children, renderWithout, renderWith } = this.props
