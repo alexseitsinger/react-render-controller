@@ -15,13 +15,20 @@ Controls what to render based on data being empty or not.
 ### Parameters
 
 -   `props`  
--   `data` **([Object][4] \| [Array][5])** Checked for emptiness.
--   `load` **[Function][6]** Invoked to make the data non-empty.
--   `unload` **[Function][6]** Invoked to make the data empty.
--   `renderWithout` **[Function][6]** Invoked when rendering with empty data.
--   `renderWith` **[Function][6]** Invoked when rendering with non-empty data.
--   `name` **[String][7]** A name to use to count this data type.
--   `maxLoads` **[Number][8]** The number of times load can re-try before stopping.
+-   `data` **([object][4] \| [array][5])** Checked for emptiness.
+-   `load` **[function][6]?** Invoked to make the data non-empty.
+-   `unload` **[function][6]?** Invoked to make the data empty.
+-   `renderWithout` **[function][6]?** Invoked when rendering with empty data.
+-   `renderWith` **[function][6]?** Invoked when rendering with non-empty data.
+-   `name` **[string][7]?** A name to use to count this data type.
+-   `skipUnloadFor` **[array][5]?** An array of pathnames to skip invoking unload
+    for when navigating to them.
+-   `currentPathname` **[string][7]?** The current pathname. Used to determine if
+    skipUnloadFor test passes.
+-   `maxCount` **[number][8]** The max number of instances before skipping invoking
+    load. (optional, default `3`)
+-   `delay` **[number][8]** The number of milliseconds to wait before invoking the
+    debounced load() and unload(). (optional, default `1000`)
 
 ### Examples
 
@@ -34,6 +41,7 @@ import { RenderController } from "@alexseitsinger/react-render-controller"
 function App({ data, load, unload }){
   return (
     <RenderController
+      name={"App_data"}
       data={data}
       load={load}
       unload={unload}
@@ -68,7 +76,7 @@ const mapDispatch = (dispatch) => ({
 export default connect(mapState, mapDispatch)(App)
 ```
 
-Returns **Component** 
+Returns **component** 
 
 [1]: #rendercontroller
 
