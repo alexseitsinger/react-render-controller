@@ -1,9 +1,9 @@
 import _ from "underscore"
 
-let controllers = {}
+const controllers = {}
 
 export function getController(name) {
-  if(!(name in controllers)) {
+  if (!(name in controllers)) {
     controllers[name] = {
       count: 0,
       attempted: false,
@@ -36,32 +36,27 @@ export function decrementCount(name) {
   return controller.count
 }
 
-export function delayCall(fn, delay) {
-  const id = setTimeout(() => {
-    fn()
-    clearTimeout(id)
-  }, delay)
-}
-
 export function isEmpty(data) {
+  var result
   if (!data) {
     return true
   }
-  var result = null
   if (_.isArray(data)) {
     // If its an empty array, set true
     if (_.isEmpty(data)) {
       result = true
-    } else {
+    }
+    else {
       // If its an array of items, re-run this fn on each item.
-      data.forEach((obj) => {
+      data.forEach(obj => {
         if (result) {
           return
         }
         result = isEmpty(obj)
       })
     }
-  } else if (_.isObject(data)) {
+  }
+  else if (_.isObject(data)) {
     if (_.isEmpty(data)) {
       result = true
     }
