@@ -1,5 +1,12 @@
-<a name="v1.1.1"></a>
-## [v1.1.1](https://github.com/alexseitsinger/react-render-controller/compare/v1.1.0...v1.1.1)
+<a name="v1.2.1"></a>
+## [v1.2.1](https://github.com/alexseitsinger/react-render-controller/compare/v1.2.0...v1.2.1)
+
+
+<a name="v1.2.0"></a>
+## [v1.2.0](https://github.com/alexseitsinger/react-render-controller/compare/v1.1.0...v1.2.0) (2019-06-19)
+
+### Features
+- Adds pathname skipping for unloading. ([46c6e66](https://github.com/alexseitsinger/react-render-controller/commit/46c6e66a4835668e3a07def973f5036fa776b8b2))
 
 
 <a name="v1.1.0"></a>
