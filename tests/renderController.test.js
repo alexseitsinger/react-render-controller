@@ -15,7 +15,7 @@ const RenderFailure = () => <div>Render Failure</div>
 
 describe("<RenderController/>", () => {
   it("renders using renderFailure when load fails to produce non-empty data", () => {
-    const delay = 1000
+    const delay = 300
     const wrapper = mount(
       <RenderController
         delay={delay}
