@@ -1,3 +1,10 @@
+<a name="v2.0.2"></a>
+## [v2.0.2](https://github.com/alexseitsinger/react-render-controller/compare/v2.0.1...v2.0.2) (2019-08-05)
+
+### Code Refactoring
+- Updates load methods. ([8c58451](https://github.com/alexseitsinger/react-render-controller/commit/8c584516cbf6c9a4cc2df8e9dabf9595f729ab32))
+
+
 <a name="v2.0.1"></a>
 ## [v2.0.1](https://github.com/alexseitsinger/react-render-controller/compare/v2.0.0...v2.0.1) (2019-08-05)
 
