@@ -1,3 +1,10 @@
+<a name="v2.0.3"></a>
+## [v2.0.3](https://github.com/alexseitsinger/react-render-controller/compare/v2.0.2...v2.0.3) (2019-08-05)
+
+### Bug Fixes
+- Fixes unloading. ([1c23dbc](https://github.com/alexseitsinger/react-render-controller/commit/1c23dbc14d0187f36b3ef3e407eb7ff9155c9e5c))
+
+
 <a name="v2.0.2"></a>
 ## [v2.0.2](https://github.com/alexseitsinger/react-render-controller/compare/v2.0.1...v2.0.2) (2019-08-05)
 
