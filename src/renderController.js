@@ -8,22 +8,30 @@ import {
 } from "./utils"
 
 /**
- * @description Controls what to render based on data being empty or not.
- * @param {object|array} data Checked for emptiness.
- * @param {function} [load] Invoked to make the data non-empty.
- * @param {function} [unload] Invoked to make the data empty.
- * @param {function} [renderWithout] Invoked when rendering with empty data.
- * @param {function} [renderWith] Invoked when rendering with non-empty data.
- * @param {string} [name] A name to use to count this data type.
- * @param {array} [skipUnloadFor] An array of pathnames to skip invoking unload
- * for when navigating to them.
- * @param {string} [currentPathname] The current pathname. Used to determine if
- * skipUnloadFor test passes.
- * @param {number} [maxCount=3] The max number of instances before skipping invoking
- * load.
- * @param {number} [delay=1000] The number of milliseconds to wait before invoking the
- * debounced load() and unload().
+ * Controls what to render based on data being empty or not.
+ *
  * @return {component}
+ *
+ * @param {object} props
+ * @param {object|array} props.data
+ * Checked for emptiness.
+ * @param {function} [props.load]
+ * Invoked to make the data non-empty.
+ * @param {function} [props.unload]
+ * Invoked to make the data empty.
+ * @param {function} [props.renderWithout]
+ * Invoked when rendering with empty data.
+ * @param {function} [props.renderWith]
+ * Invoked when rendering with non-empty data.
+ * @param {function} [props.renderFailure] i
+ * nvoked when loading was attempted but failed to produce non-empty data.
+ * @param {array} [props.skipUnloadFor]
+ * An array of pathnames to skip invoking unload for when navigating to them.
+ * @param {string} [props.currentPathname]
+ * The current pathname. Used to determine if skipUnloadFor test passes.
+ * @param {number} [props.delay=1000]
+ * The number of milliseconds to wait before invoking the debounced load() and unload().
+ *
  * @example
  * import React from "react"
  * import PropTypes from "prop-types"
@@ -33,7 +41,6 @@ import {
  * function App({ data, load, unload }){
  *   return (
  *     <RenderController
- *       name={"App_data"}
  *       data={data}
  *       load={load}
  *       unload={unload}
@@ -80,114 +87,124 @@ export class RenderController extends PureComponent {
     ]),
     load: PropTypes.func,
     unload: PropTypes.func,
-    renderWithout: PropTypes.func,
     renderWith: PropTypes.func,
-    name: PropTypes.string,
-    maxCount: PropTypes.number,
+    renderWithout: PropTypes.func,
+    renderFailure: PropTypes.func,
     skipUnloadFor: PropTypes.arrayOf(PropTypes.string),
     currentPathname: PropTypes.string,
     delay: PropTypes.number,
   }
   static defaultProps = {
-    maxCount: 3,
     skipUnloadFor: [],
     delay: 1000,
   }
+  state = {
+    loadAttempted: false,
+  }
+
   constructor(props) {
     super(props)
-    this.debouncedDoLoad = debounce(this.doLoad, props.delay)
-    this.debouncedDoUnload = debounce(this.doUnload, props.delay)
+
+    this.debouncedLoad = debounce(this.handleLoad, props.delay)
+    this.debouncedUnload = debounce(this.handleUnload, props.delay)
   }
   isLoaded = () => {
     const { data } = this.props
+
     const result = isEmpty(data)
     if(result === true) {
       return false
     }
+
     return true
   }
-  doLoad = (count, callback) => {
-    const { load, name, maxCount } = this.props
-    if(this.isLoaded() === false) {
-      if(_.isFunction(load)) {
-        if(count) {
-          const currentCount = name ? incrementCount(name) : 0
-          if (currentCount <= maxCount) {
-            load()
-            if (_.isFunction(callback)) {
-              callback()
-            }
-          }
-        }
-        else {
-          load()
-          if (_.isFunction(callback)) {
-            callback()
-          }
-        }
+  doLoad = (callback) => {
+    const { load } = this.props
+
+    if(_.isFunction(load)) {
+      load()
+
+      if (_.isFunction(callback)) {
+        callback()
       }
     }
   }
-  doUnload = (callback) => {
-    const { unload, name, skipUnloadFor, currentPathname } = this.props
-    // Otherwise, if we get an unload function, decrement the count, and unload
-    // if it's at 0. Then, run our callback if we got one.
-    if (_.isFunction(unload)) {
-      const currentCount = name ? decrementCount(name) : 0
-      if (currentCount === 0) {
-        // Skip unloading if the pathname matches a skipped pathname.
-        if (skipUnloadFor && skipUnloadFor.length && currentPathname && currentPathname.length) {
-          if (!(skipUnloadFor.includes(currentPathname))) {
-            unload()
+  handleLoad = (callback) => {
+    if(this.isLoaded() === false) {
+      this.doLoad(() => {
+        this.setState({loadAttempted: true}, () => {
+          if(_.isFunction(callback)) {
+            callback()
           }
-        }
-        else {
-          unload()
-        }
-        if (_.isFunction(callback)) {
-          callback()
-        }
+        })
+      })
+    }
+  }
+  isSkipped = () => {
+    // Skip unloading if the pathname matches a skipped pathname.
+    const { skipUnloadFor, currentPathname } = this.props
+    const hasSkipUnloadFor = (skipUnloadFor && skipUnloadFor.length)
+    const hasCurrentPathname = (currentPathname && currentPathname.length)
+
+    if(hasSkipUnloadFor && hasCurrentPathname) {
+      if(skipUnloadFor.includes(currentPathname)) {
+        return true
+      }
+    }
+
+    return false
+  }
+  handleUnload = (callback) => {
+    if(this.isLoaded() === true && this.isSkipped() === false) {
+      this.doUnload(() => {
+        this.setState({loadAttempted: false}, () => {
+          if (_.isFunction(callback)) {
+            callback()
+          }
+        })
+      })
+    }
+  }
+  doUnload = (callback) => {
+    const { unload } = this.props
+
+    if (_.isFunction(unload)) {
+      unload()
+
+      if (_.isFunction(callback)) {
+        callback()
       }
     }
   }
   componentDidUpdate() {
-    const { name } = this.props
-    if(getAttempted(name) === false) {
-      this.debouncedDoLoad(false, () => {
-        if(this.isLoaded() === false) {
-          setAttempted(name, true)
-        }
-      })
-    }
-  }
-  componentWillUnmount() {
-    const { name } = this.props
-    this.debouncedDoUnload(() => {
-      setAttempted(name, false)
-    })
+    this.debouncedLoad()
   }
   componentDidMount() {
-    const { name } = this.props
-    this.debouncedDoLoad(true, () => {
-      if (this.isLoaded() === false) {
-        setAttempted(name, true)
-      }
-    })
+    this.debouncedLoad()
+  }
+  componentWillUnmount() {
+    this.debouncedUnload()
   }
   render() {
-    const { children, renderWithout, renderWith } = this.props
+    const { children, renderWithout, renderWith, renderFailure } = this.props
+    const { loadAttempted } = this.state
+
     if (this.isLoaded() === true) {
       if (_.isFunction(renderWith)) {
         return renderWith()
       }
       return children
     }
-    else {
-      if (_.isFunction(renderWithout)) {
-        return renderWithout()
-      }
-      return null
+
+    if (loadAttempted === true && _.isFunction(renderFailure)) {
+      return renderFailure()
     }
+
+    if (_.isFunction(renderWithout)) {
+      return renderWithout()
+    }
+
+    return null
   }
 }
 
