@@ -1,3 +1,11 @@
+<a name="v2.0.1"></a>
+## [v2.0.1](https://github.com/alexseitsinger/react-render-controller/compare/v2.0.0...v2.0.1) (2019-08-05)
+
+### Code Refactoring
+- Changes default delay to 300. ([687ca17](https://github.com/alexseitsinger/react-render-controller/commit/687ca175a66468365749bc1df6be442071de602c))
+- Unload setState re-ordered. ([9070896](https://github.com/alexseitsinger/react-render-controller/commit/90708967a175635241923acf40decef52923fa2f))
+
+
 <a name="v2.0.0"></a>
 ## [v2.0.0](https://github.com/alexseitsinger/react-render-controller/compare/v1.2.0...v2.0.0) (2019-08-05)
 
