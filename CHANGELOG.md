@@ -1,5 +1,8 @@
-<a name="v1.2.1"></a>
-## [v1.2.1](https://github.com/alexseitsinger/react-render-controller/compare/v1.2.0...v1.2.1)
+<a name="v2.0.0"></a>
+## [v2.0.0](https://github.com/alexseitsinger/react-render-controller/compare/v1.2.0...v2.0.0) (2019-08-05)
+
+### Features
+- Adds state flag. ([b19422c](https://github.com/alexseitsinger/react-render-controller/commit/b19422c435b5e221e7514f7b5b43277a76b506aa))
 
 
 <a name="v1.2.0"></a>
