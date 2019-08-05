@@ -1,3 +1,10 @@
+<a name="v2.0.4"></a>
+## [v2.0.4](https://github.com/alexseitsinger/react-render-controller/compare/v2.0.3...v2.0.4) (2019-08-05)
+
+### Bug Fixes
+- Fixes incorrect check in doUnload. ([6c1b07e](https://github.com/alexseitsinger/react-render-controller/commit/6c1b07e9ca76b36c95d52b78a8123daf4f5230dd))
+
+
 <a name="v2.0.3"></a>
 ## [v2.0.3](https://github.com/alexseitsinger/react-render-controller/compare/v2.0.2...v2.0.3) (2019-08-05)
 
