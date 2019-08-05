@@ -119,21 +119,23 @@ export class RenderController extends PureComponent {
     return true
   }
   doLoad = (callback) => {
-    const { load } = this.props
+    const { load, delay } = this.props
 
     if(_.isFunction(load)) {
       load()
 
-      if (_.isFunction(callback)) {
-        callback()
-      }
+      setTimeout(() => {
+        if (_.isFunction(callback)) {
+          callback()
+        }
+      }, delay)
     }
   }
   handleLoad = (callback) => {
     if(this.isLoaded() === false) {
       this.doLoad(() => {
         this.setState({loadAttempted: true}, () => {
-          if(_.isFunction(callback)) {
+          if (_.isFunction(callback)) {
             callback()
           }
         })
@@ -156,20 +158,22 @@ export class RenderController extends PureComponent {
   }
   handleUnload = (callback) => {
     if(this.isLoaded() === true && this.isSkipped() === false) {
-      this,setState({loadAttempted: false}, () => {
+      this.setState({loadAttempted: false}, () => {
         this.doUnload(callback)
       })
     }
   }
   doUnload = (callback) => {
-    const { unload } = this.props
+    const { unload, delay } = this.props
 
     if (_.isFunction(unload)) {
       unload()
 
-      if (_.isFunction(callback)) {
-        callback()
-      }
+      setTimeout(() => {
+        if (_.isFunction(callback)) {
+          callback()
+        }
+      }, delay)
     }
   }
   componentDidUpdate() {
