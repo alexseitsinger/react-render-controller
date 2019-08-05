@@ -156,12 +156,8 @@ export class RenderController extends PureComponent {
   }
   handleUnload = (callback) => {
     if(this.isLoaded() === true && this.isSkipped() === false) {
-      this.doUnload(() => {
-        this.setState({loadAttempted: false}, () => {
-          if (_.isFunction(callback)) {
-            callback()
-          }
-        })
+      this,setState({loadAttempted: false}, () => {
+        this.doUnload(callback)
       })
     }
   }
