@@ -6,11 +6,48 @@ const objectData = { name: "a" }
 const emptyObjectData = {}
 const emptyArrayData = []
 const nullData = null
+const RenderWith = () => <div>Render With</div>
+const RenderWithout = () => <div>Render Without</div>
+const RenderFailure = () => <div>Render Failure</div>
 
 // TODO: Add test case for re-renders after mount/unmount -> Make sure it
 // doesn't cause an infinite loop (That;s why we use the "name" prop to count)
 
 describe("<RenderController/>", () => {
+  it("renders using renderFailure when load fails to produce non-empty data", () => {
+    const delay = 1000
+    const wrapper = mount(
+      <RenderController
+        delay={delay}
+        data={null}
+        load={() => {
+          console.log("load attempted")
+        }}
+        unload={() => {
+          console.log("unload attempted")
+        }}
+        renderWith={() => {
+          return <RenderWith />
+        }}
+        renderWithout={() => {
+          return <RenderWithout />
+        }}
+        renderFailure={() => {
+          return <RenderFailure />
+        }}
+      />
+    )
+    // The controller should first use renderWithout() before the loading has
+    // started.
+    expect(wrapper.find(RenderWithout)).toHaveLength(1)
+
+    setTimeout(() => {
+      // Once load has been attempted, it should use renderFailure()
+      expect(wrapper.find(RenderWithout)).toHaveLength(0)
+      expect(wrapper.find(RenderWith)).toHaveLength(0)
+      expect(wrapper.find(RenderFailure)).toHaveLength(1)
+    }, delay)
+  })
   it("invokes renderWith with array data", () => {
     const wrapper = mount(
       <RenderController
