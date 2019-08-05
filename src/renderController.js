@@ -29,7 +29,7 @@ import {
  * An array of pathnames to skip invoking unload for when navigating to them.
  * @param {string} [props.currentPathname]
  * The current pathname. Used to determine if skipUnloadFor test passes.
- * @param {number} [props.delay=1000]
+ * @param {number} [props.delay=300]
  * The number of milliseconds to wait before invoking the debounced load() and unload().
  *
  * @example
@@ -96,7 +96,7 @@ export class RenderController extends PureComponent {
   }
   static defaultProps = {
     skipUnloadFor: [],
-    delay: 1000,
+    delay: 300,
   }
   state = {
     loadAttempted: false,
