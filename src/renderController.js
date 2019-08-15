@@ -106,7 +106,6 @@ export class RenderController extends PureComponent {
     super(props)
 
     this.debouncedLoad = debounce(this.handleLoad, props.delay)
-    this.debouncedUnload = debounce(this.handleUnload, props.delay)
   }
   isLoaded = () => {
     const { data } = this.props
@@ -118,28 +117,15 @@ export class RenderController extends PureComponent {
 
     return true
   }
-  doLoad = (callback) => {
-    const { load, delay } = this.props
+  handleLoad = () => {
+    const { load } = this.props
 
-    if(_.isFunction(load)) {
-      load()
-
-      setTimeout(() => {
-        if (_.isFunction(callback)) {
-          callback()
-        }
-      }, delay)
-    }
-  }
-  handleLoad = (callback) => {
     if(this.isLoaded() === false) {
-      this.doLoad(() => {
-        this.setState({loadAttempted: true}, () => {
-          if (_.isFunction(callback)) {
-            callback()
-          }
-        })
-      })
+      if(_.isFunction(load)) {
+        load()
+
+        this.setState({loadAttempted: true})
+      }
     }
   }
   isSkipped = () => {
@@ -156,23 +142,14 @@ export class RenderController extends PureComponent {
 
     return false
   }
-  handleUnload = (callback) => {
+  handleUnload = () => {
+    const { unload } = this.props
+    // We don't want to use anything with state here, otherwise we'll cause a
+    // memory leak, since this method is debounced when its invoked.
     if(this.isSkipped() === false) {
-      this.setState({loadAttempted: false})
-      this.doUnload(callback)
-    }
-  }
-  doUnload = (callback) => {
-    const { unload, delay } = this.props
-
-    if (_.isFunction(unload)) {
-      unload()
-
-      setTimeout(() => {
-        if (_.isFunction(callback)) {
-          callback()
-        }
-      }, delay)
+      if (_.isFunction(unload)) {
+        unload()
+      }
     }
   }
   componentDidUpdate() {
@@ -182,7 +159,7 @@ export class RenderController extends PureComponent {
     this.debouncedLoad()
   }
   componentWillUnmount() {
-    this.debouncedUnload()
+    this.handleUnload()
   }
   render() {
     const { children, renderWithout, renderWith, renderFailure } = this.props
