@@ -1,3 +1,10 @@
+<a name="v2.0.5"></a>
+## [v2.0.5](https://github.com/alexseitsinger/react-render-controller/compare/v2.0.4...v2.0.5) (2019-08-15)
+
+### Bug Fixes
+- Removes debounce on unload. ([83cda3c](https://github.com/alexseitsinger/react-render-controller/commit/83cda3c4e9462fb08583f1127184eb6d0326b0e5))
+
+
 <a name="v2.0.4"></a>
 ## [v2.0.4](https://github.com/alexseitsinger/react-render-controller/compare/v2.0.3...v2.0.4) (2019-08-05)
 
