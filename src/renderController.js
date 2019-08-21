@@ -114,6 +114,21 @@ export class RenderController extends React.Component {
       loadAttempted: false,
     }
 
+    // Set a flag to determine if this instnace is mounted or not.
+    // This will help prevent memory leaks from debounced load calls.
+    this._isMounted = false
+
+    // Save a copy of the original setState with our context bound to it.
+    let realSetState = this.setState.bind(this)
+
+    // Overwrite the instance's setState to only invoke when _isMounted is true.
+    this.setState = (...args) => {
+      if (this._isMounted === false) {
+        return
+      }
+      realSetState(...args)
+    }
+
     this.debouncedLoad = debounce(this.handleLoad, props.loadDelay)
   }
 
@@ -135,9 +150,7 @@ export class RenderController extends React.Component {
         load()
 
         setTimeout(() => {
-          if (this.isMounted === true) {
-            this.setState({loadAttempted: true})
-          }
+          this.setState({loadAttempted: true})
         }, loadAttemptedDelay)
       }
     }
@@ -170,11 +183,11 @@ export class RenderController extends React.Component {
     this.debouncedLoad()
   }
   componentDidMount() {
-    this,isMounted = true
+    this._isMounted = true
     this.debouncedLoad()
   }
   componentWillUnmount() {
-    this.isMounted = false
+    this._isMounted = false
     this.handleUnload()
   }
   render() {
