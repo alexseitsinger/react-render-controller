@@ -1,3 +1,10 @@
+<a name="v2.2.0"></a>
+## [v2.2.0](https://github.com/alexseitsinger/react-render-controller/compare/v2.1.0...v2.2.0) (2019-08-21)
+
+### Code Refactoring
+- PureComponent to Component. ([266d432](https://github.com/alexseitsinger/react-render-controller/commit/266d432bade906a41c99a7aae8de9ec53cde1bd7))
+
+
 <a name="v2.1.0"></a>
 ## [v2.1.0](https://github.com/alexseitsinger/react-render-controller/compare/v2.0.5...v2.1.0) (2019-08-21)
 
