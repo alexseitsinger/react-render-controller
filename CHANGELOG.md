@@ -1,3 +1,10 @@
+<a name="v2.1.0"></a>
+## [v2.1.0](https://github.com/alexseitsinger/react-render-controller/compare/v2.0.5...v2.1.0) (2019-08-21)
+
+### Code Refactoring
+- Adds flag after a timeout. ([2317a75](https://github.com/alexseitsinger/react-render-controller/commit/2317a7534942a048290d0509ccc331df2c50719b))
+
+
 <a name="v2.0.5"></a>
 ## [v2.0.5](https://github.com/alexseitsinger/react-render-controller/compare/v2.0.4...v2.0.5) (2019-08-15)
 
