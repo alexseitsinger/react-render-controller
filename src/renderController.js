@@ -104,7 +104,7 @@ export class RenderController extends React.Component {
   static defaultProps = {
     skipUnloadFor: [],
     loadDelay: 300,
-    loadAttemptedDelay: 1000,
+    loadAttemptedDelay: 600,
   }
   state = {
     loadAttempted: false,
@@ -113,8 +113,18 @@ export class RenderController extends React.Component {
   constructor(props) {
     super(props)
 
+    this.state = {
+      loadAttempted: false,
+    }
+
+    this.elementRef = React.createRef()
     this.debouncedLoad = debounce(this.handleLoad, props.loadDelay)
   }
+
+  isMounted = () => {
+    return Boolean(this.elementRef.current !== null)
+  }
+
   isLoaded = () => {
     const { data } = this.props
 
@@ -133,7 +143,9 @@ export class RenderController extends React.Component {
         load()
 
         setTimeout(() => {
-          this.setState({loadAttempted: true})
+          if (this.isMounted() === true) {
+            this.setState({loadAttempted: true})
+          }
         }, loadAttemptedDelay)
       }
     }
