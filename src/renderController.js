@@ -1,4 +1,4 @@
-import React, { PureComponent } from "react"
+import React from "react"
 import PropTypes from "prop-types"
 import _ from "underscore"
 import { debounce } from "debounce"
@@ -17,6 +17,12 @@ import {
  * Checked for emptiness.
  * @param {function} [props.load]
  * Invoked to make the data non-empty.
+ * @param {number} [props.loadDelay=300]
+ * The number of milliseconds to wait before invoking the debounced load() and unload().
+ * @param {number} [props.loadAttemptedDelay=1000]
+ * The number of milliseconds to wait until setting the loadAttempted flag. Once
+ * this flag is set, this component will use renderFailure() instead of
+ * renderWithout() when there is empty data.
  * @param {function} [props.unload]
  * Invoked to make the data empty.
  * @param {function} [props.renderWithout]
@@ -29,8 +35,6 @@ import {
  * An array of pathnames to skip invoking unload for when navigating to them.
  * @param {string} [props.currentPathname]
  * The current pathname. Used to determine if skipUnloadFor test passes.
- * @param {number} [props.delay=300]
- * The number of milliseconds to wait before invoking the debounced load() and unload().
  *
  * @example
  * import React from "react"
@@ -43,6 +47,8 @@ import {
  *     <RenderController
  *       data={data}
  *       load={load}
+ *       loadDelay={500}
+ *       loadAttemptedDelay={1000}
  *       unload={unload}
  *       renderWith={() => {
  *          return data.map((obj, i) => {
@@ -74,7 +80,7 @@ import {
  *
  * export default connect(mapState, mapDispatch)(App)
  */
-export class RenderController extends PureComponent {
+export class RenderController extends React.Component {
   static propTypes = {
     children: PropTypes.oneOfType([
       PropTypes.arrayOf(PropTypes.node),
@@ -86,17 +92,19 @@ export class RenderController extends PureComponent {
       PropTypes.array
     ]),
     load: PropTypes.func,
+    loadDelay: PropTypes.number,
+    loadAttemptedDelay: PropTypes.number,
     unload: PropTypes.func,
     renderWith: PropTypes.func,
     renderWithout: PropTypes.func,
     renderFailure: PropTypes.func,
     skipUnloadFor: PropTypes.arrayOf(PropTypes.string),
     currentPathname: PropTypes.string,
-    delay: PropTypes.number,
   }
   static defaultProps = {
     skipUnloadFor: [],
-    delay: 300,
+    loadDelay: 300,
+    loadAttemptedDelay: 1000,
   }
   state = {
     loadAttempted: false,
@@ -105,7 +113,7 @@ export class RenderController extends PureComponent {
   constructor(props) {
     super(props)
 
-    this.debouncedLoad = debounce(this.handleLoad, props.delay)
+    this.debouncedLoad = debounce(this.handleLoad, props.loadDelay)
   }
   isLoaded = () => {
     const { data } = this.props
@@ -118,7 +126,7 @@ export class RenderController extends PureComponent {
     return true
   }
   handleLoad = () => {
-    const { load } = this.props
+    const { load, loadAttemptedDelay } = this.props
 
     if(this.isLoaded() === false) {
       if(_.isFunction(load)) {
@@ -126,7 +134,7 @@ export class RenderController extends PureComponent {
 
         setTimeout(() => {
           this.setState({loadAttempted: true})
-        }, 1000)
+        }, loadAttemptedDelay)
       }
     }
   }
