@@ -106,9 +106,6 @@ export class RenderController extends React.Component {
     loadDelay: 300,
     loadAttemptedDelay: 600,
   }
-  state = {
-    loadAttempted: false,
-  }
 
   constructor(props) {
     super(props)
@@ -117,12 +114,7 @@ export class RenderController extends React.Component {
       loadAttempted: false,
     }
 
-    this.elementRef = React.createRef()
     this.debouncedLoad = debounce(this.handleLoad, props.loadDelay)
-  }
-
-  isMounted = () => {
-    return Boolean(this.elementRef.current !== null)
   }
 
   isLoaded = () => {
@@ -143,7 +135,7 @@ export class RenderController extends React.Component {
         load()
 
         setTimeout(() => {
-          if (this.isMounted() === true) {
+          if (this.isMounted === true) {
             this.setState({loadAttempted: true})
           }
         }, loadAttemptedDelay)
@@ -178,9 +170,11 @@ export class RenderController extends React.Component {
     this.debouncedLoad()
   }
   componentDidMount() {
+    this,isMounted = true
     this.debouncedLoad()
   }
   componentWillUnmount() {
+    this.isMounted = false
     this.handleUnload()
   }
   render() {
