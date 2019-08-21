@@ -124,7 +124,9 @@ export class RenderController extends PureComponent {
       if(_.isFunction(load)) {
         load()
 
-        this.setState({loadAttempted: true})
+        setTimeout(() => {
+          this.setState({loadAttempted: true})
+        }, 1000)
       }
     }
   }
