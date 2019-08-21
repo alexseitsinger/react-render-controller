@@ -1,3 +1,10 @@
+<a name="v2.2.1"></a>
+## [v2.2.1](https://github.com/alexseitsinger/react-render-controller/compare/v2.2.0...v2.2.1) (2019-08-21)
+
+### Bug Fixes
+- Checks for mount status before setState. ([24fa2b6](https://github.com/alexseitsinger/react-render-controller/commit/24fa2b64302febc03589af56f73ce0dc602e4bca))
+
+
 <a name="v2.2.0"></a>
 ## [v2.2.0](https://github.com/alexseitsinger/react-render-controller/compare/v2.1.0...v2.2.0) (2019-08-21)
 
