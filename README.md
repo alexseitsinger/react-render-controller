@@ -2,7 +2,7 @@
 
 ## RenderController
 
-**Extends PureComponent**
+**Extends React.Component**
 
 Controls what to render based on data being empty or not.
 
@@ -11,14 +11,17 @@ Controls what to render based on data being empty or not.
 -   `props` **[object][1]** 
     -   `props.data` **([object][1] \| [array][2])** Checked for emptiness.
     -   `props.load` **[function][3]?** Invoked to make the data non-empty.
+    -   `props.loadDelay` **[number][4]** The number of milliseconds to wait before invoking the debounced load() and unload(). (optional, default `300`)
+    -   `props.loadAttemptedDelay` **[number][4]** The number of milliseconds to wait until setting the loadAttempted flag. Once
+        this flag is set, this component will use renderFailure() instead of
+        renderWithout() when there is empty data. (optional, default `1000`)
     -   `props.unload` **[function][3]?** Invoked to make the data empty.
     -   `props.renderWithout` **[function][3]?** Invoked when rendering with empty data.
     -   `props.renderWith` **[function][3]?** Invoked when rendering with non-empty data.
     -   `props.renderFailure` **[function][3]?** i
         nvoked when loading was attempted but failed to produce non-empty data.
     -   `props.skipUnloadFor` **[array][2]?** An array of pathnames to skip invoking unload for when navigating to them.
-    -   `props.currentPathname` **[string][4]?** The current pathname. Used to determine if skipUnloadFor test passes.
-    -   `props.delay` **[number][5]** The number of milliseconds to wait before invoking the debounced load() and unload(). (optional, default `1000`)
+    -   `props.currentPathname` **[string][5]?** The current pathname. Used to determine if skipUnloadFor test passes.
 
 ### Examples
 
@@ -33,6 +36,8 @@ function App({ data, load, unload }){
     <RenderController
       data={data}
       load={load}
+      loadDelay={500}
+      loadAttemptedDelay={1000}
       unload={unload}
       renderWith={() => {
          return data.map((obj, i) => {
@@ -73,6 +78,6 @@ Returns **component**
 
 [3]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Statements/function
 
-[4]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String
+[4]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number
 
-[5]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number
+[5]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String
