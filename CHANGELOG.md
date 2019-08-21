@@ -1,3 +1,11 @@
+<a name="v2.2.2"></a>
+## [v2.2.2](https://github.com/alexseitsinger/react-render-controller/compare/v2.2.1...v2.2.2) (2019-08-21)
+
+### Bug Fixes
+- Adds missing flag. ([47ead58](https://github.com/alexseitsinger/react-render-controller/commit/47ead5853766925d74aac451cd26453a9a6d78bc))
+- Adds missing properties. ([e537ae2](https://github.com/alexseitsinger/react-render-controller/commit/e537ae2ec445b1473fb87b6b70484807dc386a8e))
+
+
 <a name="v2.2.1"></a>
 ## [v2.2.1](https://github.com/alexseitsinger/react-render-controller/compare/v2.2.0...v2.2.1) (2019-08-21)
 
