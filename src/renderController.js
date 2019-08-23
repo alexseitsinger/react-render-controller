@@ -139,13 +139,6 @@ export class RenderController extends React.Component {
     return false
   }
 
-  shouldComponentUpdate(nextProps, nextState) {
-    if (_.isEqual(this.props.data, nextProps.data) === false) {
-      return true
-    }
-    return false
-  }
-
   isSkipped = () => {
     // Skip unloading if the pathname matches a skipped pathname.
     const { skipUnloadFor, currentPathname } = this.props
