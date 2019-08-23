@@ -1,3 +1,13 @@
+<a name="v2.3.0"></a>
+## [v2.3.0](https://github.com/alexseitsinger/react-render-controller/compare/v2.2.3...v2.3.0) (2019-08-23)
+
+### Bug Fixes
+- Remove scu. ([e1fa187](https://github.com/alexseitsinger/react-render-controller/commit/e1fa18742b5197481381a43b0bb9058216974c74))
+
+### Code Refactoring
+- Removes unused imports. ([e70ac05](https://github.com/alexseitsinger/react-render-controller/commit/e70ac05fac7a66aaf75afe91a8d97a3521644718))
+
+
 <a name="v2.2.3"></a>
 ## [v2.2.3](https://github.com/alexseitsinger/react-render-controller/compare/v2.2.2...v2.2.3) (2019-08-23)
 
