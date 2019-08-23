@@ -1,3 +1,12 @@
+<a name="v2.2.3"></a>
+## [v2.2.3](https://github.com/alexseitsinger/react-render-controller/compare/v2.2.2...v2.2.3) (2019-08-23)
+
+### Bug Fixes
+- Changes load procedure. ([c567c3a](https://github.com/alexseitsinger/react-render-controller/commit/c567c3a3ea6ce22ffc3fe00f63b62dd81f875762))
+- Removes debounce from load. ([b7ef8ab](https://github.com/alexseitsinger/react-render-controller/commit/b7ef8abce75ab113b22ca9f7e579bd8fc4a5c9d0))
+- Removes handleLoad from cdu. ([8844320](https://github.com/alexseitsinger/react-render-controller/commit/88443208224ec6dbac8d4a58a23bbf68d502f939))
+
+
 <a name="v2.2.2"></a>
 ## [v2.2.2](https://github.com/alexseitsinger/react-render-controller/compare/v2.2.1...v2.2.2) (2019-08-21)
 
