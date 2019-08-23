@@ -1,7 +1,6 @@
 import React from "react"
 import PropTypes from "prop-types"
 import _ from "underscore"
-import { debounce } from "debounce"
 
 import {
   isEmpty, setAttempted, getAttempted, incrementCount, decrementCount
@@ -106,6 +105,7 @@ export class RenderController extends React.Component {
   constructor(props) {
     super(props)
 
+    this._isLoadAttemptedLast = null
     this.state = {
       isLoadAttempted: false,
     }
@@ -125,28 +125,25 @@ export class RenderController extends React.Component {
     }
   }
 
-  isLoaded = () => {
-    const { data } = this.props
-
-    const result = isEmpty(data)
-    if(result === true) {
-      return false
-    }
-
-    return true
+  setLoadAttempted = bool => {
+    this._isLoadAttemptedLast = this.state.isLoadAttempted
+    this.setState({isLoadAttempted: bool})
   }
 
-  handleLoad = () => {
-    const { load, loadDelay } = this.props
-    if(this.isLoaded() === false) {
-      if(_.isFunction(load)) {
-        load()
-
-        setTimeout(() => {
-          this.setState({isLoadAttempted: true})
-        }, loadDelay)
-      }
+  wasFirstLoadAttempt = () => {
+    const current = this.state.isLoadAttempted
+    const last = this._isLoadAttemptedLast
+    if (current === true && last !== true) {
+      return true
     }
+    return false
+  }
+
+  shouldComponentUpdate(nextProps, nextState) {
+    if (_.isEqual(this.props.data, nextProps.data) === false) {
+      return true
+    }
+    return false
   }
 
   isSkipped = () => {
@@ -164,19 +161,43 @@ export class RenderController extends React.Component {
     return false
   }
 
-  handleUnload = () => {
-    const { unload } = this.props
-    // We don't want to use anything with state here, otherwise we'll cause a
-    // memory leak, since this method is debounced when its invoked.
-    if(this.isSkipped() === false) {
-      if (_.isFunction(unload)) {
-        unload()
+  isLoaded = () => {
+    const { data } = this.props
+    if (isEmpty(data) === true) {
+      return false
+    }
+    return true
+  }
+
+  handleLoad = () => {
+    const { load, loadDelay } = this.props
+    if(this.isLoaded() === false) {
+      if(_.isFunction(load)) {
+        load()
+
+        setTimeout(() => {
+          this.setLoadAttempted(true)
+        }, loadDelay)
       }
     }
   }
 
-  componentDidUpdate() {
-    //this.handleLoad()
+  handleUnload = () => {
+    const { unload } = this.props
+
+    // We don't want to use anything with state here, otherwise we'll cause a
+    // memory leak, since this method is debounced when its invoked.
+    if(this.isSkipped() === false) {
+      if (_.isFunction(unload)) {
+        // When we set the isLoadAttempted flag, the component gets unmounted,
+        // and then remounted, causing the data to unload. So, check for this
+        // state change before running unload. Only run unload when its not the
+        // first load-reload.
+        if (this.wasFirstLoadAttempt() === false) {
+          unload()
+        }
+      }
+    }
   }
 
   componentDidMount() {
