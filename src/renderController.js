@@ -176,7 +176,7 @@ export class RenderController extends React.Component {
   }
 
   componentDidUpdate() {
-    this.handleLoad()
+    //this.handleLoad()
   }
 
   componentDidMount() {
