@@ -17,12 +17,10 @@ import {
  * Checked for emptiness.
  * @param {function} [props.load]
  * Invoked to make the data non-empty.
- * @param {number} [props.loadDelay=300]
- * The number of milliseconds to wait before invoking the debounced load() and unload().
- * @param {number} [props.loadAttemptedDelay=1000]
- * The number of milliseconds to wait until setting the loadAttempted flag. Once
- * this flag is set, this component will use renderFailure() instead of
- * renderWithout() when there is empty data.
+ * @param {number} [props.loadDelay=900]
+ * The number of seconds before the isLoadAttempted flag is set to True. When
+ * this flag is True, the renderFailure() will be invoked to return output
+ * instead of renderWithout, if there is empty data.
  * @param {function} [props.unload]
  * Invoked to make the data empty.
  * @param {function} [props.renderWithout]
@@ -47,8 +45,7 @@ import {
  *     <RenderController
  *       data={data}
  *       load={load}
- *       loadDelay={500}
- *       loadAttemptedDelay={1000}
+ *       loadDelay={900}
  *       unload={unload}
  *       renderWith={() => {
  *          return data.map((obj, i) => {
@@ -93,7 +90,6 @@ export class RenderController extends React.Component {
     ]),
     load: PropTypes.func,
     loadDelay: PropTypes.number,
-    loadAttemptedDelay: PropTypes.number,
     unload: PropTypes.func,
     renderWith: PropTypes.func,
     renderWithout: PropTypes.func,
@@ -101,17 +97,17 @@ export class RenderController extends React.Component {
     skipUnloadFor: PropTypes.arrayOf(PropTypes.string),
     currentPathname: PropTypes.string,
   }
+
   static defaultProps = {
     skipUnloadFor: [],
-    loadDelay: 300,
-    loadAttemptedDelay: 600,
+    loadDelay: 900,
   }
 
   constructor(props) {
     super(props)
 
     this.state = {
-      loadAttempted: false,
+      isLoadAttempted: false,
     }
 
     // Set a flag to determine if this instnace is mounted or not.
@@ -119,17 +115,14 @@ export class RenderController extends React.Component {
     this._isMounted = false
 
     // Save a copy of the original setState with our context bound to it.
-    let realSetState = this.setState.bind(this)
-
     // Overwrite the instance's setState to only invoke when _isMounted is true.
+    let realSetState = this.setState.bind(this)
     this.setState = (...args) => {
       if (this._isMounted === false) {
         return
       }
       realSetState(...args)
     }
-
-    this.debouncedLoad = debounce(this.handleLoad, props.loadDelay)
   }
 
   isLoaded = () => {
@@ -142,19 +135,20 @@ export class RenderController extends React.Component {
 
     return true
   }
-  handleLoad = () => {
-    const { load, loadAttemptedDelay } = this.props
 
+  handleLoad = () => {
+    const { load, loadDelay } = this.props
     if(this.isLoaded() === false) {
       if(_.isFunction(load)) {
         load()
 
         setTimeout(() => {
-          this.setState({loadAttempted: true})
-        }, loadAttemptedDelay)
+          this.setState({isLoadAttempted: true})
+        }, loadDelay)
       }
     }
   }
+
   isSkipped = () => {
     // Skip unloading if the pathname matches a skipped pathname.
     const { skipUnloadFor, currentPathname } = this.props
@@ -169,6 +163,7 @@ export class RenderController extends React.Component {
 
     return false
   }
+
   handleUnload = () => {
     const { unload } = this.props
     // We don't want to use anything with state here, otherwise we'll cause a
@@ -179,20 +174,24 @@ export class RenderController extends React.Component {
       }
     }
   }
+
   componentDidUpdate() {
-    this.debouncedLoad()
+    this.handleLoad()
   }
+
   componentDidMount() {
     this._isMounted = true
-    this.debouncedLoad()
+    this.handleLoad()
   }
+
   componentWillUnmount() {
     this._isMounted = false
     this.handleUnload()
   }
+
   render() {
     const { children, renderWithout, renderWith, renderFailure } = this.props
-    const { loadAttempted } = this.state
+    const { isLoadAttempted } = this.state
 
     if (this.isLoaded() === true) {
       if (_.isFunction(renderWith)) {
@@ -201,7 +200,7 @@ export class RenderController extends React.Component {
       return children
     }
 
-    if (loadAttempted === true && _.isFunction(renderFailure)) {
+    if (isLoadAttempted === true && _.isFunction(renderFailure)) {
       return renderFailure()
     }
 
