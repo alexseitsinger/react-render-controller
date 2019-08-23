@@ -3,7 +3,7 @@ import PropTypes from "prop-types"
 import _ from "underscore"
 
 import {
-  isEmpty, setAttempted, getAttempted, incrementCount, decrementCount
+  isEmpty,
 } from "./utils"
 
 /**
