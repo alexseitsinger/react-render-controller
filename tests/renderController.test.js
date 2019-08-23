@@ -18,7 +18,7 @@ describe("<RenderController/>", () => {
     const delay = 300
     const wrapper = mount(
       <RenderController
-        delay={delay}
+        loadDelay={delay}
         data={null}
         load={() => {
           console.log("load attempted")
