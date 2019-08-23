@@ -11,10 +11,9 @@ Controls what to render based on data being empty or not.
 -   `props` **[object][1]** 
     -   `props.data` **([object][1] \| [array][2])** Checked for emptiness.
     -   `props.load` **[function][3]?** Invoked to make the data non-empty.
-    -   `props.loadDelay` **[number][4]** The number of milliseconds to wait before invoking the debounced load() and unload(). (optional, default `300`)
-    -   `props.loadAttemptedDelay` **[number][4]** The number of milliseconds to wait until setting the loadAttempted flag. Once
-        this flag is set, this component will use renderFailure() instead of
-        renderWithout() when there is empty data. (optional, default `1000`)
+    -   `props.loadDelay` **[number][4]** The number of seconds before the isLoadAttempted flag is set to True. When
+        this flag is True, the renderFailure() will be invoked to return output
+        instead of renderWithout, if there is empty data. (optional, default `900`)
     -   `props.unload` **[function][3]?** Invoked to make the data empty.
     -   `props.renderWithout` **[function][3]?** Invoked when rendering with empty data.
     -   `props.renderWith` **[function][3]?** Invoked when rendering with non-empty data.
@@ -36,8 +35,7 @@ function App({ data, load, unload }){
     <RenderController
       data={data}
       load={load}
-      loadDelay={500}
-      loadAttemptedDelay={1000}
+      loadDelay={900}
       unload={unload}
       renderWith={() => {
          return data.map((obj, i) => {
