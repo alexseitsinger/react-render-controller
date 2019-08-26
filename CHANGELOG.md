@@ -1,3 +1,10 @@
+<a name="v2.5.0"></a>
+## [v2.5.0](https://github.com/alexseitsinger/react-render-controller/compare/v2.4.0...v2.5.0) (2019-08-26)
+
+### Code Refactoring
+- Adds cdu method for loading (in dev). ([1215d39](https://github.com/alexseitsinger/react-render-controller/commit/1215d3924a8812a9c9dbd2bb14d209fd11515a9b))
+
+
 <a name="v2.4.0"></a>
 ## [v2.4.0](https://github.com/alexseitsinger/react-render-controller/compare/v2.3.0...v2.4.0) (2019-08-23)
 
