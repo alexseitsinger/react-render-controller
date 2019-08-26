@@ -105,41 +105,68 @@ export class RenderController extends React.Component {
   constructor(props) {
     super(props)
 
-    this._isLoadAttemptedLast = null
-    this.state = {
-      isLoadAttempted: false,
-    }
-
-    // Set a flag to determine if this instnace is mounted or not.
-    // This will help prevent memory leaks from debounced load calls.
-    this._isMounted = false
+    // Set a flag to signify that this instance is mounted or not. Used to
+    // determine if setState should actually run or not.
+    this._isComponentMounted = false
 
     // Save a copy of the original setState with our context bound to it.
-    // Overwrite the instance's setState to only invoke when _isMounted is true.
+    // Overwrite the instance's setState to only run when '_isComponentMounted'
+    // is true.
     let realSetState = this.setState.bind(this)
     this.setState = (...args) => {
-      if (this._isMounted === false) {
+      if (this._isComponentMounted === false) {
         return
       }
       realSetState(...args)
     }
+
+    // Set a flag to save if this component previously invoked its 'load'
+    // method. This flag should not cause a re-render, so we save it as a static
+    // property on the class.
+    this._wasLoadAttempted = false
+  }
+
+  state = {
+    // When the 'load' method is attempted, set this flag to True. When this
+    // is true, the 'renderFailure' method will be invoked to render the
+    // component when the data remains empty, instead of the 'renderWithout'
+    // method.
+    isLoadAttempted: false,
   }
 
   setLoadAttempted = bool => {
-    this._isLoadAttemptedLast = this.state.isLoadAttempted
-    this.setState({isLoadAttempted: bool})
+    const { isLoadAttempted } = this.state
+    // Save the value of our current 'isLoadAttempted' state to a static
+    // property.
+    //
+    // This is used to determine if we should actually run 'unload' when this
+    // component gets unmounted.
+    //
+    // In deve.opment, we often change the value our the provided render
+    // methods. This change would cause the entire component to re-render, but
+    // not before invoking 'handleUnload'. As a result, we might not want the
+    // data to be empty. So, to prevent this, we check for the difference
+    // betweem these flags.
+    this._wasLoadAttempted = isLoadAttempted
+    // Set the state flag to the provided boolean value, causing a re-render.
+    this.setState({ isLoadAttempted: bool })
   }
 
+  // Returns true if this is the first time this component has invoked its
+  // 'load' method. When true, unload may not run to make the data empty.
   wasFirstLoadAttempt = () => {
-    const current = this.state.isLoadAttempted
-    const last = this._isLoadAttemptedLast
-    if (current === true && last !== true) {
+    const { isLoadAttempted } = this.state
+    if (isLoadAttempted === true && this._wasLoadAttempted === false) {
       return true
     }
     return false
   }
 
-  isSkipped = () => {
+  // Check if the provided 'currentPathname' is listed in the 'skipUnloadFor'
+  // prop. If it exists, return true to prevent 'unload' from make the data
+  // empty. Otherwise, return false to allow 'unload' to make the 'data' prop
+  // empty.
+  isUnloadSkipped = () => {
     // Skip unloading if the pathname matches a skipped pathname.
     const { skipUnloadFor, currentPathname } = this.props
     const hasSkipUnloadFor = (skipUnloadFor && skipUnloadFor.length)
@@ -154,6 +181,7 @@ export class RenderController extends React.Component {
     return false
   }
 
+  // Returns true/false if the 'data' prop is empty or not.
   isLoaded = () => {
     const { data } = this.props
     if (isEmpty(data) === true) {
@@ -162,6 +190,11 @@ export class RenderController extends React.Component {
     return true
   }
 
+  // If the data is empty, and a 'load' method was provied, invoke it to attempt
+  // to make the 'data' non-empty. Then, after a delay, set the
+  // 'isLoadAttempted' flag to true. After this, if the data is still empty, and
+  // a 'renderFailure' method was provided, this method will be used to render
+  // the components output instead of 'renderWithout'.
   handleLoad = () => {
     const { load, loadDelay } = this.props
     if(this.isLoaded() === false) {
@@ -175,17 +208,19 @@ export class RenderController extends React.Component {
     }
   }
 
+  // If 'currentPathanme' was provided, it's not one of the listed pathnames
+  // to be skipped, an 'unload' mehthod was provided, and we didn't just perform
+  // our first load attempt, then invoke the 'unload' method to make the data
+  // empty.
   handleUnload = () => {
     const { unload } = this.props
 
-    // We don't want to use anything with state here, otherwise we'll cause a
-    // memory leak, since this method is debounced when its invoked.
-    if(this.isSkipped() === false) {
+    if(this.isUnloadSkipped() === false) {
       if (_.isFunction(unload)) {
         // When we set the isLoadAttempted flag, the component gets unmounted,
         // and then remounted, causing the data to unload. So, check for this
         // state change before running unload. Only run unload when its not the
-        // first load-reload.
+        // first load attempt.
         if (this.wasFirstLoadAttempt() === false) {
           unload()
         }
@@ -193,13 +228,29 @@ export class RenderController extends React.Component {
     }
   }
 
+  componentDidUpdate() {
+    // Changing the component in development causes unload to be invoked. As
+    // such, without a call to 'handleLoad' from cdu, the data stays empty. So,
+    // in order to prevent this, we need to call 'handleLoad' again each time
+    // the component is updated. Since, 'handleLoad' checks for emptiness before
+    // actually attempting to replace the data, we don't need to worry about
+    // duplicate/redundant calls from here.
+    this.handleLoad()
+  }
+
   componentDidMount() {
-    this._isMounted = true
+    // Each time the component is mounted, set this flag. This is used to
+    // determine if the setState should actually run or not. We need this
+    // because we attempt to run setState after a timeout in 'handleLoad'. If we
+    // don't do this, we may cause a memory leak each time load is attempted.
+    this._isComponentMounted = true
     this.handleLoad()
   }
 
   componentWillUnmount() {
-    this._isMounted = false
+    // Set a flag when the component will be unmounted. Same as about, this is
+    // to prevent a memory leak when invoking 'handleLoad'.
+    this._isComponentMounted = false
     this.handleUnload()
   }
 
@@ -207,6 +258,8 @@ export class RenderController extends React.Component {
     const { children, renderWithout, renderWith, renderFailure } = this.props
     const { isLoadAttempted } = this.state
 
+    // If the data is non-empty, return the output of 'renderWith'. Otherwise,
+    // return the output from 'children'.
     if (this.isLoaded() === true) {
       if (_.isFunction(renderWith)) {
         return renderWith()
@@ -214,14 +267,19 @@ export class RenderController extends React.Component {
       return children
     }
 
+    // If the data is empty, a load was attempted, and a 'renderFailure' method
+    // was passed, return the output of 'renderFailure'.
     if (isLoadAttempted === true && _.isFunction(renderFailure)) {
       return renderFailure()
     }
 
+    // If the data is empty, but no load was attempted, and the 'renderWithout'
+    // method was provided, return the output of 'renderWithout'.
     if (_.isFunction(renderWithout)) {
       return renderWithout()
     }
 
+    // Otherwise, return nothing.
     return null
   }
 }
