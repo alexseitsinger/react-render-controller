@@ -120,10 +120,7 @@ export class RenderController extends React.Component {
       realSetState(...args)
     }
 
-    // Set a flag to save if this component previously invoked its 'load'
-    // method. This flag should not cause a re-render, so we save it as a static
-    // property on the class.
-    this._isFirstLoadAttempted = false
+    this._loadsAttempted = 0
   }
 
   state = {
@@ -134,33 +131,22 @@ export class RenderController extends React.Component {
     isLoadAttempted: false,
   }
 
-  setLoadAttempted = bool => {
-    const { isLoadAttempted } = this.state
-    // Save the value of our current 'isLoadAttempted' state to a static
-    // property.
-    //
-    // This is used to determine if we should actually run 'unload' when this
-    // component gets unmounted.
-    //
-    // In deve.opment, we often change the value our the provided render
-    // methods. This change would cause the entire component to re-render, but
-    // not before invoking 'handleUnload'. As a result, we might not want the
-    // data to be empty. So, to prevent this, we check for the difference
-    // betweem these flags.
-    this._isFirstLoadAttempted = true
-    // Set the state flag to the provided boolean value, causing a re-render.
-    this.setState({ isLoadAttempted: bool })
+  isFirstLoadAttempt = () => {
+    return Boolean(this._loadsAttempted === 1)
   }
 
-  // Returns true if this is the first time this component has invoked its
-  // 'load' method. When true, unload may not run to make the data empty.
-  wasFirstLoadAttempt = () => {
-    const { isLoadAttempted } = this.state
-    if (isLoadAttempted === true && this._isFirstLoadAttempted === false) {
-      return true
-    }
-    return false
+  setLoadAttempted = bool => {
+    this.setState(prevState => {
+      if (bool === true) {
+        this._loadsAttempted += 1
+      }
+      return {
+        ...prevState,
+        isLoadAttempted: bool,
+      }
+    })
   }
+
 
   // Check if the provided 'currentPathname' is listed in the 'skipUnloadFor'
   // prop. If it exists, return true to prevent 'unload' from make the data
@@ -214,6 +200,7 @@ export class RenderController extends React.Component {
   // empty.
   handleUnload = () => {
     const { unload } = this.props
+    const { isLoadAttempted } = this.state
 
     if(this.isUnloadSkipped() === false) {
       if (_.isFunction(unload)) {
@@ -221,8 +208,10 @@ export class RenderController extends React.Component {
         // and then remounted, causing the data to unload. So, check for this
         // state change before running unload. Only run unload when its not the
         // first load attempt.
-        if (this.wasFirstLoadAttempt() === false) {
-          unload()
+        if (isLoadAttempted === true) {
+          if (this.isFirstLoadAttempt() === false) {
+            unload()
+          }
         }
       }
     }
