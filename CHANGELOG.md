@@ -1,3 +1,10 @@
+<a name="v2.5.2"></a>
+## [v2.5.2](https://github.com/alexseitsinger/react-render-controller/compare/v2.5.1...v2.5.2) (2019-08-27)
+
+### Bug Fixes
+- Fixes double loading. ([977cd48](https://github.com/alexseitsinger/react-render-controller/commit/977cd4896eed8f941d77e97d0babcf39900bc83e))
+
+
 <a name="v2.5.1"></a>
 ## [v2.5.1](https://github.com/alexseitsinger/react-render-controller/compare/v2.5.0...v2.5.1) (2019-08-27)
 
