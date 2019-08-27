@@ -1,3 +1,10 @@
+<a name="v2.5.1"></a>
+## [v2.5.1](https://github.com/alexseitsinger/react-render-controller/compare/v2.5.0...v2.5.1) (2019-08-27)
+
+### Code Refactoring
+- Changed load flag. ([d7ecab7](https://github.com/alexseitsinger/react-render-controller/commit/d7ecab720d7003230d9470effd94a52aff8514a1))
+
+
 <a name="v2.5.0"></a>
 ## [v2.5.0](https://github.com/alexseitsinger/react-render-controller/compare/v2.4.0...v2.5.0) (2019-08-26)
 
