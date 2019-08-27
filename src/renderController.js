@@ -1,6 +1,7 @@
 import React from "react"
 import PropTypes from "prop-types"
 import _ from "underscore"
+import debounce from "debounce"
 
 import {
   isEmpty,
@@ -104,6 +105,9 @@ export class RenderController extends React.Component {
 
   constructor(props) {
     super(props)
+
+    this.debouncedHandleLoad = debounce(this.handleLoad, 600)
+    this.debouncedHandleUnload = debounce(this.handleUnload, 600)
 
     // Set a flag to signify that this instance is mounted or not. Used to
     // determine if setState should actually run or not.
@@ -224,7 +228,7 @@ export class RenderController extends React.Component {
     // the component is updated. Since, 'handleLoad' checks for emptiness before
     // actually attempting to replace the data, we don't need to worry about
     // duplicate/redundant calls from here.
-    this.handleLoad()
+    this.debouncedHandleLoad()
   }
 
   componentDidMount() {
@@ -233,14 +237,14 @@ export class RenderController extends React.Component {
     // because we attempt to run setState after a timeout in 'handleLoad'. If we
     // don't do this, we may cause a memory leak each time load is attempted.
     this._isComponentMounted = true
-    this.handleLoad()
+    this.debouncedHandleLoad()
   }
 
   componentWillUnmount() {
     // Set a flag when the component will be unmounted. Same as about, this is
     // to prevent a memory leak when invoking 'handleLoad'.
     this._isComponentMounted = false
-    this.handleUnload()
+    this.debouncedHandleUnload()
   }
 
   render() {
