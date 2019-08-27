@@ -62,5 +62,5 @@
     "build": "./node_modules/.bin/webpack",
     "test": "./node_modules/.bin/jest test"
   },
-  "version": "2.5.2"
+  "version": "2.6.0"
 }
