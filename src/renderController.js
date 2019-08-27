@@ -99,7 +99,7 @@ export class RenderController extends React.Component {
 
   static defaultProps = {
     skipUnloadFor: [],
-    loadDelay: 900,
+    loadDelay: 1100,
   }
 
   constructor(props) {
@@ -123,7 +123,7 @@ export class RenderController extends React.Component {
     // Set a flag to save if this component previously invoked its 'load'
     // method. This flag should not cause a re-render, so we save it as a static
     // property on the class.
-    this._wasLoadAttempted = false
+    this._isFirstLoadAttempted = false
   }
 
   state = {
@@ -147,7 +147,7 @@ export class RenderController extends React.Component {
     // not before invoking 'handleUnload'. As a result, we might not want the
     // data to be empty. So, to prevent this, we check for the difference
     // betweem these flags.
-    this._wasLoadAttempted = isLoadAttempted
+    this._isFirstLoadAttempted = true
     // Set the state flag to the provided boolean value, causing a re-render.
     this.setState({ isLoadAttempted: bool })
   }
@@ -156,7 +156,7 @@ export class RenderController extends React.Component {
   // 'load' method. When true, unload may not run to make the data empty.
   wasFirstLoadAttempt = () => {
     const { isLoadAttempted } = this.state
-    if (isLoadAttempted === true && this._wasLoadAttempted === false) {
+    if (isLoadAttempted === true && this._isFirstLoadAttempted === false) {
       return true
     }
     return false
