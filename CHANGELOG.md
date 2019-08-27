@@ -1,3 +1,10 @@
+<a name="v2.6.0"></a>
+## [v2.6.0](https://github.com/alexseitsinger/react-render-controller/compare/v2.5.2...v2.6.0) (2019-08-27)
+
+### Features
+- Adds debouncing to loading. ([f772a2e](https://github.com/alexseitsinger/react-render-controller/commit/f772a2e0246edabf75e11111caef8fc12fc60c49))
+
+
 <a name="v2.5.2"></a>
 ## [v2.5.2](https://github.com/alexseitsinger/react-render-controller/compare/v2.5.1...v2.5.2) (2019-08-27)
 
