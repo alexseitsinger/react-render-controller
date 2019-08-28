@@ -1,3 +1,10 @@
+<a name="v2.6.1"></a>
+## [v2.6.1](https://github.com/alexseitsinger/react-render-controller/compare/v2.6.0...v2.6.1) (2019-08-28)
+
+### Bug Fixes
+- Adds flag check in scu. ([82e953f](https://github.com/alexseitsinger/react-render-controller/commit/82e953f2c9efdf83f9a40b2e6710d7046c9873c1))
+
+
 <a name="v2.6.0"></a>
 ## [v2.6.0](https://github.com/alexseitsinger/react-render-controller/compare/v2.5.2...v2.6.0) (2019-08-27)
 
