@@ -149,11 +149,14 @@ export class RenderController extends React.Component {
 
   setLoadAttempted = () => {
     this.setState(prevState => {
-      this._loadsAttempted += 1
-      return {
-        ...prevState,
-        isLoadAttempted: true,
+      if (prevState.isLoadAttempted === false) {
+        this._loadsAttempted += 1
+        return {
+          ...prevState,
+          isLoadAttemped: true,
+        }
       }
+      return prevState
     })
   }
 
@@ -197,9 +200,11 @@ export class RenderController extends React.Component {
         if (this.isMaxLoadsAttempted() === false) {
           load()
 
+            /*
           setTimeout(() => {
             this.setLoadAttempted()
           }, loadDelay)
+          */
         }
       }
     }
@@ -224,16 +229,6 @@ export class RenderController extends React.Component {
         }
       }
     }
-  }
-
-  shouldComponentUpdate(nextProps, nextState) {
-    if(this.state.isLoadAttempted === false && nextState.isLoadAttempted === true) {
-      this._isUnloadAllowed = false
-    }
-    else {
-      this._isUnloadAllowed = true
-    }
-    return true
   }
 
   componentDidUpdate() {
@@ -277,9 +272,9 @@ export class RenderController extends React.Component {
 
     // If the data is empty, a load was attempted, and a 'renderFailure' method
     // was passed, return the output of 'renderFailure'.
-    if (isLoadAttempted === true && _.isFunction(renderFailure)) {
-      return renderFailure()
-    }
+    //if (isLoadAttempted === true && _.isFunction(renderFailure)) {
+    //  return renderFailure()
+    //}
 
     // If the data is empty, but no load was attempted, and the 'renderWithout'
     // method was provided, return the output of 'renderWithout'.
