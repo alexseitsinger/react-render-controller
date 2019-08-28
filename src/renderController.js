@@ -101,13 +101,14 @@ export class RenderController extends React.Component {
   static defaultProps = {
     skipUnloadFor: [],
     loadDelay: 1100,
+    maxLoads: 5,
   }
 
   constructor(props) {
     super(props)
 
-    this.debouncedHandleLoad = debounce(this.handleLoad, 600)
-    this.debouncedHandleUnload = debounce(this.handleUnload, 600)
+    //this.debouncedHandleLoad = debounce(this.handleLoad, 600)
+    //this.debouncedHandleUnload = debounce(this.handleUnload, 600)
 
     // Set a flag to signify that this instance is mounted or not. Used to
     // determine if setState should actually run or not.
@@ -125,6 +126,7 @@ export class RenderController extends React.Component {
     }
 
     this._loadsAttempted = 0
+    this._isUnloadAllowed = true
   }
 
   state = {
@@ -136,21 +138,24 @@ export class RenderController extends React.Component {
   }
 
   isFirstLoadAttempt = () => {
-    return Boolean(this._loadsAttempted === 1)
+    const { isLoadAttempted } = this.state
+    return Boolean(isLoadAttempted === false && this._loadsAttempted === 0)
   }
 
-  setLoadAttempted = bool => {
+  isMaxLoadsAttempted = () => {
+    const { maxLoads } = this.props
+    return maxLoads === this._loadsAttempted
+  }
+
+  setLoadAttempted = () => {
     this.setState(prevState => {
-      if (bool === true) {
-        this._loadsAttempted += 1
-      }
+      this._loadsAttempted += 1
       return {
         ...prevState,
-        isLoadAttempted: bool,
+        isLoadAttempted: true,
       }
     })
   }
-
 
   // Check if the provided 'currentPathname' is listed in the 'skipUnloadFor'
   // prop. If it exists, return true to prevent 'unload' from make the data
@@ -189,11 +194,13 @@ export class RenderController extends React.Component {
     const { load, loadDelay } = this.props
     if(this.isLoaded() === false) {
       if(_.isFunction(load)) {
-        load()
+        if (this.isMaxLoadsAttempted() === false) {
+          load()
 
-        setTimeout(() => {
-          this.setLoadAttempted(true)
-        }, loadDelay)
+          setTimeout(() => {
+            this.setLoadAttempted()
+          }, loadDelay)
+        }
       }
     }
   }
@@ -212,13 +219,21 @@ export class RenderController extends React.Component {
         // and then remounted, causing the data to unload. So, check for this
         // state change before running unload. Only run unload when its not the
         // first load attempt.
-        if (isLoadAttempted === true) {
-          if (this.isFirstLoadAttempt() === false) {
-            unload()
-          }
+        if (this._isUnloadAllowed === true) {
+          unload()
         }
       }
     }
+  }
+
+  shouldComponentUpdate(nextProps, nextState) {
+    if(this.state.isLoadAttempted === false && nextState.isLoadAttempted === true) {
+      this._isUnloadAllowed = false
+    }
+    else {
+      this._isUnloadAllowed = true
+    }
+    return true
   }
 
   componentDidUpdate() {
@@ -228,7 +243,7 @@ export class RenderController extends React.Component {
     // the component is updated. Since, 'handleLoad' checks for emptiness before
     // actually attempting to replace the data, we don't need to worry about
     // duplicate/redundant calls from here.
-    this.debouncedHandleLoad()
+    this.handleLoad()
   }
 
   componentDidMount() {
@@ -237,14 +252,14 @@ export class RenderController extends React.Component {
     // because we attempt to run setState after a timeout in 'handleLoad'. If we
     // don't do this, we may cause a memory leak each time load is attempted.
     this._isComponentMounted = true
-    this.debouncedHandleLoad()
+    this.handleLoad()
   }
 
   componentWillUnmount() {
     // Set a flag when the component will be unmounted. Same as about, this is
     // to prevent a memory leak when invoking 'handleLoad'.
     this._isComponentMounted = false
-    this.debouncedHandleUnload()
+    this.handleUnload()
   }
 
   render() {
