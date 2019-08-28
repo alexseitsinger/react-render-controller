@@ -1,3 +1,10 @@
+<a name="v2.6.3"></a>
+## [v2.6.3](https://github.com/alexseitsinger/react-render-controller/compare/v2.6.2...v2.6.3) (2019-08-28)
+
+### Bug Fixes
+- Fixes loading. ([fe428ef](https://github.com/alexseitsinger/react-render-controller/commit/fe428efec4d1a3709ae9444c9ddf8471b1ace40f))
+
+
 <a name="v2.6.2"></a>
 ## [v2.6.2](https://github.com/alexseitsinger/react-render-controller/compare/v2.6.1...v2.6.2) (2019-08-28)
 
