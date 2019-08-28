@@ -1,3 +1,10 @@
+<a name="v2.6.2"></a>
+## [v2.6.2](https://github.com/alexseitsinger/react-render-controller/compare/v2.6.1...v2.6.2) (2019-08-28)
+
+### Bug Fixes
+- Removes loading screen. ([38638c4](https://github.com/alexseitsinger/react-render-controller/commit/38638c4c3df159ed259f810a7c98737e1c6e8754))
+
+
 <a name="v2.6.1"></a>
 ## [v2.6.1](https://github.com/alexseitsinger/react-render-controller/compare/v2.6.0...v2.6.1) (2019-08-28)
 
