@@ -2,6 +2,12 @@ import _ from "underscore"
 
 const controllers = {}
 
+export const removeLeadingAndTrailingSlashes = url => {
+  url = url.replace(/^\//, "")
+  url = url.replace(/\/$/, "")
+  return url
+}
+
 export function getController(name) {
   if (!(name in controllers)) {
     controllers[name] = {

@@ -4,7 +4,7 @@ import _ from "underscore"
 import debounce from "debounce"
 
 import {
-  isEmpty,
+  isEmpty, removeLeadingAndTrailingSlashes,
 } from "./utils"
 
 /**
@@ -94,32 +94,19 @@ export class RenderController extends React.Component {
     renderWith: PropTypes.func,
     renderWithout: PropTypes.func,
     renderFailure: PropTypes.func,
-    skipUnloadFor: PropTypes.arrayOf(PropTypes.string),
-    currentPathname: PropTypes.string,
+    lastPathname: PropTypes.string,
+    nextPathname: PropTypes.string,
+    skippedPathnames: PropTypes.arrayOf(PropTypes.string),
   }
 
   static defaultProps = {
-    skipUnloadFor: [],
+    skippedPathnames: [],
   }
 
   constructor(props) {
     super(props)
-    this.handleLoad = debounce(this.handleLoad, 600)
+    this.handleLoad = debounce(this.handleLoad, 700)
     this.handleLoad()
-  }
-
-  isUnloadSkipped = () => {
-    const { skipUnloadFor, currentPathname } = this.props
-    const hasSkipUnloadFor = (skipUnloadFor && skipUnloadFor.length)
-    const hasCurrentPathname = (currentPathname && currentPathname.length)
-
-    if(hasSkipUnloadFor && hasCurrentPathname) {
-      if(skipUnloadFor.includes(currentPathname)) {
-        return true
-      }
-    }
-
-    return false
   }
 
   isDataEmpty = () => {
@@ -128,10 +115,10 @@ export class RenderController extends React.Component {
   }
 
   handleLoad = () => {
-    const { load, name } = this.props
+    const { load } = this.props
 
-    if(this.isDataEmpty() === true) {
-      if(_.isFunction(load)) {
+    if(_.isFunction(load)) {
+      if (this.isDataEmpty() === true) {
         load()
       }
     }
@@ -140,11 +127,53 @@ export class RenderController extends React.Component {
   handleUnload = () => {
     const { unload } = this.props
 
-    if(this.isUnloadSkipped() === false) {
-      if (_.isFunction(unload)) {
+    if (_.isFunction(unload)) {
+      if (this.isSkippedPathname() === false) {
         unload()
       }
     }
+  }
+
+  isSkippedPathname = () => {
+    const { skippedPathnames, nextPathname, lastPathname } = this.props
+    // If we dont get any pathnames, then assume its not skipped.
+    if ((!(nextPathname)) || (!(lastPathname))) {
+      return false
+    }
+    // Remove leading/trailing slashes to preserve correct order in array.
+    const nextPathnameStripped = removeLeadingAndTrailingSlashes(nextPathname)
+    const lastPathnameStripped = removeLeadingAndTrailingSlashes(lastPathname)
+    // If the pathnames are the same, then assume it's skipped.
+    if (nextPathnameStripped === lastPathnameStripped) {
+      return true
+    }
+    // If we dont get any pathnames to skip, then assume its not skipped.
+    if (!(skippedPathnames.length)) {
+      return false
+    }
+    // Check that the nextPathanem matches one of the skippedPathnames.
+    const isTrue = result => (result === true)
+    const nextPathnameBits = nextPathnameStripped.split("/")
+    return skippedPathnames.map(skippedPathname => {
+      const skippedPathnameStripped = removeLeadingAndTrailingSlashes(skippedPathname)
+      if (nextPathnameStripped === skippedPathnameStripped) {
+        return true
+      }
+      return skippedPathnameStripped.split("/").map((skippedPathnameBit, i) => {
+        const isWildcard = Boolean(
+          skippedPathnameBit === "*"
+          && nextPathnameBits.length
+          && nextPathnameBits[i]
+          && nextPathnameBits[i].length
+        )
+        const isMatching = Boolean(
+          nextPathnameBits.length
+          && nextPathnameBits[i]
+          && nextPathnameBits[i] === skippedPathnameBit
+        )
+        return ((isMatching === true) || (isWildcard === true))
+      }).every(isTrue)
+    }).includes(true)
   }
 
   componentDidUpdate() {
