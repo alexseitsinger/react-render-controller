@@ -1,3 +1,10 @@
+<a name="v2.6.4"></a>
+## [v2.6.4](https://github.com/alexseitsinger/react-render-controller/compare/v2.6.3...v2.6.4) (2019-08-29)
+
+### Bug Fixes
+- Moves loading to constructor. ([228b3f7](https://github.com/alexseitsinger/react-render-controller/commit/228b3f7f62443fafa4156db8192381c673139969))
+
+
 <a name="v2.6.3"></a>
 ## [v2.6.3](https://github.com/alexseitsinger/react-render-controller/compare/v2.6.2...v2.6.3) (2019-08-28)
 
