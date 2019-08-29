@@ -104,20 +104,8 @@ export class RenderController extends React.Component {
 
   constructor(props) {
     super(props)
-
     this.handleLoad = debounce(this.handleLoad, 600)
-
-    this._isComponentMounted = false
-
-    let realSetState = this.setState.bind(this)
-    this.setState = (...args) => {
-      if (this._isComponentMounted === false) {
-        return
-      }
-      realSetState(...args)
-    }
-
-    this._timesMounted = 0
+    this.handleLoad()
   }
 
   isUnloadSkipped = () => {
@@ -134,18 +122,15 @@ export class RenderController extends React.Component {
     return false
   }
 
-  isLoaded = () => {
+  isDataEmpty = () => {
     const { data } = this.props
-    if (isEmpty(data) === true) {
-      return false
-    }
-    return true
+    return (isEmpty(data) === true)
   }
 
   handleLoad = () => {
-    const { load } = this.props
+    const { load, name } = this.props
 
-    if(this.isLoaded() === false) {
+    if(this.isDataEmpty() === true) {
       if(_.isFunction(load)) {
         load()
       }
@@ -157,9 +142,7 @@ export class RenderController extends React.Component {
 
     if(this.isUnloadSkipped() === false) {
       if (_.isFunction(unload)) {
-        if (this._timesMounted >= 1) {
-          unload()
-        }
+        unload()
       }
     }
   }
@@ -168,21 +151,14 @@ export class RenderController extends React.Component {
     this.handleLoad()
   }
 
-  componentDidMount() {
-    this._isComponentMounted = true
-    this._timesMounted += 1
-    this.handleLoad()
-  }
-
   componentWillUnmount() {
-    this._isComponentMounted = false
     this.handleUnload()
   }
 
   render() {
     const { children, renderWithout, renderWith, renderFailure } = this.props
 
-    if (this.isLoaded() === true) {
+    if (this.isDataEmpty() === false) {
       if (_.isFunction(renderWith)) {
         return renderWith()
       }
