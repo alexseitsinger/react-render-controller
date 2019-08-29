@@ -1,3 +1,10 @@
+<a name="v2.7.0"></a>
+## [v2.7.0](https://github.com/alexseitsinger/react-render-controller/compare/v2.6.4...v2.7.0) (2019-08-29)
+
+### Features
+- Adds load/unload with pathname checks. ([7e4283f](https://github.com/alexseitsinger/react-render-controller/commit/7e4283fda5dfe415aef2c79a58ce6d83cf6f557b))
+
+
 <a name="v2.6.4"></a>
 ## [v2.6.4](https://github.com/alexseitsinger/react-render-controller/compare/v2.6.3...v2.6.4) (2019-08-29)
 
