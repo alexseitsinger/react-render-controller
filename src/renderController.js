@@ -4,7 +4,11 @@ import _ from "underscore"
 import debounce from "debounce"
 
 import {
-  isEmpty, removeLeadingAndTrailingSlashes,
+  isEmpty,
+  removeLeadingAndTrailingSlashes,
+  runUnloaders,
+  addUnloader,
+  createShouldSkipUnload,
 } from "./utils"
 
 /**
@@ -31,7 +35,7 @@ import {
  * nvoked when loading was attempted but failed to produce non-empty data.
  * @param {array} [props.skipUnloadFor]
  * An array of pathnames to skip invoking unload for when navigating to them.
- * @param {string} [props.currentPathname]
+ * @param {string} [props.lastPathname]
  * The current pathname. Used to determine if skipUnloadFor test passes.
  *
  * @example
@@ -95,7 +99,7 @@ export class RenderController extends React.Component {
     renderWithout: PropTypes.func,
     renderFailure: PropTypes.func,
     lastPathname: PropTypes.string,
-    nextPathname: PropTypes.string,
+    currentPathname: PropTypes.string,
     skippedPathnames: PropTypes.arrayOf(PropTypes.string),
   }
 
@@ -105,8 +109,28 @@ export class RenderController extends React.Component {
 
   constructor(props) {
     super(props)
+    this.processUnloaders()
     this.handleLoad = debounce(this.handleLoad, 700)
     this.handleLoad()
+  }
+
+  processUnloaders = () => {
+    const {
+      lastPathname,
+      currentPathname,
+      skippedPathnames,
+      unload,
+    } = this.props
+
+    if (!( lastPathname && currentPathname )) {
+      return
+    }
+    runUnloaders(lastPathname, currentPathname)
+
+    if (!(_.isFunction(unload))) {
+      return
+    }
+    addUnloader(unload, createShouldSkipUnload(currentPathname, skippedPathnames))
   }
 
   isDataEmpty = () => {
@@ -124,55 +148,52 @@ export class RenderController extends React.Component {
     }
   }
 
-  handleUnload = () => {
-    const { unload } = this.props
-
-    if (_.isFunction(unload)) {
-      if (this.isSkippedPathname() === false) {
-        unload()
-      }
-    }
-  }
-
   isSkippedPathname = () => {
-    const { skippedPathnames, nextPathname, lastPathname } = this.props
+    const { skippedPathnames, currentPathname, lastPathname } = this.props
+
     // If we dont get any pathnames, then assume its not skipped.
-    if ((!(nextPathname)) || (!(lastPathname))) {
+    if ((!(currentPathname)) || (!(lastPathname))) {
       return false
     }
+
     // Remove leading/trailing slashes to preserve correct order in array.
-    const nextPathnameStripped = removeLeadingAndTrailingSlashes(nextPathname)
     const lastPathnameStripped = removeLeadingAndTrailingSlashes(lastPathname)
+    const currentPathnameStripped = removeLeadingAndTrailingSlashes(currentPathname)
+    console.log("lastPathnameStripped: ", lastPathnameStripped)
+    console.log("currentPathnameStripped: ", currentPathnameStripped)
+
     // If the pathnames are the same, then assume it's skipped.
-    if (nextPathnameStripped === lastPathnameStripped) {
+    if (currentPathnameStripped === lastPathnameStripped) {
       return true
     }
+
     // If we dont get any pathnames to skip, then assume its not skipped.
     if (!(skippedPathnames.length)) {
       return false
     }
+
     // Check that the nextPathanem matches one of the skippedPathnames.
-    const isTrue = result => (result === true)
-    const nextPathnameBits = nextPathnameStripped.split("/")
     return skippedPathnames.map(skippedPathname => {
-      const skippedPathnameStripped = removeLeadingAndTrailingSlashes(skippedPathname)
-      if (nextPathnameStripped === skippedPathnameStripped) {
-        return true
+      if (_.isObject(skippedPathname)) {
+        const lastStripped = removeLeadingAndTrailingSlashes(skippedPathname.last)
+        const isLastSkipped = this.isMatchingPaths(lastStripped, lastPathnameStripped)
+        console.log("lastStripped: ", lastStripped)
+        console.log("isLastSkipped: ", isLastSkipped)
+
+        const currentStripped = removeLeadingAndTrailingSlashes(skippedPathname.current)
+        const isCurrentSkipped = this.isMatchingPaths(currentStripped, currentPathnameStripped)
+        console.log("currentStripped: ", currentStripped)
+        console.log("isCurrentSkipped: ", isCurrentSkipped)
+
+        return (isLastSkipped === true && isCurrentSkipped === true)
       }
-      return skippedPathnameStripped.split("/").map((skippedPathnameBit, i) => {
-        const isWildcard = Boolean(
-          skippedPathnameBit === "*"
-          && nextPathnameBits.length
-          && nextPathnameBits[i]
-          && nextPathnameBits[i].length
-        )
-        const isMatching = Boolean(
-          nextPathnameBits.length
-          && nextPathnameBits[i]
-          && nextPathnameBits[i] === skippedPathnameBit
-        )
-        return ((isMatching === true) || (isWildcard === true))
-      }).every(isTrue)
+      else if (_.isString(skippedPathname)) {
+        const skippedPathnameStripped = removeLeadingAndTrailingSlashes(skippedPathname)
+        return this.isMatchingPaths(skippedPathnameStripped, currentPathnameStripped)
+      }
+      else {
+        throw new Error("Skipped paths must be an object or a string.")
+      }
     }).includes(true)
   }
 
@@ -180,9 +201,6 @@ export class RenderController extends React.Component {
     this.handleLoad()
   }
 
-  componentWillUnmount() {
-    this.handleUnload()
-  }
 
   render() {
     const { children, renderWithout, renderWith, renderFailure } = this.props

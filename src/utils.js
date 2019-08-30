@@ -1,12 +1,74 @@
 import _ from "underscore"
 
-const controllers = {}
-
 export const removeLeadingAndTrailingSlashes = url => {
+  if (url.length === 1 && url === "/") {
+    return url
+  }
   url = url.replace(/^\//, "")
   url = url.replace(/\/$/, "")
   return url
 }
+
+export const isMatchingPaths = (skippedPathname, currentPathname) => {
+  const skipped = removeLeadingAndTrailingSlashes(skippedPathname)
+  const current = removeLeadingAndTrailingSlashes(currentPathname)
+  if (skipped === current) {
+    return true
+  }
+  const isTrue = result => (result === true)
+  const currentBits = current.split("/")
+  return skipped.split("/").map((skippedBit, i) => {
+    const isWildcard = Boolean(
+      skippedBit === "*"
+      && currentBits.length
+      && currentBits[i]
+      && currentBits[i].length
+    )
+    const isMatching = Boolean(
+      currentBits.length
+      && currentBits[i]
+      && currentBits[i] === skippedBit
+    )
+    return ((isMatching === true) || (isWildcard === true))
+  }).every(isTrue)
+}
+
+export const createShouldSkipUnload = (currentPathname, skippedPathnames) => {
+  return (from, to) => {
+    return skippedPathnames.map(skippedPathname => {
+      var isFromMatching
+      var isToMatching
+      if (_.isObject(skippedPathname)) {
+        isFromMatching = isMatchingPaths(skippedPathname.from, from)
+        isToMatching = isMatchingPaths(skippedPathname.to, to)
+      }
+      else {
+        isFromMatching = isMatchingPaths(currentPathname, from)
+        isToMatching = isMatchingPaths(skippedPathname, to)
+      }
+      return ((isFromMatching === true) && isToMatching === true)
+    }).includes(true)
+  }
+}
+
+const unloaders = []
+export const runUnloaders = (from, to) => {
+  unloaders.forEach((obj, i, arr) => {
+    if (obj.shouldSkipUnload(from, to) === false) {
+      obj.unload()
+      arr.splice(i, 1)
+    }
+  })
+}
+
+export const addUnloader = (unload, shouldSkipUnload) => {
+  if (unloaders.indexOf(unload) === -1) {
+    unloaders.push({unload, shouldSkipUnload})
+  }
+}
+
+
+const controllers = {}
 
 export function getController(name) {
   if (!(name in controllers)) {
