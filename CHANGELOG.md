@@ -1,3 +1,10 @@
+<a name="v2.9.0"></a>
+## [v2.9.0](https://github.com/alexseitsinger/react-render-controller/compare/v2.8.0...v2.9.0) (2019-08-30)
+
+### Features
+- Adds batch loading. ([414b71b](https://github.com/alexseitsinger/react-render-controller/commit/414b71b5c2f857cc61b4f5fc969e9cbc6e7c2ac0))
+
+
 <a name="v2.8.0"></a>
 ## [v2.8.0](https://github.com/alexseitsinger/react-render-controller/compare/v2.7.0...v2.8.0) (2019-08-30)
 
