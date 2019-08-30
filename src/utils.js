@@ -33,8 +33,11 @@ export const isMatchingPaths = (skippedPathname, currentPathname) => {
   }).every(isTrue)
 }
 
-export const createShouldSkipUnload = (currentPathname, skippedPathnames) => {
+export const createShouldSkipUnload = (lastPathname, currentPathname, skippedPathnames) => {
   return (from, to) => {
+    if (lastPathname === currentPathname) {
+      return true
+    }
     return skippedPathnames.map(skippedPathname => {
       var isFromMatching
       var isToMatching
@@ -50,6 +53,21 @@ export const createShouldSkipUnload = (currentPathname, skippedPathnames) => {
     }).includes(true)
   }
 }
+
+const loaders = []
+export const addLoader = fn => {
+  if (loaders.indexOf(fn) === -1){
+    loaders.push(fn)
+  }
+}
+export const runLoaders = _.debounce(() => {
+  var f
+  while (loaders.length) {
+    f = loaders.pop()
+    f()
+  }
+}, 1500)
+
 
 const unloaders = []
 export const runUnloaders = (from, to) => {
