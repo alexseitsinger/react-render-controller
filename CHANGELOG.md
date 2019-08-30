@@ -1,3 +1,10 @@
+<a name="v2.8.0"></a>
+## [v2.8.0](https://github.com/alexseitsinger/react-render-controller/compare/v2.7.0...v2.8.0) (2019-08-30)
+
+### Features
+- Adds correct unloading process. ([770b94f](https://github.com/alexseitsinger/react-render-controller/commit/770b94f0c4d8dade9fbd5bed899c9746eae7cbb4))
+
+
 <a name="v2.7.0"></a>
 ## [v2.7.0](https://github.com/alexseitsinger/react-render-controller/compare/v2.6.4...v2.7.0) (2019-08-29)
 
