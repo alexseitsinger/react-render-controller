@@ -1,3 +1,10 @@
+<a name="v2.10.0"></a>
+## [v2.10.0](https://github.com/alexseitsinger/react-render-controller/compare/v2.9.0...v2.10.0) (2019-08-31)
+
+### Code Refactoring
+- Cleans up utils. ([d77fc0e](https://github.com/alexseitsinger/react-render-controller/commit/d77fc0eaf9919534993780f4e38f54cda3e538b1))
+
+
 <a name="v2.9.0"></a>
 ## [v2.9.0](https://github.com/alexseitsinger/react-render-controller/compare/v2.8.0...v2.9.0) (2019-08-30)
 
