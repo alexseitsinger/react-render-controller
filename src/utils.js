@@ -1,12 +1,13 @@
 import _ from "underscore"
 
 export const removeLeadingAndTrailingSlashes = url => {
-  if (url.length === 1 && url === "/") {
-    return url
+  var updated = url
+  if (updated.length === 1 && updated === "/") {
+    return updated
   }
-  url = url.replace(/^\//, "")
-  url = url.replace(/\/$/, "")
-  return url
+  updated = updated.replace(/^\//, "")
+  updated = updated.replace(/\/$/, "")
+  return updated
 }
 
 export const isMatchingPaths = (skippedPathname, currentPathname) => {
@@ -19,44 +20,40 @@ export const isMatchingPaths = (skippedPathname, currentPathname) => {
   const currentBits = current.split("/")
   return skipped.split("/").map((skippedBit, i) => {
     const isWildcard = Boolean(
-      skippedBit === "*"
-      && currentBits.length
-      && currentBits[i]
-      && currentBits[i].length
+      skippedBit === "*" && currentBits.length && currentBits[i] && currentBits[i].length
     )
     const isMatching = Boolean(
-      currentBits.length
-      && currentBits[i]
-      && currentBits[i] === skippedBit
+      currentBits.length && currentBits[i] && currentBits[i] === skippedBit
     )
     return ((isMatching === true) || (isWildcard === true))
-  }).every(isTrue)
+  })
+    .every(isTrue)
 }
 
-export const createShouldSkipUnload = (lastPathname, currentPathname, skippedPathnames) => {
-  return (from, to) => {
-    if (lastPathname === currentPathname) {
-      return true
-    }
-    return skippedPathnames.map(skippedPathname => {
-      var isFromMatching
-      var isToMatching
-      if (_.isObject(skippedPathname)) {
-        isFromMatching = isMatchingPaths(skippedPathname.from, from)
-        isToMatching = isMatchingPaths(skippedPathname.to, to)
-      }
-      else {
-        isFromMatching = isMatchingPaths(currentPathname, from)
-        isToMatching = isMatchingPaths(skippedPathname, to)
-      }
-      return ((isFromMatching === true) && isToMatching === true)
-    }).includes(true)
+export const createShouldSkipUnload = (
+  lastPathname, currentPathname, skippedPathnames
+) => (from, to) => {
+  if (lastPathname === currentPathname) {
+    return true
   }
+  return skippedPathnames.map(skippedPathname => {
+    var isFromMatching
+    var isToMatching
+    if (_.isObject(skippedPathname)) {
+      isFromMatching = isMatchingPaths(skippedPathname.from, from)
+      isToMatching = isMatchingPaths(skippedPathname.to, to)
+    }
+    else {
+      isFromMatching = isMatchingPaths(currentPathname, from)
+      isToMatching = isMatchingPaths(skippedPathname, to)
+    }
+    return ((isFromMatching === true) && isToMatching === true)
+  }).includes(true)
 }
 
 const loaders = []
 export const addLoader = fn => {
-  if (loaders.indexOf(fn) === -1){
+  if (loaders.indexOf(fn) === -1) {
     loaders.push(fn)
   }
 }
@@ -78,51 +75,13 @@ export const runUnloaders = (from, to) => {
     }
   })
 }
-
 export const addUnloader = (unload, shouldSkipUnload) => {
   if (unloaders.indexOf(unload) === -1) {
-    unloaders.push({unload, shouldSkipUnload})
+    unloaders.push({ unload, shouldSkipUnload })
   }
 }
 
-
-const controllers = {}
-
-export function getController(name) {
-  if (!(name in controllers)) {
-    controllers[name] = {
-      count: 0,
-      attempted: false,
-    }
-  }
-  return controllers[name]
-}
-
-export function getAttempted(name) {
-  const controller = getController(name)
-  return Boolean(controller.attempted)
-}
-
-export function setAttempted(name, bool) {
-  const controller = getController(name)
-  controller.attempted = Boolean(bool)
-  return controller.attempted
-}
-
-export function incrementCount(name) {
-  const controller = getController(name)
-  controller.count = ++controller.count
-  return controller.count
-}
-
-export function decrementCount(name) {
-  const controller = getController(name)
-  controller.count = --controller.count
-  controller.count = Math.max(0, controller.count)
-  return controller.count
-}
-
-export function isEmpty(data) {
+export const isEmpty = data => {
   var result
   if (!data) {
     return true
