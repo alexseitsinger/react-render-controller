@@ -1,3 +1,7 @@
+<a name="v2.10.1"></a>
+## [v2.10.1](https://github.com/alexseitsinger/react-render-controller/compare/v2.10.0...v2.10.1) (2019-08-31)
+
+
 <a name="v2.10.0"></a>
 ## [v2.10.0](https://github.com/alexseitsinger/react-render-controller/compare/v2.9.0...v2.10.0) (2019-08-31)
 
