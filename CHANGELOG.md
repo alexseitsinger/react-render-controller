@@ -1,3 +1,10 @@
+<a name="v2.11.0"></a>
+## [v2.11.0](https://github.com/alexseitsinger/react-render-controller/compare/v2.10.1...v2.11.0) (2019-09-01)
+
+### Features
+- Changes runLoaders/addLoader. ([b6b2619](https://github.com/alexseitsinger/react-render-controller/commit/b6b26195c709a968bb36077e11aa787b1717cb14))
+
+
 <a name="v2.10.1"></a>
 ## [v2.10.1](https://github.com/alexseitsinger/react-render-controller/compare/v2.10.0...v2.10.1) (2019-08-31)
 
