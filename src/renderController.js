@@ -178,7 +178,8 @@ export class RenderController extends React.Component {
   processLoaders = () => {
     const { load } = this.props
     if (_.isFunction(load)) {
-      addLoader(() => {
+      const name = this.getDataName()
+      addLoader(name, () => {
         if (this.isDataEmpty() === true) {
           load()
         }
@@ -208,9 +209,30 @@ export class RenderController extends React.Component {
     ))
   }
 
+  getDataName = () => {
+    const { data } = this.props
+    const keys = Object.keys(data)
+    if (!(keys.length) || (("id" || "uuid" || "url") in data)) {
+      return `unnamedData${_.uniqueId()}`
+    }
+    return keys.join("_")
+  }
+
   isDataEmpty = () => {
     const { data } = this.props
-    return (isEmpty(data) === true)
+    // add handler for arrays
+    const names = Object.keys(data)
+    if (!( names.length )) {
+      return true
+    }
+    if (("url" || "uuid" || "id") in data) {
+      return (isEmpty(data) === true)
+    }
+    const isTrue = result => result === true
+    return names.map(name => {
+      const obj = data[name]
+      return (isEmpty(obj) === true)
+    }).every(isTrue)
   }
 
   render() {

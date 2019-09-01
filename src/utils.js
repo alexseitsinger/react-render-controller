@@ -51,19 +51,21 @@ export const createShouldSkipUnload = (
   }).includes(true)
 }
 
-const loaders = []
-export const addLoader = fn => {
-  if (loaders.indexOf(fn) === -1) {
-    loaders.push(fn)
+const loaders = {}
+export const addLoader = (name, fn) => {
+  if (!( name )) {
+    throw "There is not name for data."
+  }
+  if (!( name in loaders )) {
+    loaders[name] = fn
   }
 }
 export const runLoaders = _.debounce(() => {
-  var f
-  while (loaders.length) {
-    f = loaders.pop()
-    f()
-  }
-}, 1500)
+  Object.keys(loaders).forEach(key => {
+    loaders[key]()
+    delete loaders[key]
+  })
+}, 3000)
 
 
 const unloaders = []
