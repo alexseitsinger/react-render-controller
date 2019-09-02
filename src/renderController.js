@@ -176,16 +176,21 @@ export class RenderController extends React.Component {
   }
 
   processLoaders = () => {
-    const { load } = this.props
+    const {
+      load,
+      lastPathname,
+      currentPathname,
+    } = this.props
+
     if (_.isFunction(load)) {
       const name = this.getDataName()
-      addLoader(name, () => {
-        if (this.isDataEmpty() === true) {
+      addLoader(name, force => {
+        if ((force === true) || (this.isDataEmpty() === true)) {
           load()
         }
       })
     }
-    runLoaders()
+    runLoaders(lastPathname, currentPathname)
   }
 
   processUnloaders = () => {

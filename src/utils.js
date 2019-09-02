@@ -30,6 +30,54 @@ export const isMatchingPaths = (skippedPathname, currentPathname) => {
     .every(isTrue)
 }
 
+const pathnames = {
+  last: "",
+  current: "",
+}
+
+const loaders = {}
+export const addLoader = (name, fn) => {
+  if (!(name)) {
+    throw new Error("There is not name for data.")
+  }
+  if (!(name in loaders)) {
+    loaders[name] = fn
+  }
+}
+
+export const runLoaders = _.debounce((from, to) => {
+  const isLastSame = (pathnames.last === from)
+  const isCurrentSame = (pathnames.current === to)
+  const force = (isLastSame && isCurrentSame)
+  Object.keys(loaders).forEach(key => {
+    loaders[key](force)
+    delete loaders[key]
+  })
+}, 3000)
+
+
+const unloaders = []
+export const runUnloaders = (from, to) => {
+  const isLastSame = (pathnames.last === from)
+  const isCurrentSame = (pathnames.current === to)
+  if (isLastSame && isCurrentSame) {
+    return
+  }
+  pathnames.last = from
+  pathnames.current = to
+  unloaders.forEach((obj, i, arr) => {
+    if (obj.shouldSkipUnload(from, to) === false) {
+      obj.unload()
+      arr.splice(i, 1)
+    }
+  })
+}
+export const addUnloader = (unload, shouldSkipUnload) => {
+  if (unloaders.indexOf(unload) === -1) {
+    unloaders.push({ unload, shouldSkipUnload })
+  }
+}
+
 export const createShouldSkipUnload = (
   lastPathname, currentPathname, skippedPathnames
 ) => (from, to) => {
@@ -49,38 +97,6 @@ export const createShouldSkipUnload = (
     }
     return ((isFromMatching === true) && isToMatching === true)
   }).includes(true)
-}
-
-const loaders = {}
-export const addLoader = (name, fn) => {
-  if (!( name )) {
-    throw "There is not name for data."
-  }
-  if (!( name in loaders )) {
-    loaders[name] = fn
-  }
-}
-export const runLoaders = _.debounce(() => {
-  Object.keys(loaders).forEach(key => {
-    loaders[key]()
-    delete loaders[key]
-  })
-}, 3000)
-
-
-const unloaders = []
-export const runUnloaders = (from, to) => {
-  unloaders.forEach((obj, i, arr) => {
-    if (obj.shouldSkipUnload(from, to) === false) {
-      obj.unload()
-      arr.splice(i, 1)
-    }
-  })
-}
-export const addUnloader = (unload, shouldSkipUnload) => {
-  if (unloaders.indexOf(unload) === -1) {
-    unloaders.push({ unload, shouldSkipUnload })
-  }
 }
 
 export const isEmpty = data => {
