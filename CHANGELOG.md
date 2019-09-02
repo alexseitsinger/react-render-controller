@@ -1,3 +1,10 @@
+<a name="v2.12.0"></a>
+## [v2.12.0](https://github.com/alexseitsinger/react-render-controller/compare/v2.11.0...v2.12.0) (2019-09-02)
+
+### Features
+- Tracks paths and forces/skips load/unload. ([e148ba1](https://github.com/alexseitsinger/react-render-controller/commit/e148ba1f12a606b53f9a4566f0e7319454222cb9))
+
+
 <a name="v2.11.0"></a>
 ## [v2.11.0](https://github.com/alexseitsinger/react-render-controller/compare/v2.10.1...v2.11.0) (2019-09-01)
 
