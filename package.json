@@ -1,13 +1,11 @@
 {
   "author": {
     "email": "software@alexseitsinger.com",
-    "name": "Alex Seitsinger",
-    "url": "https://www.alexseitsinger.com"
+    "name": "Alex Seitsinger"
   },
   "dependencies": {
     "@babel/runtime-corejs3": "7.5.5",
     "core-js": "3.2.1",
-    "debounce": "1.2.0",
     "prop-types": "15.7.2",
     "underscore": "1.9.1"
   },
@@ -42,7 +40,7 @@
     "README.md",
     "LICENSE"
   ],
-  "homepage": "https://www.alexseitsinger.com/packages/node/react-render-controller",
+  "homepage": "https://github.com/alexseitsinger/react-render-controller",
   "keywords": [
     "react",
     "render",
