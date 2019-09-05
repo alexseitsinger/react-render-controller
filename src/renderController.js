@@ -58,9 +58,11 @@ import {
  *   applyMiddleware,
  *   compose,
  * } from "redux"
- * import { locationsMiddleware } from "@alexseitsinger/redux-locations"
+ * import { createLocationsMiddleware } from "@alexseitsinger/redux-locations"
  *
  * import { createRootReducer } from "reducer"
+ *
+ * const locationsMiddleware = createLocationsMiddleware()
  *
  * export const createStore = (..., initialState, ...) => {
  *   const rootReducer = createRootReducer()
