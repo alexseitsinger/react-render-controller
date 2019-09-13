@@ -1,3 +1,13 @@
+<a name="v2.15.0"></a>
+## [v2.15.0](https://github.com/alexseitsinger/react-render-controller/compare/v2.14.0...v2.15.0) (2019-09-13)
+
+### Bug Fixes
+- Checks if render functions changed. ([66fbe24](https://github.com/alexseitsinger/react-render-controller/commit/66fbe24915b4ad68d2fded1eab17169e5a2220d8))
+
+### Code Refactoring
+- Removes scu. ([82edb7f](https://github.com/alexseitsinger/react-render-controller/commit/82edb7f386de4e66945ad2f5a463526ca792fcf5))
+
+
 <a name="v2.14.0"></a>
 ## [v2.14.0](https://github.com/alexseitsinger/react-render-controller/compare/v2.13.0...v2.14.0) (2019-09-13)
 
