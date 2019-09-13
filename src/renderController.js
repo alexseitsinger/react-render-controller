@@ -177,6 +177,13 @@ export class RenderController extends React.Component {
     this.processLoaders()
   }
 
+  shouldComponentUpdate(nextProps, nextState) {
+    if(_.isEqual(nextProps.data, this.props.data)) {
+      return false
+    }
+    return true
+  }
+
   processLoaders = () => {
     const {
       load,
