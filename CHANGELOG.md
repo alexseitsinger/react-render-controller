@@ -1,3 +1,10 @@
+<a name="v2.14.0"></a>
+## [v2.14.0](https://github.com/alexseitsinger/react-render-controller/compare/v2.13.0...v2.14.0) (2019-09-13)
+
+### Features
+- Chekcs for same data re-loads. ([064c481](https://github.com/alexseitsinger/react-render-controller/commit/064c4813eb5593d61518676c34fa4001e95417cd))
+
+
 <a name="v2.13.0"></a>
 ## [v2.13.0](https://github.com/alexseitsinger/react-render-controller/compare/v2.12.0...v2.13.0) (2019-09-05)
 
