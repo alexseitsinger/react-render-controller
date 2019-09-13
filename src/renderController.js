@@ -177,19 +177,6 @@ export class RenderController extends React.Component {
     this.processLoaders()
   }
 
-  shouldComponentUpdate(nextProps, nextState) {
-    const isDataEqual = (_.isEqual(nextProps.data, this.props.data))
-    const isRenderWithChanged = nextProps.renderWith !== this.props.renderWith
-    const isRenderWithoutChanged = nextProps.renderWithout !== this.props.renderWithout
-    if (isDataEqual) {
-      if (isRenderWithChanged || isRenderWithoutChanged) {
-        return true
-      }
-      return false
-    }
-    return true
-  }
-
   processLoaders = () => {
     const {
       load,
