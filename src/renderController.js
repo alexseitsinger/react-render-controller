@@ -178,7 +178,13 @@ export class RenderController extends React.Component {
   }
 
   shouldComponentUpdate(nextProps, nextState) {
-    if(_.isEqual(nextProps.data, this.props.data)) {
+    const isDataEqual = (_.isEqual(nextProps.data, this.props.data))
+    const isRenderWithChanged = nextProps.renderWith !== this.props.renderWith
+    const isRenderWithoutChanged = nextProps.renderWithout !== this.props.renderWithout
+    if (isDataEqual) {
+      if (isRenderWithChanged || isRenderWithoutChanged) {
+        return true
+      }
       return false
     }
     return true
