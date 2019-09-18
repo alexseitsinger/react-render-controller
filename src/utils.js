@@ -45,7 +45,7 @@ export const addLoader = (name, fn) => {
   }
 }
 
-export const runLoaders = _.debounce((from, to) => {
+export const runLoaders = _.throttle((from, to) => {
   const isLastSame = (pathnames.last === from)
   const isCurrentSame = (pathnames.current === to)
   const force = (isLastSame && isCurrentSame)
@@ -53,7 +53,7 @@ export const runLoaders = _.debounce((from, to) => {
     loaders[key](force)
     delete loaders[key]
   })
-}, 3000)
+}, 200)
 
 
 const unloaders = []
