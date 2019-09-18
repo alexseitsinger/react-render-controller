@@ -1,3 +1,11 @@
+<a name="v2.16.0"></a>
+## [v2.16.0](https://github.com/alexseitsinger/react-render-controller/compare/v2.15.0...v2.16.0) (2019-09-18)
+
+### Code Refactoring
+- Changes to throttle, 200. ([40446b9](https://github.com/alexseitsinger/react-render-controller/commit/40446b935f92e8d36d2cf0e1c92e6e4e1efe62ce))
+- Moves dataName to invokation. ([90bf140](https://github.com/alexseitsinger/react-render-controller/commit/90bf140e728ab9c4cb84016c083b92539b0eef6e))
+
+
 <a name="v2.15.0"></a>
 ## [v2.15.0](https://github.com/alexseitsinger/react-render-controller/compare/v2.14.0...v2.15.0) (2019-09-13)
 
