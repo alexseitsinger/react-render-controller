@@ -185,8 +185,7 @@ export class RenderController extends React.Component {
     } = this.props
 
     if (_.isFunction(load)) {
-      const name = this.getDataName()
-      addLoader(name, force => {
+      addLoader(this.getDataName(), force => {
         if ((force === true) || (this.isDataEmpty() === true)) {
           load()
         }
