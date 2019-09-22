@@ -262,12 +262,7 @@ export class RenderController extends React.Component {
 
   shouldComponentUpdate() {
     const result = this.shouldUpdate()
-    console.log("shouldUpdate: ", result)
     return result
-  }
-
-  componentDidUpdate() {
-    console.log("didUpdate")
   }
 
   render() {
