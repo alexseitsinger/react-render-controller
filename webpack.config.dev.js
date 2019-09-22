@@ -4,12 +4,13 @@ const nodeExternals = require("webpack-node-externals")
 module.exports = {
   entry: "./src/index.js",
   target: "node",
-  mode: "production",
-  devtool: false,
+  mode: "development",
+  devtool: "source-map",
   output: {
     path: path.resolve("./dist"),
-    filename: "[name].js",
+    filename: "[name].dev.js",
     libraryTarget: "commonjs2",
+    sourceMapFilename: "[name].dev.js.map",
   },
   module: {
     rules: [
@@ -20,12 +21,4 @@ module.exports = {
       },
     ],
   },
-  externals: [
-    nodeExternals({
-      modulesFromFile: {
-        exclude: ["dependencies"],
-        include: ["peerDependencies", "devDependencies"],
-      },
-    }),
-  ],
 }
