@@ -30,54 +30,6 @@ export const isMatchingPaths = (skippedPathname, currentPathname) => {
     .every(isTrue)
 }
 
-const pathnames = {
-  last: "",
-  current: "",
-}
-
-const loaders = {}
-export const addLoader = (name, fn) => {
-  if (!(name)) {
-    throw new Error("There is not name for data.")
-  }
-  if (!(name in loaders)) {
-    loaders[name] = fn
-  }
-}
-
-export const runLoaders = _.throttle((from, to) => {
-  const isLastSame = (pathnames.last === from)
-  const isCurrentSame = (pathnames.current === to)
-  const force = (isLastSame && isCurrentSame)
-  Object.keys(loaders).forEach(key => {
-    loaders[key](force)
-    delete loaders[key]
-  })
-}, 200)
-
-
-const unloaders = []
-export const runUnloaders = (from, to) => {
-  const isLastSame = (pathnames.last === from)
-  const isCurrentSame = (pathnames.current === to)
-  if (isLastSame && isCurrentSame) {
-    return
-  }
-  pathnames.last = from
-  pathnames.current = to
-  unloaders.forEach((obj, i, arr) => {
-    if (obj.shouldSkipUnload(from, to) === false) {
-      obj.unload()
-      arr.splice(i, 1)
-    }
-  })
-}
-export const addUnloader = (unload, shouldSkipUnload) => {
-  if (unloaders.indexOf(unload) === -1) {
-    unloaders.push({ unload, shouldSkipUnload })
-  }
-}
-
 export const createShouldSkipUnload = (
   lastPathname, currentPathname, skippedPathnames
 ) => (from, to) => {
@@ -97,6 +49,77 @@ export const createShouldSkipUnload = (
     }
     return ((isFromMatching === true) && isToMatching === true)
   }).includes(true)
+}
+
+const pathnames = {
+  last: "",
+  current: "",
+}
+
+const isSameNavigation = (from, to) => {
+  const isLastSame = (pathnames.last === from)
+  const isCurrentSame = (pathnames.current === to)
+  return (isLastSame && isCurrentSame)
+}
+
+const loaders = {}
+export const addLoader = (dataName, method) => {
+  if (!( dataName in loaders )) {
+    loaders[dataName] = method
+  }
+}
+
+export const runLoaders = _.debounce((from, to) => {
+  Object.keys(loaders).forEach((k, i, a) => {
+    loaders[k]()
+    delete loaders[k]
+  })
+}, 2500)
+
+export const createShouldUpdate = () => {
+  var ct = 0
+
+  return () => {
+    ct += 1
+
+    const methods = Object.keys(loaders)
+    const total = methods.length
+    if (ct > total) {
+      return true
+    }
+
+    return false
+  }
+}
+
+
+const unloaders = {}
+export const addUnloader = (last, current, skipped, unload, dataName) => {
+  if (!( dataName in unloaders )) {
+    const shouldSkipUnload = createShouldSkipUnload(last, current, skipped)
+    const handler = (from, to) => {
+      if (shouldSkipUnload(from, to) === false) {
+        unload()
+      }
+    }
+    unloaders[dataName] = handler
+  }
+}
+
+export const runUnloaders = (from, to) => {
+  // If its the same pathname, don't unload.
+  if (isSameNavigation(from, to) === true) {
+    return
+  }
+
+  Object.keys(unloaders).forEach((k, i, a) => {
+    unloaders[k](from, to)
+    delete unloaders[k]
+  })
+
+  // Save the pathanmes
+  pathnames.last = from
+  pathnames.current = to
 }
 
 export const isEmpty = data => {

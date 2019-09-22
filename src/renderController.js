@@ -3,6 +3,7 @@ import PropTypes from "prop-types"
 import _ from "underscore"
 
 import {
+  createShouldUpdate,
   isEmpty,
   removeLeadingAndTrailingSlashes,
   runUnloaders,
@@ -173,24 +174,33 @@ export class RenderController extends React.Component {
 
   constructor(props) {
     super(props)
+    this.dataName = null
     this.processUnloaders()
     this.processLoaders()
   }
 
-  processLoaders = () => {
-    const {
-      load,
-      lastPathname,
-      currentPathname,
-    } = this.props
+  handleLoad = () => {
+    const { load }  = this.props
 
     if (_.isFunction(load)) {
-      addLoader(this.getDataName(), force => {
-        if ((force === true) || (this.isDataEmpty() === true)) {
-          load()
-        }
-      })
+      if (this.isDataEmpty() === true) {
+        load()
+      }
     }
+  }
+
+  processLoaders = () => {
+    const { load, lastPathname, currentPathname } = this.props
+
+    if (!( lastPathname, currentPathname )) {
+      return
+    }
+
+    const dataName = this.getDataName()
+    addLoader(dataName, this.handleLoad)
+
+    this.shouldUpdate = createShouldUpdate(currentPathname)
+
     runLoaders(lastPathname, currentPathname)
   }
 
@@ -207,38 +217,57 @@ export class RenderController extends React.Component {
     }
     runUnloaders(lastPathname, currentPathname)
 
-    if (!(_.isFunction(unload))) {
+    if (_.isFunction(unload) === false) {
       return
     }
-    addUnloader(unload, createShouldSkipUnload(
-      lastPathname, currentPathname, skippedPathnames,
-    ))
+    const dataName = this.getDataName()
+    addUnloader(lastPathname, currentPathname, skippedPathnames, unload, dataName)
   }
 
   getDataName = () => {
-    const { data } = this.props
-    const keys = Object.keys(data)
-    if (!(keys.length) || (("id" || "uuid" || "url") in data)) {
-      return `unnamedData${_.uniqueId()}`
+    var dataName = this.dataName
+    if (!(dataName)) {
+      const { data } = this.props
+      if (!( data )) {
+        this.dataName = dataName = `unnamedData${_.uniqueId()}`
+      }
+      const keys = Object.keys(data)
+      this.dataName = dataName = keys.join("_")
     }
-    return keys.join("_")
+    return dataName
   }
 
   isDataEmpty = () => {
     const { data } = this.props
-    // add handler for arrays
-    const names = Object.keys(data)
-    if (!( names.length )) {
+
+    if (!(data)) {
       return true
     }
-    if (("url" || "uuid" || "id") in data) {
-      return (isEmpty(data) === true)
+
+    const keys = Object.keys(data)
+    if (!(keys.length) || (keys.length > 1)) {
+      throw new Error("Data must be a named object.")
     }
-    const isTrue = result => result === true
-    return names.map(name => {
-      const obj = data[name]
-      return (isEmpty(obj) === true)
-    }).every(isTrue)
+
+    const dataName = this.getDataName()
+    const actualData = data[dataName]
+
+    const actualDataKeys = Object.keys(actualData)
+    if (!(actualDataKeys.length)) {
+      return true
+    }
+
+    return isEmpty(actualData) === true
+  }
+
+  shouldComponentUpdate() {
+    const result = this.shouldUpdate()
+    console.log("shouldUpdate: ", result)
+    return result
+  }
+
+  componentDidUpdate() {
+    console.log("didUpdate")
   }
 
   render() {
