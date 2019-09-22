@@ -36,6 +36,8 @@
   },
   "files": [
     "dist/main.js",
+    "dist/main.dev.js",
+    "dist/main.dev.js.map",
     "package.json",
     "README.md",
     "LICENSE"
@@ -47,7 +49,7 @@
     "data"
   ],
   "license": "BSD-2-Clause",
-  "main": "dist/main.js",
+  "main": "index.js",
   "name": "@alexseitsinger/react-render-controller",
   "peerDependencies": {
     "react": "^16.8.6"
@@ -57,7 +59,9 @@
     "url": "https://github.com/alexseitsinger/react-render-controller.git"
   },
   "scripts": {
-    "build": "./node_modules/.bin/webpack",
+    "build": "yarn run build:production && yarn run build:development",
+    "build:production": "./node_modules/.bin/webpack",
+    "build:development": "./node_modules/.bin/webpack --config=webpack.config.dev.js",
     "test": "./node_modules/.bin/jest test"
   },
   "version": "2.16.0"
