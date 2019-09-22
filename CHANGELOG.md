@@ -1,3 +1,10 @@
+<a name="v2.18.0"></a>
+## [v2.18.0](https://github.com/alexseitsinger/react-render-controller/compare/v2.17.0...v2.18.0) (2019-09-22)
+
+### Code Refactoring
+- Removes console messages. ([6928512](https://github.com/alexseitsinger/react-render-controller/commit/692851229454cbd604a08359a691d5998746d5f2))
+
+
 <a name="v2.17.0"></a>
 ## [v2.17.0](https://github.com/alexseitsinger/react-render-controller/compare/v2.16.0...v2.17.0) (2019-09-22)
 
