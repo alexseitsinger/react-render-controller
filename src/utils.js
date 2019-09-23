@@ -56,12 +56,6 @@ const pathnames = {
   current: "",
 }
 
-const isSameNavigation = (from, to) => {
-  const isLastSame = (pathnames.last === from)
-  const isCurrentSame = (pathnames.current === to)
-  return (isLastSame && isCurrentSame)
-}
-
 const loaders = {}
 export const addLoader = (dataName, method) => {
   if (!( dataName in loaders )) {
@@ -107,12 +101,13 @@ export const addUnloader = (last, current, skipped, unload, dataName) => {
 }
 
 export const runUnloaders = (from, to) => {
-  // If its the same pathname, don't unload.
-  if (isSameNavigation(from, to) === true) {
+  const { current } = pathnames
+  if (current === to) {
     return
   }
 
-  Object.keys(unloaders).forEach((k, i, a) => {
+  // Run unloaders
+  Object.keys(unloaders).forEach(k => {
     unloaders[k](from, to)
     delete unloaders[k]
   })
