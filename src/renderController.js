@@ -261,8 +261,7 @@ export class RenderController extends React.Component {
   }
 
   shouldComponentUpdate() {
-    const result = this.shouldUpdate()
-    return result
+    return this.shouldUpdate()
   }
 
   render() {
