@@ -1,3 +1,13 @@
+<a name="v2.18.1"></a>
+## [v2.18.1](https://github.com/alexseitsinger/react-render-controller/compare/v2.18.0...v2.18.1) (2019-09-23)
+
+### Bug Fixes
+- Fixes incorrect unloading. ([3275fc8](https://github.com/alexseitsinger/react-render-controller/commit/3275fc8cf5c57d0543874c8511fef344893704a6))
+
+### Code Refactoring
+- Refactors scu. ([093e223](https://github.com/alexseitsinger/react-render-controller/commit/093e223d096775eac8b1b24c6c90876ac04b08c8))
+
+
 <a name="v2.18.0"></a>
 ## [v2.18.0](https://github.com/alexseitsinger/react-render-controller/compare/v2.17.0...v2.18.0) (2019-09-22)
 
