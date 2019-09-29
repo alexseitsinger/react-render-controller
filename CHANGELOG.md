@@ -1,3 +1,10 @@
+<a name="v2.19.0"></a>
+## [v2.19.0](https://github.com/alexseitsinger/react-render-controller/compare/v2.18.1...v2.19.0) (2019-09-29)
+
+### Code Refactoring
+- Adds error for empty data. ([be55db8](https://github.com/alexseitsinger/react-render-controller/commit/be55db8c7bced88ba485387aa9d27ec7cea0ca42))
+
+
 <a name="v2.18.1"></a>
 ## [v2.18.1](https://github.com/alexseitsinger/react-render-controller/compare/v2.18.0...v2.18.1) (2019-09-23)
 
