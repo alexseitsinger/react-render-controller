@@ -239,7 +239,6 @@ export class RenderController extends React.Component {
 
   isDataEmpty = () => {
     const { data } = this.props
-
     if (!(data)) {
       return true
     }
@@ -251,6 +250,9 @@ export class RenderController extends React.Component {
 
     const dataName = this.getDataName()
     const actualData = data[dataName]
+    if (!actualData) {
+      throw new Error("Data must be a named object.")
+    }
 
     const actualDataKeys = Object.keys(actualData)
     if (!(actualDataKeys.length)) {
