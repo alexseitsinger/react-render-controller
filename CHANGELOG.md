@@ -1,3 +1,11 @@
+<a name="v2.20.0"></a>
+## [v2.20.0](https://github.com/alexseitsinger/react-render-controller/compare/v2.19.0...v2.20.0) (2019-10-02)
+
+### Bug Fixes
+- Changes path matcher. ([a6e8688](https://github.com/alexseitsinger/react-render-controller/commit/a6e86883d0a28fb8807899812af9add3b455e1d7))
+- Removes scu. ([88d2f8d](https://github.com/alexseitsinger/react-render-controller/commit/88d2f8d172e0044fcf5d1d43d3ff5aa1b9e9e165))
+
+
 <a name="v2.19.0"></a>
 ## [v2.19.0](https://github.com/alexseitsinger/react-render-controller/compare/v2.18.1...v2.19.0) (2019-09-29)
 
