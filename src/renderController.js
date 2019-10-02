@@ -199,8 +199,6 @@ export class RenderController extends React.Component {
     const dataName = this.getDataName()
     addLoader(dataName, this.handleLoad)
 
-    this.shouldUpdate = createShouldUpdate(currentPathname)
-
     runLoaders(lastPathname, currentPathname)
   }
 
@@ -212,7 +210,7 @@ export class RenderController extends React.Component {
       unload,
     } = this.props
 
-    if (!( lastPathname && currentPathname )) {
+    if (!(lastPathname && currentPathname)) {
       return
     }
     runUnloaders(lastPathname, currentPathname)
@@ -260,10 +258,6 @@ export class RenderController extends React.Component {
     }
 
     return isEmpty(actualData) === true
-  }
-
-  shouldComponentUpdate() {
-    return this.shouldUpdate()
   }
 
   render() {
