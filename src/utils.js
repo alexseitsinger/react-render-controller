@@ -13,42 +13,43 @@ export const removeLeadingAndTrailingSlashes = url => {
 export const isMatchingPaths = (skippedPathname, currentPathname) => {
   const skipped = removeLeadingAndTrailingSlashes(skippedPathname)
   const current = removeLeadingAndTrailingSlashes(currentPathname)
+
   if (skipped === current) {
     return true
   }
+
+  var currentBits
+  if (current === "/") {
+    currentBits = ["/"]
+  }
+  else {
+    currentBits = current.split("/")
+  }
+  currentBits = currentBits.filter(bit => bit.length > 0)
+
   const isTrue = result => (result === true)
-  const currentBits = current.split("/")
+
   return skipped.split("/").map((skippedBit, i) => {
-    const isWildcard = Boolean(
-      skippedBit === "*" && currentBits.length && currentBits[i] && currentBits[i].length
+    if (skippedBit === "*") {
+      return true
+    }
+    const isMatching = (
+      currentBits.length
+      && currentBits[i]
+      && currentBits[i] === skippedBit
     )
-    const isMatching = Boolean(
-      currentBits.length && currentBits[i] && currentBits[i] === skippedBit
-    )
-    return ((isMatching === true) || (isWildcard === true))
-  })
-    .every(isTrue)
+    return (isMatching === true)
+  }).every(isTrue)
 }
 
-export const createShouldSkipUnload = (
-  lastPathname, currentPathname, skippedPathnames
-) => (from, to) => {
-  if (lastPathname === currentPathname) {
-    return true
-  }
-  return skippedPathnames.map(skippedPathname => {
-    var isFromMatching
-    var isToMatching
-    if (_.isObject(skippedPathname)) {
-      isFromMatching = isMatchingPaths(skippedPathname.from, from)
-      isToMatching = isMatchingPaths(skippedPathname.to, to)
-    }
-    else {
-      isFromMatching = isMatchingPaths(currentPathname, from)
-      isToMatching = isMatchingPaths(skippedPathname, to)
-    }
-    return ((isFromMatching === true) && isToMatching === true)
+export const createShouldUnload = (last, current, skipped) => (from, to) => {
+  const isSkipped = skipped.map(skippedPathname => {
+    const isFromMatching = isMatchingPaths(skippedPathname.from, from)
+    const isToMatching = isMatchingPaths(skippedPathname.to, to)
+    return ((isFromMatching === true) && (isToMatching === true))
   }).includes(true)
+
+  return (isSkipped === false || last === current)
 }
 
 const pathnames = {
@@ -90,13 +91,14 @@ export const createShouldUpdate = () => {
 const unloaders = {}
 export const addUnloader = (last, current, skipped, unload, dataName) => {
   if (!( dataName in unloaders )) {
-    const shouldSkipUnload = createShouldSkipUnload(last, current, skipped)
-    const handler = (from, to) => {
-      if (shouldSkipUnload(from, to) === false) {
+    const shouldUnload = createShouldUnload(last, current, skipped)
+
+    unloaders[dataName] = (from, to, callback) => {
+      if (shouldUnload(from, to) === true) {
         unload()
+        callback()
       }
     }
-    unloaders[dataName] = handler
   }
 }
 
@@ -107,9 +109,10 @@ export const runUnloaders = (from, to) => {
   }
 
   // Run unloaders
-  Object.keys(unloaders).forEach(k => {
-    unloaders[k](from, to)
-    delete unloaders[k]
+  Object.keys(unloaders).forEach((k, i, a) => {
+    unloaders[k](from, to, () => {
+      delete unloaders[k]
+    })
   })
 
   // Save the pathanmes
