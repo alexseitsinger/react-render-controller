@@ -57,23 +57,36 @@ const pathnames = {
   current: "",
 }
 
+let loaded = []
+const loadedWaiting = []
+
+const clearLoadedWaiting = _.debounce(() => {
+  loadedWaiting.forEach(name => {
+    loaded = loaded.filter(n => n !== name)
+  })
+}, 10000)
+
+export const clearLoaded = dataName => {
+  if (loadedWaiting.indexOf(dataName) === -1) {
+    loadedWaiting.push(dataName)
+  }
+
+  clearLoadedWaiting()
+}
+
 const loaders = {}
 export const addLoader = (dataName, method) => {
-  if (!(dataName in loaders)) {
-    loaders[dataName] = _.once(method)
+  if (loaded.indexOf(dataName) === -1) {
+    loaders[dataName] = method
+    loaded.push(dataName)
   }
 }
 
-export const checkForReload = _.debounce((lastLoadCount, comp, callback) => {
-  if (lastLoadCount === comp.loadCount) {
-    callback()
-  }
-}, 3000)
-
 export const runLoaders = _.debounce((from, to) => {
-  Object.keys(loaders).forEach(k => {
-    loaders[k]()
-    delete loaders[k]
+  Object.keys(loaders).forEach(key => {
+    loaders[key]()
+    delete loaders[key]
+    clearLoaded(key)
   })
 }, 3000)
 
