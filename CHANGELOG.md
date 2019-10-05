@@ -1,3 +1,14 @@
+<a name="v2.22.0"></a>
+## [v2.22.0](https://github.com/alexseitsinger/react-render-controller/compare/v2.21.0...v2.22.0) (2019-10-05)
+
+
+<a name="v2.21.0"></a>
+## [v2.21.0](https://github.com/alexseitsinger/react-render-controller/compare/v2.20.0...v2.21.0) (2019-10-05)
+
+### Code Refactoring
+- Updates load/unload handlers. ([151a2cd](https://github.com/alexseitsinger/react-render-controller/commit/151a2cdb4e040db83434b55bdd7069a98d2d2bc4))
+
+
 <a name="v2.20.0"></a>
 ## [v2.20.0](https://github.com/alexseitsinger/react-render-controller/compare/v2.19.0...v2.20.0) (2019-10-02)
 
