@@ -1,3 +1,13 @@
+<a name="v2.23.0"></a>
+## [v2.23.0](https://github.com/alexseitsinger/react-render-controller/compare/v2.22.1...v2.23.0) (2019-10-05)
+
+### Code Refactoring
+- Updates load process. ([18849fd](https://github.com/alexseitsinger/react-render-controller/commit/18849fd1aacaa8ac1dfa76ddc2f53fbb51e7e4be))
+
+### Features
+- Adds new load process. ([920e04e](https://github.com/alexseitsinger/react-render-controller/commit/920e04e5cd31f280df48683bea12bcbc064454cb))
+
+
 <a name="v2.22.1"></a>
 ## [v2.22.1](https://github.com/alexseitsinger/react-render-controller/compare/v2.22.0...v2.22.1) (2019-10-05)
 
