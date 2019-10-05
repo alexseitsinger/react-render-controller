@@ -59,17 +59,23 @@ const pathnames = {
 
 const loaders = {}
 export const addLoader = (dataName, method) => {
-  if (!( dataName in loaders )) {
-    loaders[dataName] = method
+  if (!(dataName in loaders)) {
+    loaders[dataName] = _.once(method)
   }
 }
 
+export const checkForReload = _.debounce((lastLoadCount, comp, callback) => {
+  if (lastLoadCount === comp.loadCount) {
+    callback()
+  }
+}, 3000)
+
 export const runLoaders = _.debounce((from, to) => {
-  Object.keys(loaders).forEach((k, i, a) => {
+  Object.keys(loaders).forEach(k => {
     loaders[k]()
     delete loaders[k]
   })
-}, 2500)
+}, 3000)
 
 export const createShouldUpdate = () => {
   var ct = 0

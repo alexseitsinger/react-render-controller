@@ -170,6 +170,7 @@ export class RenderController extends React.Component {
 
   static defaultProps = {
     skippedPathnames: [],
+    maxLoads: 3,
   }
 
   constructor(props) {
@@ -177,13 +178,19 @@ export class RenderController extends React.Component {
     this.dataName = null
     this.processUnloaders()
     this.processLoaders()
+    this.loadCount = 0
   }
 
-  handleLoad = () => {
-    const { load }  = this.props
+  handleLoad = (force) => {
+    const { load, maxLoads }  = this.props
 
     if (_.isFunction(load)) {
       if (this.isDataEmpty() === true) {
+        if (this.loadCount >= maxLoads) {
+          console.log("Attempted too many loads in a row.")
+          return
+        }
+
         load()
       }
     }
@@ -200,6 +207,19 @@ export class RenderController extends React.Component {
     addLoader(dataName, this.handleLoad)
 
     runLoaders(lastPathname, currentPathname)
+  }
+
+  handleUnload = () => {
+    const { unload } = this.props
+
+    if (_.isFunction(unload)) {
+      unload()
+
+      checkForReload(this.loadCount, this, () => {
+        console.log("Resetting load count...")
+        this.loadCount = 0
+      })
+    }
   }
 
   processUnloaders = () => {
@@ -219,7 +239,7 @@ export class RenderController extends React.Component {
       return
     }
     const dataName = this.getDataName()
-    addUnloader(lastPathname, currentPathname, skippedPathnames, unload, dataName)
+    addUnloader(lastPathname, currentPathname, skippedPathnames, this.handleUnload, dataName)
   }
 
   getDataName = () => {
