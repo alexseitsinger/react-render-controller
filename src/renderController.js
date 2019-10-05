@@ -192,6 +192,7 @@ export class RenderController extends React.Component {
         }
 
         load()
+        this.loadCount += 1
       }
     }
   }
