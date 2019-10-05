@@ -1,3 +1,10 @@
+<a name="v2.22.1"></a>
+## [v2.22.1](https://github.com/alexseitsinger/react-render-controller/compare/v2.22.0...v2.22.1) (2019-10-05)
+
+### Bug Fixes
+- Adds missing loadCount increment. ([b2536b9](https://github.com/alexseitsinger/react-render-controller/commit/b2536b9a62804f59be2976278442b170d5381c26))
+
+
 <a name="v2.22.0"></a>
 ## [v2.22.0](https://github.com/alexseitsinger/react-render-controller/compare/v2.21.0...v2.22.0) (2019-10-05)
 
