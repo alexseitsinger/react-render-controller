@@ -14,6 +14,11 @@ const loadDelay = 3000
 
 // TODO: Add test case for re-renders after mount/unmount -> Make sure it
 // doesn't cause an infinite loop (That;s why we use the "name" prop to count)
+//
+// TODO: Add test for:
+//       1) multiple instances loading the same data name.
+//          a) should only invoke load once after a delay.
+//       2) ensure load only happens once, then resets after 10 seconds of idle.
 
 describe("<RenderController/>", () => {
   it("renders using renderFailure when load fails to produce non-empty data", () => {
