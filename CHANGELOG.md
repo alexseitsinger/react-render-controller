@@ -1,3 +1,13 @@
+<a name="v3.0.0"></a>
+## [v3.0.0](https://github.com/alexseitsinger/react-render-controller/compare/v2.23.0...v3.0.0) (2019-10-08)
+
+### Code Refactoring
+- Reduce delay for clearLoadWaiting. ([53753eb](https://github.com/alexseitsinger/react-render-controller/commit/53753eb3d78189a4f9d69285157c053b04750a57))
+
+### Features
+- Adds state for renderFirst. ([7600d10](https://github.com/alexseitsinger/react-render-controller/commit/7600d10705d54609d7e975d95e9d83ab2140a6d4))
+
+
 <a name="v2.23.0"></a>
 ## [v2.23.0](https://github.com/alexseitsinger/react-render-controller/compare/v2.22.1...v2.23.0) (2019-10-05)
 
