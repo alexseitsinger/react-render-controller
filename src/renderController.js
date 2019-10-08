@@ -192,7 +192,7 @@ export class RenderController extends React.Component {
     if (_.isFunction(load)) {
       if (this.isDataEmpty() === true) {
         load()
-        this.setState({isFirstRender: false})
+        this.setRenderAttempted()
       }
     }
   }
