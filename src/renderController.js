@@ -161,6 +161,7 @@ export class RenderController extends React.Component {
     ]),
     load: PropTypes.func,
     unload: PropTypes.func,
+    renderFirst: PropTypes.func,
     renderWith: PropTypes.func,
     renderWithout: PropTypes.func,
     lastPathname: PropTypes.string,
@@ -172,9 +173,15 @@ export class RenderController extends React.Component {
     skippedPathnames: [],
   }
 
+  state = {
+    isRenderAttempted: false,
+  }
+
   constructor(props) {
     super(props)
+
     this.dataName = null
+
     this.processUnloaders()
     this.processLoaders()
   }
@@ -185,8 +192,17 @@ export class RenderController extends React.Component {
     if (_.isFunction(load)) {
       if (this.isDataEmpty() === true) {
         load()
+        this.setState({isFirstRender: false})
       }
     }
+  }
+
+  setRenderAttempted = _.debounce(() => {
+    this.setState({isRenderAttempted: true})
+  }, 6000)
+
+  componentDidMount() {
+    this.setRenderAttempted()
   }
 
   processLoaders = () => {
@@ -269,7 +285,14 @@ export class RenderController extends React.Component {
   }
 
   render() {
-    const { children, renderWithout, renderWith, renderFailure } = this.props
+    const { children, renderWithout, renderWith, renderFirst } = this.props
+    const { isRenderAttempted } = this.state
+
+    if (isRenderAttempted === false) {
+      if (_.isFunction(renderFirst)) {
+        return renderFirst()
+      }
+    }
 
     if (this.isDataEmpty() === false) {
       if (_.isFunction(renderWith)) {
