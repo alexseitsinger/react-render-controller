@@ -64,7 +64,7 @@ const clearLoadedWaiting = _.debounce(() => {
   loadedWaiting.forEach(name => {
     loaded = loaded.filter(n => n !== name)
   })
-}, 10000)
+}, 5000)
 
 export const clearLoaded = dataName => {
   if (loadedWaiting.indexOf(dataName) === -1) {
