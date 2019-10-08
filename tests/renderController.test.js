@@ -19,6 +19,8 @@ const loadDelay = 3000
 //       1) multiple instances loading the same data name.
 //          a) should only invoke load once after a delay.
 //       2) ensure load only happens once, then resets after 10 seconds of idle.
+//       3) if using shouldUpdate(), check the last action (load or unload)
+//          to determine if shouldUpdate should run or just passthrough (unload)
 
 describe("<RenderController/>", () => {
   it("renders using renderFailure when load fails to produce non-empty data", () => {
