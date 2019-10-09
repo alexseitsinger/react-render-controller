@@ -82,39 +82,19 @@ const pathnames = {
   current: "",
 }
 
-let loaded = []
-const loadedWaiting = []
-
-const clearLoadedWaiting = _.debounce(() => {
-  loadedWaiting.forEach(name => {
-    loaded = loaded.filter(n => n !== name)
-  })
-}, 5000)
-
-export const clearLoaded = dataName => {
-  if (loadedWaiting.indexOf(dataName) === -1) {
-    loadedWaiting.push(dataName)
-  }
-
-  clearLoadedWaiting()
-}
 
 const loaders = {}
 export const addLoader = (dataName, method, callback) => {
   var isCancelled = false
 
-  //if (loaded.indexOf(dataName) === -1) {
-    loaders[dataName] = () => {
-      if (isCancelled === true) {
-        return
-      }
-
-      method()
-      callback()
+  loaders[dataName] = () => {
+    if (isCancelled === true) {
+      return
     }
 
-    loaded.push(dataName)
-  //}
+    method()
+    callback()
+  }
 
   return () => {
     isCancelled = true
@@ -162,9 +142,9 @@ export const addUnloader = (last, current, skipped, unload, dataName) => {
     unloaders[dataName] = (from, to) => {
       if (shouldUnload(from, to) === true) {
         if (isLoadPending(dataName) === true) {
-          console.log("load pending... skipping!")
           return
         }
+
         unload()
         resetLoadCount()
         delete unloaders[dataName]
