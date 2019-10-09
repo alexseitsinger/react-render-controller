@@ -240,12 +240,11 @@ export class RenderController extends React.Component {
   isDataLoaded = () => {
     const { data } = this.props
 
-    const keys = Object.keys(data)
-    if (keys.length) {
-      return (isEmpty(data) === true)
+    if (!data) {
+      return false
     }
 
-    return false
+    return (isEmpty(data) === false)
   }
 
   render() {
