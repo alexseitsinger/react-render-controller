@@ -107,7 +107,6 @@ export const runLoaders = _.debounce((from, to) => {
     loaders[key]()
     updateLoadCount(key)
     delete loaders[key]
-    clearLoaded(key)
   })
 }, 3000)
 
