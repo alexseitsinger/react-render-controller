@@ -1,3 +1,11 @@
+<a name="v4.0.0"></a>
+## [v4.0.0](https://github.com/alexseitsinger/react-render-controller/compare/v3.1.0...v4.0.0) (2019-10-09)
+
+### Code Refactoring
+- Cleans up component. ([60e751f](https://github.com/alexseitsinger/react-render-controller/commit/60e751fa10663a638d3b8241d268f77f926332a0))
+- Cleans up load methods. ([a55d28c](https://github.com/alexseitsinger/react-render-controller/commit/a55d28ce38997ecbba5447d58b09112e7e0b087d))
+
+
 <a name="v3.1.0"></a>
 ## [v3.1.0](https://github.com/alexseitsinger/react-render-controller/compare/v3.0.0...v3.1.0) (2019-10-09)
 
