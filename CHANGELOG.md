@@ -1,3 +1,10 @@
+<a name="v4.0.1"></a>
+## [v4.0.1](https://github.com/alexseitsinger/react-render-controller/compare/v4.0.0...v4.0.1) (2019-10-09)
+
+### Bug Fixes
+- Removes unused method call. ([481233b](https://github.com/alexseitsinger/react-render-controller/commit/481233bfa70958eca9b8dcae37bf58b147950ee6))
+
+
 <a name="v4.0.0"></a>
 ## [v4.0.0](https://github.com/alexseitsinger/react-render-controller/compare/v3.1.0...v4.0.0) (2019-10-09)
 
