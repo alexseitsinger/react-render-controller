@@ -9,6 +9,9 @@ const nullData = null
 const RenderWith = () => <div>Render With</div>
 const RenderWithout = () => <div>Render Without</div>
 const RenderFailure = () => <div>Render Failure</div>
+const WithData = () => <div className={"withData"}>With Data</div>
+const WithoutData = () => <div className={"withoutData"}>Without Data</div>
+
 
 const loadDelay = 3000
 
@@ -23,134 +26,61 @@ const loadDelay = 3000
 //          to determine if shouldUpdate should run or just passthrough (unload)
 
 describe("<RenderController/>", () => {
-  it("renders using renderFailure when load fails to produce non-empty data", () => {
-
-    const wrapper = mount(
-      <RenderController
-        data={null}
-        load={() => {
-          console.log("load attempted")
-        }}
-        unload={() => {
-          console.log("unload attempted")
-        }}
-        renderWith={() => {
-          return <RenderWith />
-        }}
-        renderWithout={() => {
-          return <RenderWithout />
-        }}
-      />
-    )
-    // The controller should first use renderWithout() before the loading has
-    // started.
-    expect(wrapper.find(RenderWithout)).toHaveLength(1)
-
-    setTimeout(() => {
-      // Once load has been attempted, it should use renderFailure()
-      expect(wrapper.find(RenderWithout)).toHaveLength(0)
-      expect(wrapper.find(RenderWith)).toHaveLength(0)
-      expect(wrapper.find(RenderFailure)).toHaveLength(1)
-    }, loadDelay)
-  })
-
-    /**
-  it("invokes renderWith with array data", () => {
-    const wrapper = mount(
-      <RenderController
-        data={arrayData}
-        renderWith={() => {
-          return <div className={"withData"}>With Data</div>
-        }}
-      />
-    )
-    expect(wrapper.find(".withData")).toHaveLength(1)
-    expect(wrapper.find(".withData").text()).toBe("With Data")
-  })
-  */
 
   it("invokes renderWith with object data", () => {
     const wrapper = mount(
       <RenderController
-        data={{
-          data: objectData,
-        }}
-        renderWith={() => {
-          return <div className={"withData"}>With Data</div>
-        }}
+        name={"dataName"}
+        data={objectData}
+        load={() => {}}
+        unload={() => {}}
+        currentPathname={"/"}
+        lastPathname={"/"}
+        renderWith={() => <WithData />}
       />
     )
-    expect(wrapper.find(".withData")).toHaveLength(1)
-    expect(wrapper.find(".withData").text()).toBe("With Data")
+
+    setTimeout(() => {
+      expect(wrapper.find(".withData")).toHaveLength(1)
+      expect(wrapper.find(".withData").text()).toBe("With Data")
+    }, loadDelay)
   })
 
   it("renders children with data", () => {
     const wrapper = mount(
       <RenderController
-        data={{
-          data: objectData
-        }}>
-        <div className={"withData"}>With Data</div>
+        name={"dataName"}
+        data={objectData}
+        load={() => {}}
+        unload={() => {}}
+        currentPathname={"/"}
+        lastPathname={"/"}>
+        <WithData />
       </RenderController>
     )
-    expect(wrapper.find(".withData")).toHaveLength(1)
-    expect(wrapper.find(".withData").text()).toBe("With Data")
-  })
 
-    /**
-  it("invokes renderWithout with empty array data", () => {
-    const wrapper = mount(
-      <RenderController
-        data={emptyArrayData}
-        renderWithout={() => {
-          return <div className={"withoutData"}>Without Data</div>
-        }}
-      />
-    )
-    expect(wrapper.find(".withoutData")).toHaveLength(1)
-    expect(wrapper.find(".withoutData").text()).toBe("Without Data")
+    setTimeout(() => {
+      expect(wrapper.find(".withData")).toHaveLength(1)
+      expect(wrapper.find(".withData").text()).toBe("With Data")
+    }, loadDelay)
   })
-  */
 
   it("invokes renderWithout with empty named object.", () => {
     const wrapper = mount(
       <RenderController
-        data={{ myData: emptyObjectData }}
-        renderWithout={() => {
-          return <div className={"withoutData"}>Without Data</div>
-        }}
+        name={"dataName"}
+        data={emptyObjectData}
+        currentPathname={"/"}
+        lastPathname={"/"}
+        load={() => {}}
+        unload={() => {}}
+        renderWithout={() => (<WithoutData />)}
       />
     )
-    expect(wrapper.find(".withoutData")).toHaveLength(1)
-    expect(wrapper.find(".withoutData").text()).toBe("Without Data")
-  })
 
-    /**
-  it("invokes renderWithout with null data", () => {
-    const wrapper = mount(
-      <RenderController
-        data={nullData}
-        renderWithout={() => {
-          return <div className={"withoutData"}>Without Data</div>
-        }}
-      />
-    )
-    expect(wrapper.find(".withoutData")).toHaveLength(1)
-    expect(wrapper.find(".withoutData").text()).toBe("Without Data")
+    setTimeout(() => {
+      expect(wrapper.find(".withoutData")).toHaveLength(1)
+      expect(wrapper.find(".withoutData").text()).toBe("Without Data")
+    }, loadDelay)
   })
-  */
-
-    /*
-  it("renders nothing with null data, and no renderWithout method", () => {
-    const wrapper = mount(<RenderController data={nullData} />)
-    expect(wrapper.children()).toHaveLength(0)
-  })
-  */
-
-    /*
-  it("renders nothing with no props", () => {
-    const wrapper = mount(<RenderController />)
-    expect(wrapper.children()).toHaveLength(0)
-  })
-  */
 })
