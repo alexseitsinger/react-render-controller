@@ -244,7 +244,7 @@ export class RenderController extends React.Component {
       return false
     }
 
-    return (isEmpty(data) === false)
+    return !isEmpty(data)
   }
 
   render() {
