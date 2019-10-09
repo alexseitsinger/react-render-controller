@@ -1,3 +1,10 @@
+<a name="v4.0.2"></a>
+## [v4.0.2](https://github.com/alexseitsinger/react-render-controller/compare/v4.0.1...v4.0.2) (2019-10-09)
+
+### Bug Fixes
+- Fixed isDataLoaded. ([2525cdd](https://github.com/alexseitsinger/react-render-controller/commit/2525cddb0590c9af6c56a5d67128c791ff09675d))
+
+
 <a name="v4.0.1"></a>
 ## [v4.0.1](https://github.com/alexseitsinger/react-render-controller/compare/v4.0.0...v4.0.1) (2019-10-09)
 
