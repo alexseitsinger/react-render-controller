@@ -115,9 +115,7 @@ describe("<RenderController/>", () => {
   it("invokes renderWithout with empty named object.", () => {
     const wrapper = mount(
       <RenderController
-        data={{
-          data: emptyObjectData,
-        }}
+        data={{ myData: emptyObjectData }}
         renderWithout={() => {
           return <div className={"withoutData"}>Without Data</div>
         }}
