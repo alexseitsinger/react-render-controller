@@ -52,6 +52,31 @@ export const createShouldUnload = (last, current, skipped) => (from, to) => {
   return (isSkipped === false || last === current)
 }
 
+
+const loadCounts = {}
+export const getLoadCount = dataName => {
+  if (!( dataName in loadCounts )) {
+    loadCounts[dataName] = -1
+  }
+  const loadCount = loadCounts[dataName]
+  return loadCount
+}
+
+export const resetLoadCount = dataName => {
+  if (dataName in loadCounts) {
+    loadCounts[dataName] = -1
+  }
+}
+
+export const updateLoadCount = dataName => {
+  if (!( dataName in loadCounts )) {
+    loadCounts[dataName] = -1
+  }
+  loadCounts[dataName] += 1
+  const loadCount = loadCounts[dataName]
+  return loadCount
+}
+
 const pathnames = {
   last: "",
   current: "",
@@ -75,16 +100,32 @@ export const clearLoaded = dataName => {
 }
 
 const loaders = {}
-export const addLoader = (dataName, method) => {
-  if (loaded.indexOf(dataName) === -1) {
-    loaders[dataName] = method
+export const addLoader = (dataName, method, callback) => {
+  var isCancelled = false
+
+  //if (loaded.indexOf(dataName) === -1) {
+    loaders[dataName] = () => {
+      if (isCancelled === true) {
+        return
+      }
+
+      method()
+      callback()
+    }
+
     loaded.push(dataName)
+  //}
+
+  return () => {
+    isCancelled = true
   }
 }
 
 export const runLoaders = _.debounce((from, to) => {
   Object.keys(loaders).forEach(key => {
+    // Run the loader, update the load count, and delete it from the queue.
     loaders[key]()
+    updateLoadCount(key)
     delete loaders[key]
     clearLoaded(key)
   })
@@ -106,16 +147,27 @@ export const createShouldUpdate = () => {
   }
 }
 
+export const isLoadPending = dataName => {
+  if (dataName in loaders) {
+    return true
+  }
+  return false
+}
 
 const unloaders = {}
 export const addUnloader = (last, current, skipped, unload, dataName) => {
   if (!( dataName in unloaders )) {
     const shouldUnload = createShouldUnload(last, current, skipped)
 
-    unloaders[dataName] = (from, to, callback) => {
+    unloaders[dataName] = (from, to) => {
       if (shouldUnload(from, to) === true) {
+        if (isLoadPending(dataName) === true) {
+          console.log("load pending... skipping!")
+          return
+        }
         unload()
-        callback()
+        resetLoadCount()
+        delete unloaders[dataName]
       }
     }
   }
@@ -128,10 +180,8 @@ export const runUnloaders = (from, to) => {
   }
 
   // Run unloaders
-  Object.keys(unloaders).forEach((k, i, a) => {
-    unloaders[k](from, to, () => {
-      delete unloaders[k]
-    })
+  Object.keys(unloaders).forEach(k => {
+    unloaders[k](from, to)
   })
 
   // Save the pathanmes
