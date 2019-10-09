@@ -161,14 +161,15 @@ export class RenderController extends React.Component {
       PropTypes.arrayOf(PropTypes.object),
       PropTypes.object,
       PropTypes.array
-    ]),
-    load: PropTypes.func,
-    unload: PropTypes.func,
+    ]).isRequired,
+    name: PropTypes.string.isRequired,
+    load: PropTypes.func.isRequired,
+    unload: PropTypes.func.isRequired,
     renderFirst: PropTypes.func,
     renderWith: PropTypes.func,
     renderWithout: PropTypes.func,
-    lastPathname: PropTypes.string,
-    currentPathname: PropTypes.string,
+    lastPathname: PropTypes.string.isRequired,
+    currentPathname: PropTypes.string.isRequired,
     skippedPathnames: PropTypes.arrayOf(PropTypes.string),
   }
 
@@ -179,7 +180,6 @@ export class RenderController extends React.Component {
   constructor(props) {
     super(props)
 
-    this.dataName = null
     this.cancelLoad = null
 
     this.processUnloaders()
@@ -194,26 +194,24 @@ export class RenderController extends React.Component {
     }
   }
 
-  handleLoad = (force) => {
-    const { load }  = this.props
+  handleLoad = () => {
+    const { load, name }  = this.props
 
-    if (_.isFunction(load)) {
-      if (this.isDataEmpty() === true) {
-        if (getLoadCount(this.getDataName()) <= 0) {
-          load()
-        }
+    if (this.isDataLoaded() === false) {
+      if (getLoadCount(name) <= 0) {
+        load()
       }
     }
   }
 
   processLoaders = () => {
-    const { load, lastPathname, currentPathname } = this.props
+    const {
+      name,
+      lastPathname,
+      currentPathname
+    } = this.props
 
-    if (!( lastPathname, currentPathname )) {
-      return
-    }
-
-    this.cancelLoad = addLoader(this.getDataName(), this.handleLoad, () => {
+    this.cancelLoad = addLoader(name, this.handleLoad, () => {
       this.cancelLoad = null
     })
 
@@ -221,109 +219,57 @@ export class RenderController extends React.Component {
   }
 
   handleUnload = () => {
-    const { unload } = this.props
+    const { name, unload } = this.props
 
-    if (_.isFunction(unload)) {
-      unload()
-      resetLoadCount(this.getDataName())
-    }
+    unload()
+    resetLoadCount(name)
   }
 
   processUnloaders = () => {
     const {
+      name,
       lastPathname,
       currentPathname,
       skippedPathnames,
-      unload,
     } = this.props
 
-    if (!(lastPathname && currentPathname)) {
-      return
-    }
     runUnloaders(lastPathname, currentPathname)
-
-    if (_.isFunction(unload) === false) {
-      return
-    }
-    addUnloader(lastPathname, currentPathname, skippedPathnames, this.handleUnload, this.getDataName())
+    addUnloader(lastPathname, currentPathname, skippedPathnames, this.handleUnload, name)
   }
 
-  getDataName = () => {
-    const {
-      currentPathname,
-      data,
-    } = this.props
-
-    const prefix = currentPathname
-    var suffix
-
-    var dataName = this.dataName
-    if (!(dataName)) {
-      if (_.isObject(data)) {
-        const keys = Object.keys(data)
-        if (keys.length) {
-          suffix = keys.join("_")
-        }
-        else {
-          suffix = _.uniqueId()
-        }
-      }
-      else {
-        suffix = `data_${_.uniqueId()}`
-      }
-
-      this.dataName = dataName = `${prefix}_${suffix}`
-    }
-
-    return dataName
-  }
-
-  isDataEmpty = () => {
+  isDataLoaded = () => {
     const { data } = this.props
-    if (!(data)) {
-      return true
-    }
 
     const keys = Object.keys(data)
-    if (!(keys.length) || (keys.length > 1)) {
-      throw new Error("Data must be a named object.")
+    if (keys.length) {
+      return (isEmpty(data) === true)
     }
 
-    const actualData = data[keys[0]]
-    if (!actualData) {
-      throw new Error("Data must be a named object.")
-    }
-
-    const actualDataKeys = Object.keys(actualData)
-    if (!(actualDataKeys.length)) {
-      return true
-    }
-
-    return isEmpty(actualData) === true
+    return false
   }
 
   render() {
-    const { children, renderWithout, renderWith, renderFirst } = this.props
+    const { children, name, renderWithout, renderWith, renderFirst } = this.props
 
-    if (this.isDataEmpty() === true) {
-      if (getLoadCount(this.getDataName()) <= 0) {
-        if (_.isFunction(renderFirst)) {
-          return renderFirst()
-        }
+    if (this.isDataLoaded() === true) {
+      if (_.isFunction(renderWith)) {
+        return renderWith()
       }
 
-      if (_.isFunction(renderWithout)) {
-        return renderWithout()
+      return children
+    }
+
+    if (getLoadCount(name) <= 0) {
+      if (_.isFunction(renderFirst)) {
+        return renderFirst()
       }
-
-      return null
     }
 
-    if (_.isFunction(renderWith)) {
-      return renderWith()
+    if (_.isFunction(renderWithout)) {
+      return renderWithout()
     }
 
-    return children
+    return null
   }
 }
 
