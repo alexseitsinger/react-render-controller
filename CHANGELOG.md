@@ -1,3 +1,13 @@
+<a name="v3.1.0"></a>
+## [v3.1.0](https://github.com/alexseitsinger/react-render-controller/compare/v3.0.0...v3.1.0) (2019-10-09)
+
+### Bug Fixes
+- Fixes setRenderAttempted in handleLoad. ([ee23347](https://github.com/alexseitsinger/react-render-controller/commit/ee233475cc8a5555355773a7665e9473f11c9fb1))
+
+### Features
+- Adds cancels and loadCounts. ([48aa959](https://github.com/alexseitsinger/react-render-controller/commit/48aa959cb93f6015572814380f8c87948492ad8c))
+
+
 <a name="v3.0.0"></a>
 ## [v3.0.0](https://github.com/alexseitsinger/react-render-controller/compare/v2.23.0...v3.0.0) (2019-10-08)
 
