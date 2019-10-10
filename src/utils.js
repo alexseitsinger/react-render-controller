@@ -169,19 +169,19 @@ export const runUnloaders = (from, to) => {
 }
 
 export const isEmpty = data => {
-  var result
+  var result = false
   if (!data) {
     return true
   }
   if (_.isArray(data)) {
     // If its an empty array, set true
-    if (_.isEmpty(data)) {
+    if (_.isEmpty(data) === true) {
       result = true
     }
     else {
       // If its an array of items, re-run this fn on each item.
       data.forEach(obj => {
-        if (result) {
+        if (result === true) {
           return
         }
         result = isEmpty(obj)
@@ -189,7 +189,7 @@ export const isEmpty = data => {
     }
   }
   else if (_.isObject(data)) {
-    if (_.isEmpty(data)) {
+    if (_.isEmpty(data) === true) {
       result = true
     }
   }
