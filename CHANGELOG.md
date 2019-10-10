@@ -1,3 +1,16 @@
+<a name="v4.1.0"></a>
+## [v4.1.0](https://github.com/alexseitsinger/react-render-controller/compare/v4.0.2...v4.1.0) (2019-10-10)
+
+### Bug Fixes
+- Fixed isDataLoaded. ([35929df](https://github.com/alexseitsinger/react-render-controller/commit/35929df3b871f7b2629b828d2f85d4e6991be0d0))
+
+### Code Refactoring
+- Adds false boolean to isEmpty. ([a128f76](https://github.com/alexseitsinger/react-render-controller/commit/a128f76b3ae8535c2811d45778497c7aa4c64159))
+
+### Features
+- Adds state check for first renders. ([8c7a1d4](https://github.com/alexseitsinger/react-render-controller/commit/8c7a1d4f95caa248f9c8f8459bc113ad3390b250))
+
+
 <a name="v4.0.2"></a>
 ## [v4.0.2](https://github.com/alexseitsinger/react-render-controller/compare/v4.0.1...v4.0.2) (2019-10-09)
 
