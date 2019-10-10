@@ -177,6 +177,10 @@ export class RenderController extends React.Component {
     skippedPathnames: [],
   }
 
+  state = {
+    isLoadAttempted: false,
+  }
+
   constructor(props) {
     super(props)
 
@@ -200,9 +204,14 @@ export class RenderController extends React.Component {
     if (this.isDataLoaded() === false) {
       if (getLoadCount(name) <= 0) {
         load()
+        this.setLoadAttempted()
       }
     }
   }
+
+  setLoadAttempted = _.debounce(() => {
+    this.setState({isLoadAttempted: true})
+  }, 6000)
 
   processLoaders = () => {
     const {
@@ -240,25 +249,25 @@ export class RenderController extends React.Component {
   isDataLoaded = () => {
     const { data } = this.props
 
-    if (!data) {
+    if (!data || isEmpty(data) === true) {
       return false
     }
 
-    return !isEmpty(data)
+    return true
   }
 
   render() {
     const { children, name, renderWithout, renderWith, renderFirst } = this.props
+    const { isLoadAttempted } = this.state
 
     if (this.isDataLoaded() === true) {
       if (_.isFunction(renderWith)) {
         return renderWith()
       }
-
       return children
     }
 
-    if (getLoadCount(name) <= 0) {
+    if (isLoadAttempted === false && getLoadCount(name) <= 0) {
       if (_.isFunction(renderFirst)) {
         return renderFirst()
       }
