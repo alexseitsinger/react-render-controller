@@ -186,8 +186,25 @@ export class RenderController extends React.Component {
 
     this.cancelLoad = null
 
+    this._isMounted = false
+    let realSetState = this.setState.bind(this)
+    this.setState = (...args) => {
+      if (this._isMounted === false) {
+        return
+      }
+      realSetState(...args)
+    }
+
     this.processUnloaders()
     this.processLoaders()
+  }
+
+  componentDidMount() {
+    this._isMounted = true
+  }
+
+  componentWillUnmount() {
+    this._isMounted = false
   }
 
   componentDidUpdate(prevProps, prevState) {
