@@ -1,3 +1,10 @@
+<a name="v4.1.1"></a>
+## [v4.1.1](https://github.com/alexseitsinger/react-render-controller/compare/v4.1.0...v4.1.1) (2019-10-11)
+
+### Bug Fixes
+- Fixes memory leak. ([9387a33](https://github.com/alexseitsinger/react-render-controller/commit/9387a33dc5f60a628374921903ca46678ced4dd4))
+
+
 <a name="v4.1.0"></a>
 ## [v4.1.0](https://github.com/alexseitsinger/react-render-controller/compare/v4.0.2...v4.1.0) (2019-10-10)
 
