@@ -3,17 +3,19 @@ import PropTypes from "prop-types"
 import _ from "underscore"
 
 import {
-  resetLoadCount,
-  updateLoadCount,
   getLoadCount,
-  createShouldUpdate,
-  isEmpty,
-  removeLeadingAndTrailingSlashes,
+  resetLoadCount,
+} from "./counting"
+import {
   runUnloaders,
   addUnloader,
-  createShouldSkipUnload,
-  addLoader,
+} from "./unloading"
+import {
   runLoaders,
+  addLoader,
+} from "./loading"
+import {
+  isEmpty,
 } from "./utils"
 
 /**
@@ -155,12 +157,12 @@ export class RenderController extends React.Component {
   static propTypes = {
     children: PropTypes.oneOfType([
       PropTypes.arrayOf(PropTypes.node),
-      PropTypes.node
+      PropTypes.node,
     ]),
     data: PropTypes.oneOfType([
       PropTypes.arrayOf(PropTypes.object),
       PropTypes.object,
-      PropTypes.array
+      PropTypes.array,
     ]).isRequired,
     name: PropTypes.string.isRequired,
     load: PropTypes.func.isRequired,
@@ -170,11 +172,18 @@ export class RenderController extends React.Component {
     renderWithout: PropTypes.func,
     lastPathname: PropTypes.string.isRequired,
     currentPathname: PropTypes.string.isRequired,
-    skippedPathnames: PropTypes.arrayOf(PropTypes.string),
+    skippedPathnames: PropTypes.arrayOf(PropTypes.shape({
+      from: PropTypes.string.isRequired,
+      to: PropTypes.string.isRequired,
+    })),
   }
 
   static defaultProps = {
+    children: null,
     skippedPathnames: [],
+    renderFirst: null,
+    renderWith: null,
+    renderWithout: null,
   }
 
   state = {
@@ -187,7 +196,7 @@ export class RenderController extends React.Component {
     this.cancelLoad = null
 
     this._isMounted = false
-    let realSetState = this.setState.bind(this)
+    const realSetState = this.setState.bind(this)
     this.setState = (...args) => {
       if (this._isMounted === false) {
         return
@@ -208,16 +217,20 @@ export class RenderController extends React.Component {
   }
 
   componentDidUpdate(prevProps, prevState) {
-    if (_.isEqual(this.props.data, prevProps.data) === false) {
+    const { data } = this.props
+    if (_.isEqual(data, prevProps.data) === false) {
       if (_.isFunction(this.cancelLoad)) {
         this.cancelLoad()
       }
     }
   }
 
+  setLoadAttempted = _.debounce(() => {
+    this.setState({ isLoadAttempted: true })
+  }, 6000)
+
   handleLoad = () => {
     const { load, name }  = this.props
-
     if (this.isDataLoaded() === false) {
       if (getLoadCount(name) <= 0) {
         load()
@@ -225,10 +238,6 @@ export class RenderController extends React.Component {
       }
     }
   }
-
-  setLoadAttempted = _.debounce(() => {
-    this.setState({isLoadAttempted: true})
-  }, 6000)
 
   processLoaders = () => {
     const {
@@ -246,7 +255,6 @@ export class RenderController extends React.Component {
 
   handleUnload = () => {
     const { name, unload } = this.props
-
     unload()
     resetLoadCount(name)
   }
