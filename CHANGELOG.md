@@ -1,3 +1,14 @@
+<a name="v4.2.0"></a>
+## [v4.2.0](https://github.com/alexseitsinger/react-render-controller/compare/v4.1.1...v4.2.0) (2019-10-21)
+
+### Code Refactoring
+- Changes render process. ([14b3b70](https://github.com/alexseitsinger/react-render-controller/commit/14b3b70ad551ab6ff08517ac90766b1cfbb7f726))
+- Moves modules around. ([925d440](https://github.com/alexseitsinger/react-render-controller/commit/925d440a4de5eded742d739ebd3feb564a3fcb9d))
+
+### Features
+- Adds eslint plugins. ([7eb134d](https://github.com/alexseitsinger/react-render-controller/commit/7eb134d6d8513b844ee358d6cde13b9deee38359))
+
+
 <a name="v4.1.1"></a>
 ## [v4.1.1](https://github.com/alexseitsinger/react-render-controller/compare/v4.1.0...v4.1.1) (2019-10-11)
 
