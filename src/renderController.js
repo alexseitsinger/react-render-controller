@@ -214,6 +214,9 @@ export class RenderController extends React.Component {
 
   componentWillUnmount() {
     this._isMounted = false
+    if (_.isFunction(this.cancelLoad)) {
+      this.cancelLoad()
+    }
   }
 
   componentDidUpdate(prevProps, prevState) {
