@@ -1,3 +1,10 @@
+<a name="v4.3.0"></a>
+## [v4.3.0](https://github.com/alexseitsinger/react-render-controller/compare/v4.2.0...v4.3.0) (2019-10-22)
+
+### Features
+- Runs cancelLoad on unmount. ([f105fe5](https://github.com/alexseitsinger/react-render-controller/commit/f105fe583e6b62a81f8123f710fb2ab2b5d90f4b))
+
+
 <a name="v4.2.0"></a>
 ## [v4.2.0](https://github.com/alexseitsinger/react-render-controller/compare/v4.1.1...v4.2.0) (2019-10-21)
 
