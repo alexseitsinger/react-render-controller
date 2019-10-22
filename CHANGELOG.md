@@ -1,3 +1,10 @@
+<a name="v4.3.1"></a>
+## [v4.3.1](https://github.com/alexseitsinger/react-render-controller/compare/v4.3.0...v4.3.1) (2019-10-22)
+
+### Bug Fixes
+- Removes loaders when cancelled. ([083ddf3](https://github.com/alexseitsinger/react-render-controller/commit/083ddf3e7d12ba7e8903814a4bad199fe89173b7))
+
+
 <a name="v4.3.0"></a>
 ## [v4.3.0](https://github.com/alexseitsinger/react-render-controller/compare/v4.2.0...v4.3.0) (2019-10-22)
 
