@@ -9,6 +9,7 @@ export const addLoader = (name, load, callback) => {
 
   loaders[name] = () => {
     if (isLoadCancelled === true) {
+      delete loaders[name]
       return
     }
     load()
