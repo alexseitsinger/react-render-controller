@@ -1,3 +1,10 @@
+<a name="v5.0.0"></a>
+## [v5.0.0](https://github.com/alexseitsinger/react-render-controller/compare/v4.3.1...v5.0.0) (2019-10-23)
+
+### Features
+- Changes props for multi-object load/unload. ([b37af70](https://github.com/alexseitsinger/react-render-controller/commit/b37af7032631d306a747a74abca429dafdeeb899))
+
+
 <a name="v4.3.1"></a>
 ## [v4.3.1](https://github.com/alexseitsinger/react-render-controller/compare/v4.3.0...v4.3.1) (2019-10-22)
 
