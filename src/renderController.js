@@ -21,26 +21,15 @@ import {
 /**
  * Controls what to render based on data being empty or not.
  *
- * @return {function}
- *
  * @param {object} props
  * @param {object|array} props.data
- * Checked for emptiness.
  * @param {function} [props.load]
- * Invoked to make the data non-empty.
  * @param {function} [props.unload]
- * Invoked to make the data empty.
  * @param {function} [props.renderWith]
- * Invoked when rendering with non-empty data.
  * @param {function} [props.renderWithout]
- * Invoked when rendering with empty data.
  * @param {string} [props.lastPathname]
- * The pathname of the last page navigated to
  * @param {string} [props.currentPathname]
- * The pathname of the current page navigated to.
  * @param {array} [props.skippedPathnames]
- * The pathnames to skip unloading for when this component is navigated away
- * from.
  *
  * @example
  * // reducer.js
@@ -159,14 +148,16 @@ export class RenderController extends React.Component {
       PropTypes.arrayOf(PropTypes.node),
       PropTypes.node,
     ]),
-    data: PropTypes.oneOfType([
-      PropTypes.arrayOf(PropTypes.object),
-      PropTypes.object,
-      PropTypes.array,
-    ]).isRequired,
-    name: PropTypes.string.isRequired,
-    load: PropTypes.func.isRequired,
-    unload: PropTypes.func.isRequired,
+    targets: PropTypes.arrayOf(PropTypes.shape({
+      name: PropTypes.string.isRequired,
+      data: PropTypes.oneOfType([
+        PropTypes.array,
+        PropTypes.object,
+      ]),
+      load: PropTypes.func.isRequired,
+      unload: PropTypes.func,
+    })).isRequired,
+    failDelay: PropTypes.number,
     renderFirst: PropTypes.func,
     renderWith: PropTypes.func,
     renderWithout: PropTypes.func,
@@ -184,6 +175,7 @@ export class RenderController extends React.Component {
     renderFirst: null,
     renderWith: null,
     renderWithout: null,
+    failDelay: 6000,
   }
 
   state = {
@@ -193,8 +185,12 @@ export class RenderController extends React.Component {
   constructor(props) {
     super(props)
 
-    this.cancelLoad = null
+    // Store a set of canceller functions to run when our debounced load
+    // functions should not continue due to unmounting, etc.
+    this.cancellers = []
 
+    // Control our setState method with a variable to prevent memroy leaking
+    // from our debounced methods running after the components are removed.
     this._isMounted = false
     const realSetState = this.setState.bind(this)
     this.setState = (...args) => {
@@ -204,6 +200,14 @@ export class RenderController extends React.Component {
       realSetState(...args)
     }
 
+    // After a certain delay, toggle our load attempted flag to change what gets
+    // displayed (from renderFirst -> renderWithout)
+    this.setLoadAttempted = _.debounce(() => {
+      this.setState({ isLoadAttempted: true })
+    }, props.failDelay)
+
+    // Start the process off before the component gets mounted so data is
+    // updated as early as possible,
     this.processUnloaders()
     this.processLoaders()
   }
@@ -212,90 +216,144 @@ export class RenderController extends React.Component {
     this._isMounted = true
   }
 
+  componentDidUpdate(prevProps) {
+    const { targets } = this.props
+
+    // If we have pending loads, and then we navigate away from that controller
+    // before the load completes, the data will clear, and then load again.
+    // To avoid this, cancel any pending loads everytime our targets change.
+    if (_.isEqual(targets, prevProps.targets) === false) {
+      this.runCancellers()
+    }
+  }
+
   componentWillUnmount() {
     this._isMounted = false
-    if (_.isFunction(this.cancelLoad)) {
-      this.cancelLoad()
-    }
+
+    // Before any unmounting, cancel any pending loads.
+    this.runCancellers()
   }
 
-  componentDidUpdate(prevProps, prevState) {
-    const { data } = this.props
-    if (_.isEqual(data, prevProps.data) === false) {
-      if (_.isFunction(this.cancelLoad)) {
-        this.cancelLoad()
+  runCancellers = () => {
+    this.cancellers.forEach(f => {
+      if (_.isFunction(f)) {
+        f()
       }
-    }
+    })
   }
 
-  setLoadAttempted = _.debounce(() => {
-    this.setState({ isLoadAttempted: true })
-  }, 6000)
+  getTargetName = name => {
+    const { currentPathname } = this.props
+    return `${currentPathname}_${name}`
+  }
+
+  hasTargetLoadedBefore = name => {
+    const targetName = this.getTargetName(name)
+    if (getLoadCount(targetName) <= 0) {
+      return false
+    }
+    return true
+  }
 
   handleLoad = () => {
-    const { load, name }  = this.props
-    if (this.isDataLoaded() === false) {
-      if (getLoadCount(name) <= 0) {
-        load()
-        this.setLoadAttempted()
-      }
+    const { targets } = this.props
+
+    if (this.isTargetsLoaded() === false) {
+      targets.forEach(obj => {
+        if (this.hasTargetLoadedBefore(obj.name) === false) {
+          obj.load()
+          this.setLoadAttempted()
+        }
+      })
     }
   }
 
   processLoaders = () => {
     const {
-      name,
+      targets,
       lastPathname,
-      currentPathname
+      currentPathname,
     } = this.props
 
-    this.cancelLoad = addLoader(name, this.handleLoad, () => {
-      this.cancelLoad = null
+    targets.forEach(obj => {
+      const targetName = this.getTargetName(obj.name)
+      this.cancellers[targetName] = addLoader(targetName, this.handleLoad, () => {
+        this.cancellers[targetName] = null
+      })
     })
 
     runLoaders(lastPathname, currentPathname)
   }
 
   handleUnload = () => {
-    const { name, unload } = this.props
-    unload()
-    resetLoadCount(name)
+    const { targets } = this.props
+
+    targets.forEach(obj => {
+      obj.unload()
+      const targetName = this.getTargetName(obj.name)
+      resetLoadCount(targetName)
+    })
   }
 
   processUnloaders = () => {
     const {
-      name,
+      targets,
       lastPathname,
       currentPathname,
       skippedPathnames,
     } = this.props
 
     runUnloaders(lastPathname, currentPathname)
-    addUnloader(lastPathname, currentPathname, skippedPathnames, this.handleUnload, name)
+
+    targets.forEach(obj => {
+      const targetName = this.getTargetName(obj.name)
+      addUnloader(lastPathname, currentPathname, skippedPathnames, this.handleUnload, targetName)
+    })
   }
 
-  isDataLoaded = () => {
-    const { data } = this.props
+  isTargetsLoaded = () => {
+    const { targets } = this.props
 
-    if (!data || isEmpty(data) === true) {
-      return false
+    return targets.map(obj => {
+      if (!obj.data || isEmpty(obj.data) === true) {
+        return false
+      }
+      return true
+    }).every(result => result === true)
+  }
+
+  isFirstLoad = () => {
+    const { targets } = this.props
+
+    var total = 0
+    targets.forEach(obj => {
+      const targetName = this.getTargetName(obj.name)
+      total += getLoadCount(targetName)
+    })
+
+    if (total <= 0) {
+      return true
     }
-
-    return true
+    return false
   }
 
   render() {
-    const { children, name, renderWithout, renderWith, renderFirst } = this.props
+    const {
+      children,
+      renderWithout,
+      renderWith,
+      renderFirst,
+    } = this.props
     const { isLoadAttempted } = this.state
 
-    if (this.isDataLoaded() === true) {
+    if (this.isTargetsLoaded() === true) {
       if (_.isFunction(renderWith)) {
         return renderWith()
       }
       return children
     }
 
-    if (isLoadAttempted === false && getLoadCount(name) <= 0) {
+    if ((isLoadAttempted === false) && this.isFirstLoad() === true) {
       if (_.isFunction(renderFirst)) {
         return renderFirst()
       }
@@ -304,7 +362,6 @@ export class RenderController extends React.Component {
     if (_.isFunction(renderWithout)) {
       return renderWithout()
     }
-
     return null
   }
 }
