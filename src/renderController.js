@@ -289,7 +289,9 @@ export class RenderController extends React.Component {
     const { targets } = this.props
 
     targets.forEach(obj => {
-      obj.unload()
+      if (_.isFunction(obj.unload)) {
+        obj.unload()
+      }
       const targetName = this.getTargetName(obj.name)
       resetLoadCount(targetName)
     })
