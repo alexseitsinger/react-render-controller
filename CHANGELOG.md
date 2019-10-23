@@ -1,3 +1,10 @@
+<a name="v5.0.1"></a>
+## [v5.0.1](https://github.com/alexseitsinger/react-render-controller/compare/v5.0.0...v5.0.1) (2019-10-23)
+
+### Bug Fixes
+- Adds check for unload method. ([cb489dd](https://github.com/alexseitsinger/react-render-controller/commit/cb489ddb91e94194b40254248b0d5c1f560bf416))
+
+
 <a name="v5.0.0"></a>
 ## [v5.0.0](https://github.com/alexseitsinger/react-render-controller/compare/v4.3.1...v5.0.0) (2019-10-23)
 
