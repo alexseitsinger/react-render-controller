@@ -1,4 +1,5 @@
 import React from "react"
+
 import { RenderController } from "../src"
 
 const arrayData = [{ name: "a" }, { name: "b" }]
@@ -13,7 +14,7 @@ const WithData = () => <div className={"withData"}>With Data</div>
 const WithoutData = () => <div className={"withoutData"}>Without Data</div>
 
 
-const loadDelay = 3000
+const loadDelay = 2500
 
 // TODO: Add test case for re-renders after mount/unmount -> Make sure it
 // doesn't cause an infinite loop (That;s why we use the "name" prop to count)
@@ -26,14 +27,17 @@ const loadDelay = 3000
 //          to determine if shouldUpdate should run or just passthrough (unload)
 
 describe("<RenderController/>", () => {
-
   it("invokes renderWith with object data", () => {
     const wrapper = mount(
       <RenderController
-        name={"dataName"}
-        data={objectData}
-        load={() => {}}
-        unload={() => {}}
+        targets={[
+          {
+            name: "dataOne",
+            data: objectData,
+            load: () => {},
+            unload: () => {},
+          },
+        ]}
         currentPathname={"/"}
         lastPathname={"/"}
         renderWith={() => <WithData />}
@@ -49,12 +53,17 @@ describe("<RenderController/>", () => {
   it("renders children with data", () => {
     const wrapper = mount(
       <RenderController
-        name={"dataName"}
-        data={objectData}
-        load={() => {}}
-        unload={() => {}}
+        targets={[
+          {
+            name: "dataOne",
+            data: objectData,
+            load: () => {},
+            unload: () => {},
+          },
+        ]}
         currentPathname={"/"}
-        lastPathname={"/"}>
+        lastPathname={"/"}
+        renderWith={() => <WithData />}>
         <WithData />
       </RenderController>
     )
@@ -65,15 +74,19 @@ describe("<RenderController/>", () => {
     }, loadDelay)
   })
 
-  it("invokes renderWithout with empty named object.", () => {
+  it("invokes renderWithout with empty object.", () => {
     const wrapper = mount(
       <RenderController
-        name={"dataName"}
-        data={emptyObjectData}
+        targets={[
+          {
+            name: "dataOne",
+            data: emptyObjectData,
+            load: () => {},
+            unload: () => {},
+          },
+        ]}
         currentPathname={"/"}
         lastPathname={"/"}
-        load={() => {}}
-        unload={() => {}}
         renderWithout={() => (<WithoutData />)}
       />
     )
