@@ -4,136 +4,80 @@
 
 **Extends React.Component**
 
-Controls what to render based on data being empty or not.
+Renders a component after its data has loaded.
 
 ### Parameters
 
 -   `props` **[object][1]** 
-    -   `props.data` **([object][1] \| [array][2])** Checked for emptiness.
-    -   `props.load` **[function][3]?** Invoked to make the data non-empty.
-    -   `props.unload` **[function][3]?** Invoked to make the data empty.
-    -   `props.renderWith` **[function][3]?** Invoked when rendering with non-empty data.
-    -   `props.renderWithout` **[function][3]?** Invoked when rendering with empty data.
-    -   `props.lastPathname` **[string][4]?** The pathname of the last page navigated to
-    -   `props.currentPathname` **[string][4]?** The pathname of the current page navigated to.
-    -   `props.skippedPathnames` **[array][2]?** The pathnames to skip unloading for when this component is navigated away
-        from.
+    -   `props.targets` **[array][2]** Objects to load data for with their respective loaders & unloaders.
+    -   `props.children` **[function][3]?** Component(s) to render when data is non-empty.
+    -   `props.renderFirst` **[function][3]?** Function to invoke to render when data loading starts and is currently empty.
+    -   `props.renderWith` **[function][3]?** Function to invoke to render when data is loaded and non-empty.
+    -   `props.renderWithout` **[function][3]?** Function to invoke when data loading fails to produce non-empty data.
+    -   `props.lastPathname` **[string][4]?** The previous page's pathname.
+    -   `props.currentPathname` **[string][4]?** The current page's pathname.
+    -   `props.skippedPathnames` **[array][2]?** The pathnames to skip unloading for.
 
 ### Examples
 
 ```javascript
-// reducer.js
-import { combineReducers } from "react-redux"
-import { locationsReducer } from "@alexseitsinger/redux-locations"
-
-import { pageOneReducer } from "pages/page-one/reducer"
-
-export const createRootReducer = () => combineReducers({
-  locations: locationsReducer,
-  pages: combineReducers({
-    ...
-    pageOne: pageOneReducer,
-    ...
-  }),
-})
-
-// store.js
-import {
-  createStore as createReduxStore,
-  applyMiddleware,
-  compose,
-} from "redux"
-import { createLocationsMiddleware } from "@alexseitsinger/redux-locations"
-
-import { createRootReducer } from "reducer"
-
-const locationsMiddleware = createLocationsMiddleware()
-
-export const createStore = (..., initialState, ...) => {
-  const rootReducer = createRootReducer()
-  const middleware = [
-    ...
-    locationsMiddleware,
-    ...
-  ]
-  const storeEnhancers = compose(applyMiddleware(...middleware))
-  const store = createReduxStore(rootReducer, initialState, storeEnhancers)
-  return store
-}
-
-// pages/page-one/index.js
-import React from "react"
-import { connect } from "react-redux"
 import { RenderController } from "@alexseitsinger/react-render-controller"
 
-import { getPageData, setPageData } from "actions/page-one.js"
-
 function PageOne({
-  states: {
-    pageOne: {
-      data,
-    },
-    locations: {
-      last,
-      current,
-    },
-  },
-  methods: {
-    pageOne: {
-      loadData,
-      unloadData,
-    },
-  },
-}){
+   pageData, getPageData, setPageData, last, current,
+}) {
   return (
     <RenderController
-      data={data}
-      load={loadData}
-      unload={unloadData}
+      targets={[
+        {
+          name: "data",
+          data: pageData,
+          load: () => getPageData(),
+          unload: () => setPageData({}),
+        }
+      ]}
       lastPathname={last.pathname}
       currentPathname={current.pathname}
       skippedPathnames={[
-        "/path/to/page"
+        {
+          from: "/about",
+          to: "/",
+        },
+        {
+           from: "/",
+           to: "/about",
+        },
       ]}
-      renderWith={() => {
-         // This is rendered when the 'data' object/array is non-empty.
-         return data.map((obj, i) => {
+      renderFirst={() => (
+         <div>Loading page data...</div>
+      )}
+      renderWith={() => (
+         pageData.map((obj, i) => {
            const key = "data" + i.toString()
            return (
              <div key={key}>{obj.name}</div>
            )
          })
-      }}
-      renderWithout={() => {
-        // This is rendered when the data object/array is empty.
-        return (
-          <div>No data</div>
-        )
-      }}
+      )}
+      renderWithout={() => (
+         <div>No page data</div>
+      )}
     />
   )
 }
 
 const mapState = state => ({
-  states: {
+    pageData: state.pageData,
     locations: state.locations,
-    pageOne: state.pages.pageOne,
-  },
 })
 
 const mapDispatch = dispatch => ({
-  methods: {
-    pageOne: {
-      loadData: () => dispatch(getPageData()),
-      unloadData: () => dispatch(setPageData({})),
-    },
-  },
+   getPageData: () => dispatch(getPageData()),
+   setPageData: obj => dispatch(setPageData(obj)),
 })
 
 export default connect(mapState, mapDispatch)(PageOne)
 ```
-
-Returns **[function][3]** 
 
 [1]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object
 
