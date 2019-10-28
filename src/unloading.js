@@ -8,23 +8,32 @@ const pathnames = {
 
 const unloaders = {}
 
-export const addUnloader = (last, current, skipped, unload, name) => {
-  if (!(name in unloaders)) {
-    const shouldUnload = (from, to) => {
-      const isSkipped = skipped.map(skippedPathname => {
-        const isFromMatching = isMatchingPaths(skippedPathname.from, from)
-        const isToMatching = isMatchingPaths(skippedPathname.to, to)
-        return ((isFromMatching === true) && (isToMatching === true))
-      }).includes(true)
-      return (isSkipped === false || last === current)
-    }
+export const addUnloader = ({
+  lastPathname,
+  currentPathname,
+  skippedPathnames,
+  handler,
+  method,
+  name,
+}) => {
+  if (name in unloaders) {
+    return
+  }
 
-    unloaders[name] = (from, to) => {
-      if (shouldUnload(from, to) === true) {
-        unload()
-        resetLoadCount()
-        delete unloaders[name]
-      }
+  const shouldUnload = (from, to) => {
+    const isSkipped = skippedPathnames.map(skippedPathname => {
+      const isFromMatching = isMatchingPaths(skippedPathname.from, from)
+      const isToMatching = isMatchingPaths(skippedPathname.to, to)
+      return ((isFromMatching === true) && (isToMatching === true))
+    }).includes(true)
+    return ((isSkipped === false) || (lastPathname === currentPathname))
+  }
+
+  unloaders[name] = (from, to) => {
+    if (shouldUnload(from, to) === true) {
+      handler()
+      resetLoadCount()
+      delete unloaders[name]
     }
   }
 }

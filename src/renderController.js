@@ -3,6 +3,12 @@ import PropTypes from "prop-types"
 import _ from "underscore"
 
 import {
+  lastRunDelay,
+  runDelayAmount,
+  runDelay,
+  incrementRunDelay,
+} from "./delays"
+import {
   getLoadCount,
   resetLoadCount,
 } from "./counting"
@@ -14,6 +20,10 @@ import {
   runLoaders,
   addLoader,
 } from "./loading"
+import {
+  hasRecentlyMounted,
+  addRecentlyMounted,
+} from "./mounts"
 import {
   isEmpty,
 } from "./utils"
@@ -122,6 +132,7 @@ export class RenderController extends React.Component {
       from: PropTypes.string.isRequired,
       to: PropTypes.string.isRequired,
     })),
+    totalLoaders: PropTypes.number,
   }
 
   static defaultProps = {
@@ -131,6 +142,7 @@ export class RenderController extends React.Component {
     renderWith: null,
     renderWithout: null,
     failDelay: 6000,
+    totalLoaders: 1,
   }
 
   state = {
@@ -161,9 +173,10 @@ export class RenderController extends React.Component {
       this.setState({ isLoadAttempted: true })
     }, props.failDelay)
 
+    // Unload previous data first.
+    this.processUnloaders()
     // Start the process off before the component gets mounted so data is
     // updated as early as possible,
-    this.processUnloaders()
     this.processLoaders()
   }
 
@@ -186,7 +199,59 @@ export class RenderController extends React.Component {
     this._isMounted = false
 
     // Before any unmounting, cancel any pending loads.
-    this.runCancellers()
+    //this.runCancellers()
+  }
+
+  handleLoad = () => {
+    const { targets } = this.props
+
+    if (this.isTargetsLoaded() === false) {
+      targets.forEach(obj => {
+        if (this.hasTargetLoadedBefore(obj.name) === false) {
+          obj.load()
+          this.setLoadAttempted()
+        }
+      })
+    }
+  }
+
+  handleUnload = () => {
+    const { targets } = this.props
+
+    targets.forEach(obj => {
+      if (_.isFunction(obj.unload)) {
+        obj.unload()
+      }
+
+      const targetName = this.getTargetName(obj.name)
+      resetLoadCount(targetName)
+    })
+  }
+
+  processLoaders = () => {
+    const {
+      targets,
+      lastPathname,
+      currentPathname,
+      totalLoaders,
+    } = this.props
+
+    targets.forEach((obj, i) => {
+      const targetName = this.getTargetName(obj.name)
+
+      this.cancellers[targetName] = addLoader({
+        name: targetName,
+        handler: this.handleLoad,
+        method: obj.load,
+        callback: () => {
+          this.cancellers[targetName] = null
+        },
+      })
+
+      if ((i + 1) === targets.length) {
+        runLoaders(totalLoaders)
+      }
+    })
   }
 
   runCancellers = () => {
@@ -210,46 +275,20 @@ export class RenderController extends React.Component {
     return true
   }
 
-  handleLoad = () => {
-    const { targets } = this.props
 
-    if (this.isTargetsLoaded() === false) {
-      targets.forEach(obj => {
-        if (this.hasTargetLoadedBefore(obj.name) === false) {
-          obj.load()
-          this.setLoadAttempted()
-        }
-      })
-    }
-  }
-
-  processLoaders = () => {
+  getMasterName = () => {
     const {
-      targets,
-      lastPathname,
       currentPathname,
+      targets,
     } = this.props
 
-    targets.forEach(obj => {
-      const targetName = this.getTargetName(obj.name)
-      this.cancellers[targetName] = addLoader(targetName, this.handleLoad, () => {
-        this.cancellers[targetName] = null
-      })
-    })
-
-    runLoaders(lastPathname, currentPathname)
-  }
-
-  handleUnload = () => {
-    const { targets } = this.props
+    var masterName = `${currentPathname}`
 
     targets.forEach(obj => {
-      if (_.isFunction(obj.unload)) {
-        obj.unload()
-      }
-      const targetName = this.getTargetName(obj.name)
-      resetLoadCount(targetName)
+      masterName = `${masterName}_${obj.name}`
     })
+
+    return masterName
   }
 
   processUnloaders = () => {
@@ -263,8 +302,14 @@ export class RenderController extends React.Component {
     runUnloaders(lastPathname, currentPathname)
 
     targets.forEach(obj => {
-      const targetName = this.getTargetName(obj.name)
-      addUnloader(lastPathname, currentPathname, skippedPathnames, this.handleUnload, targetName)
+      addUnloader({
+        name: this.getTargetName(obj.name),
+        method: obj.unload,
+        handler: this.handleUnload,
+        lastPathname,
+        currentPathname,
+        skippedPathnames,
+      })
     })
   }
 
