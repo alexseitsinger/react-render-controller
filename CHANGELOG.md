@@ -1,3 +1,14 @@
+<a name="v5.3.0"></a>
+## [v5.3.0](https://github.com/alexseitsinger/react-render-controller/compare/v5.2.0...v5.3.0) (2019-10-28)
+
+### Code Refactoring
+- Moves delete call. ([d3cbabb](https://github.com/alexseitsinger/react-render-controller/commit/d3cbabbb30569a78d3a832254e8836bacb433eff))
+- Re-enables runCancellers on unmount. ([6b260e3](https://github.com/alexseitsinger/react-render-controller/commit/6b260e3840301748183dab9f22172e60a31d2b7e))
+
+### Features
+- Adds module. ([b5e3f9d](https://github.com/alexseitsinger/react-render-controller/commit/b5e3f9dcd48b31cdf828baedfafd5280204bd18d))
+
+
 <a name="v5.2.0"></a>
 ## [v5.2.0](https://github.com/alexseitsinger/react-render-controller/compare/v5.1.0...v5.2.0) (2019-10-28)
 
