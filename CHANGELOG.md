@@ -1,3 +1,14 @@
+<a name="v5.2.0"></a>
+## [v5.2.0](https://github.com/alexseitsinger/react-render-controller/compare/v5.1.0...v5.2.0) (2019-10-28)
+
+### Code Refactoring
+- Changes loading/unloading process. ([61f3b34](https://github.com/alexseitsinger/react-render-controller/commit/61f3b34c6fc3d78abfbf215ff63b9528e6cf552e))
+
+### Features
+- Adds modules. ([54d3a3f](https://github.com/alexseitsinger/react-render-controller/commit/54d3a3f56b7d5b353157a729953a4f5e64401442))
+- Adds more dev deps. ([a4b7a3d](https://github.com/alexseitsinger/react-render-controller/commit/a4b7a3db322d4495e232a07580cc746b5c31cbf8))
+
+
 <a name="v5.1.0"></a>
 ## [v5.1.0](https://github.com/alexseitsinger/react-render-controller/compare/v5.0.1...v5.1.0) (2019-10-24)
 
