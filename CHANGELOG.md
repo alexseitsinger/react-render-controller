@@ -1,3 +1,10 @@
+<a name="v5.3.1"></a>
+## [v5.3.1](https://github.com/alexseitsinger/react-render-controller/compare/v5.3.0...v5.3.1) (2019-10-28)
+
+### Bug Fixes
+- Adds missing import. ([c863414](https://github.com/alexseitsinger/react-render-controller/commit/c863414ea9889e492db426adc1995c2a5d550033))
+
+
 <a name="v5.3.0"></a>
 ## [v5.3.0](https://github.com/alexseitsinger/react-render-controller/compare/v5.2.0...v5.3.0) (2019-10-28)
 
