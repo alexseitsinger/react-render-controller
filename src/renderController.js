@@ -198,7 +198,7 @@ export class RenderController extends React.Component {
     this._isMounted = false
 
     // Before any unmounting, cancel any pending loads.
-    //this.runCancellers()
+    this.runCancellers()
   }
 
   handleLoad = () => {
