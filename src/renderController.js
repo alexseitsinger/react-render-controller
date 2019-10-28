@@ -175,8 +175,7 @@ export class RenderController extends React.Component {
 
     // Unload previous data first.
     this.processUnloaders()
-    // Start the process off before the component gets mounted so data is
-    // updated as early as possible,
+    // Start loading data.
     this.processLoaders()
   }
 
@@ -274,7 +273,6 @@ export class RenderController extends React.Component {
     }
     return true
   }
-
 
   getMasterName = () => {
     const {
