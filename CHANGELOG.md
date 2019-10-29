@@ -1,3 +1,10 @@
+<a name="v5.4.0"></a>
+## [v5.4.0](https://github.com/alexseitsinger/react-render-controller/compare/v5.3.1...v5.4.0) (2019-10-29)
+
+### Features
+- Adds reversed pathnames. ([9021e2f](https://github.com/alexseitsinger/react-render-controller/commit/9021e2f7f41b29f25efa43e63b316a71786ec306))
+
+
 <a name="v5.3.1"></a>
 ## [v5.3.1](https://github.com/alexseitsinger/react-render-controller/compare/v5.3.0...v5.3.1) (2019-10-28)
 
