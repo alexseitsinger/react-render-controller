@@ -20,8 +20,21 @@ export const addUnloader = ({
     return
   }
 
+  const finalSkippedPathnames = skippedPathnames.map((obj, i, arr) => {
+    if (obj.reverse && obj.reverse === true) {
+      const newObj = {
+        from: obj.to,
+        to: obj.from,
+      }
+      if (arr.indexOf(newObj) === -1) {
+        arr.push(newObj)
+      }
+    }
+    return obj
+  })
+
   const shouldUnload = (from, to) => {
-    const isSkipped = skippedPathnames.map(skippedPathname => {
+    const isSkipped = finalSkippedPathnames.map(skippedPathname => {
       const isFromMatching = isMatchingPaths(skippedPathname.from, from)
       const isToMatching = isMatchingPaths(skippedPathname.to, to)
       return ((isFromMatching === true) && (isToMatching === true))
