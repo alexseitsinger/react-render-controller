@@ -132,7 +132,7 @@ export class RenderController extends React.Component {
     renderWith: null,
     renderWithout: null,
     failDelay: 6000,
-    totalLoaders: 1,
+    totalLoaders: null,
   }
 
   state = {
@@ -220,10 +220,21 @@ export class RenderController extends React.Component {
     })
   }
 
+  getTotalLoaders = () => {
+    const {
+      totalLoaders,
+      targets,
+    } = this.props
+
+    if (!totalLoaders) {
+      return targets.length
+    }
+    return totalLoaders
+  }
+
   processLoaders = () => {
     const {
       targets,
-      totalLoaders,
     } = this.props
 
     targets.forEach((obj, i, arr) => {
@@ -238,7 +249,7 @@ export class RenderController extends React.Component {
       })
 
       if (arr.length === (i + 1)) {
-        runLoaders(totalLoaders)
+        runLoaders(this.getTotalLoaders())
       }
     })
   }
