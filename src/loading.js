@@ -14,10 +14,6 @@ const getTotalLoaders = () => {
 export const addLoader = ({ name, handler, callback }) => {
   var isLoadCancelled = false
 
-  if (name in loaders) {
-    return
-  }
-
   loaders[name] = () => {
     delete loaders[name]
     if (isLoadCancelled === true) {

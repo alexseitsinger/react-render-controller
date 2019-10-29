@@ -193,14 +193,18 @@ export class RenderController extends React.Component {
   handleLoad = () => {
     const { targets } = this.props
 
-    if (this.isTargetsLoaded() === false) {
-      targets.forEach(obj => {
-        if (this.hasTargetLoadedBefore(obj.name) === false) {
-          obj.load()
-          this.setLoadAttempted()
-        }
-      })
+    if (this.isTargetsLoaded() === true) {
+      return
     }
+
+    targets.forEach(obj => {
+      if (this.hasTargetLoadedBefore(obj.name) === true) {
+        return
+      }
+
+      obj.load()
+      this.setLoadAttempted()
+    })
   }
 
   handleUnload = () => {
