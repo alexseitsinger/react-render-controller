@@ -13,7 +13,6 @@ export const addUnloader = ({
   currentPathname,
   skippedPathnames,
   handler,
-  method,
   name,
 }) => {
   if (name in unloaders) {
