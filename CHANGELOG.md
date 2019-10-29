@@ -1,3 +1,10 @@
+<a name="v5.5.0"></a>
+## [v5.5.0](https://github.com/alexseitsinger/react-render-controller/compare/v5.4.1...v5.5.0) (2019-10-29)
+
+### Features
+- Adds counter for targets. ([d7ac024](https://github.com/alexseitsinger/react-render-controller/commit/d7ac02464d4dc875fb5418b5bec168f50feb365d))
+
+
 <a name="v5.4.1"></a>
 ## [v5.4.1](https://github.com/alexseitsinger/react-render-controller/compare/v5.4.0...v5.4.1) (2019-10-29)
 
