@@ -1,3 +1,18 @@
+<a name="v5.4.1"></a>
+## [v5.4.1](https://github.com/alexseitsinger/react-render-controller/compare/v5.4.0...v5.4.1) (2019-10-29)
+
+### Bug Fixes
+- Fixes non-loading. ([9443816](https://github.com/alexseitsinger/react-render-controller/commit/9443816aa3ce009174fd9458bcba8bf1bf8397f5))
+
+### Code Refactoring
+- Deletes unused modules. ([c10c772](https://github.com/alexseitsinger/react-render-controller/commit/c10c772ca3ca3d938116cb8cc8c4176e043cace8))
+- Removes unused args. ([9bb17d1](https://github.com/alexseitsinger/react-render-controller/commit/9bb17d160a3d666f6b2ef8fad9e7000d4ba8f681))
+- Removes unused args. ([6b4fc57](https://github.com/alexseitsinger/react-render-controller/commit/6b4fc5743e906a5ffe73cb0de2a698e16572a3bd))
+- Removes unused modules. ([0808d22](https://github.com/alexseitsinger/react-render-controller/commit/0808d222fea0bfd6fbee96162210aef2f90183b0))
+- Removes unused modules. ([31e489e](https://github.com/alexseitsinger/react-render-controller/commit/31e489e4a28fb13453b5adb943bea40450351aba))
+- Updates. ([8593ed8](https://github.com/alexseitsinger/react-render-controller/commit/8593ed8e472173e48e05df23379e0dd6bd12a2e1))
+
+
 <a name="v5.4.0"></a>
 ## [v5.4.0](https://github.com/alexseitsinger/react-render-controller/compare/v5.3.1...v5.4.0) (2019-10-29)
 
