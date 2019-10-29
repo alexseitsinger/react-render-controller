@@ -219,24 +219,21 @@ export class RenderController extends React.Component {
   processLoaders = () => {
     const {
       targets,
-      lastPathname,
-      currentPathname,
       totalLoaders,
     } = this.props
 
-    targets.forEach((obj, i) => {
+    targets.forEach((obj, i, arr) => {
       const targetName = this.getTargetName(obj.name)
 
       this.cancellers[targetName] = addLoader({
         name: targetName,
         handler: this.handleLoad,
-        method: obj.load,
         callback: () => {
           this.cancellers[targetName] = null
         },
       })
 
-      if ((i + 1) === targets.length) {
+      if (arr.length === (i + 1)) {
         runLoaders(totalLoaders)
       }
     })
@@ -291,7 +288,6 @@ export class RenderController extends React.Component {
     targets.forEach(obj => {
       addUnloader({
         name: this.getTargetName(obj.name),
-        method: obj.unload,
         handler: this.handleUnload,
         lastPathname,
         currentPathname,
