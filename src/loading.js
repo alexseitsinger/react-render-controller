@@ -11,7 +11,7 @@ const getTotalLoaders = () => {
   return Object.keys(loaders).length
 }
 
-export const addLoader = ({ name, handler, method, callback }) => {
+export const addLoader = ({ name, handler, callback }) => {
   var isLoadCancelled = false
 
   if (name in loaders) {
