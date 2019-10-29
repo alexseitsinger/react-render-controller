@@ -173,9 +173,8 @@ export class RenderController extends React.Component {
       this.setState({ isLoadAttempted: true })
     }, props.failDelay)
 
-    // Unload previous data first.
+    // Unload previous data first, then load new data.
     this.processUnloaders()
-    // Start loading data.
     this.processLoaders()
   }
 
