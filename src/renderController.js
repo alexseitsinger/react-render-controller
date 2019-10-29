@@ -3,12 +3,6 @@ import PropTypes from "prop-types"
 import _ from "underscore"
 
 import {
-  lastRunDelay,
-  runDelayAmount,
-  runDelay,
-  incrementRunDelay,
-} from "./delays"
-import {
   getLoadCount,
   resetLoadCount,
 } from "./counting"
@@ -20,10 +14,6 @@ import {
   runLoaders,
   addLoader,
 } from "./loading"
-import {
-  hasRecentlyMounted,
-  addRecentlyMounted,
-} from "./mounts"
 import {
   isEmpty,
 } from "./utils"
@@ -343,7 +333,9 @@ export class RenderController extends React.Component {
       renderWith,
       renderFirst,
     } = this.props
-    const { isLoadAttempted } = this.state
+    const {
+      isLoadAttempted
+    } = this.state
 
     if (this.isTargetsLoaded() === true) {
       if (_.isFunction(renderWith)) {
