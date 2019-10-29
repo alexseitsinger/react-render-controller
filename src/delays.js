@@ -16,7 +16,6 @@ export const incrementRunDelay = name => {
     lastRunDelay = runDelay
     runDelay += runDelayAmount
   }
-  console.log("runDelay: ", runDelay)
 }
 
 export const decrementRunDelay = name => {
