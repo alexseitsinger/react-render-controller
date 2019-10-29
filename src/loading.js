@@ -3,13 +3,8 @@ import _ from "underscore"
 import {
   updateLoadCount,
 } from "./counting"
-import {
-  runDelayAmount,
-} from "./delays"
-import {
-  doesLoaderMethodExist,
-  rememberLoaderMethod,
-} from "./methods"
+
+const runDelayAmount = 1100
 
 const loaders = {}
 const getTotalLoaders = () => {
@@ -19,14 +14,9 @@ const getTotalLoaders = () => {
 export const addLoader = ({ name, handler, method, callback }) => {
   var isLoadCancelled = false
 
-  if (doesLoaderMethodExist(method) === true) {
-    return
-  }
   if (name in loaders) {
     return
   }
-
-  rememberLoaderMethod(method)
 
   loaders[name] = () => {
     delete loaders[name]
