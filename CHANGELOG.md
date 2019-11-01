@@ -1,3 +1,10 @@
+<a name="v5.6.0"></a>
+## [v5.6.0](https://github.com/alexseitsinger/react-render-controller/compare/v5.5.0...v5.6.0) (2019-11-01)
+
+### Bug Fixes
+- Fixes reverse skippedPathnames. ([5932a47](https://github.com/alexseitsinger/react-render-controller/commit/5932a473ece75b98540d8d81c84acb599a4ac937))
+
+
 <a name="v5.5.0"></a>
 ## [v5.5.0](https://github.com/alexseitsinger/react-render-controller/compare/v5.4.1...v5.5.0) (2019-10-29)
 
