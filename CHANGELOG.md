@@ -1,3 +1,10 @@
+<a name="v5.6.1"></a>
+## [v5.6.1](https://github.com/alexseitsinger/react-render-controller/compare/v5.6.0...v5.6.1) (2019-11-01)
+
+### Bug Fixes
+- Fixes pathname updates. ([f445f71](https://github.com/alexseitsinger/react-render-controller/commit/f445f71a6b81c4215d9906abf67c270fca89e9b5))
+
+
 <a name="v5.6.0"></a>
 ## [v5.6.0](https://github.com/alexseitsinger/react-render-controller/compare/v5.5.0...v5.6.0) (2019-11-01)
 
