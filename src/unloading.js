@@ -51,13 +51,13 @@ export const runUnloaders = (from, to) => {
     return
   }
 
+  // Save the pathanmes
+  pathnames.last = from
+  pathnames.current = to
+
   // Run unloaders
   Object.keys(unloaders).forEach(k => {
     unloaders[k](from, to)
   })
-
-  // Save the pathanmes
-  pathnames.last = from
-  pathnames.current = to
 }
 
