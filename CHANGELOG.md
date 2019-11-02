@@ -1,3 +1,10 @@
+<a name="v5.7.0"></a>
+## [v5.7.0](https://github.com/alexseitsinger/react-render-controller/compare/v5.6.1...v5.7.0) (2019-11-02)
+
+### Code Refactoring
+- Reoganizes modules. ([ea498a1](https://github.com/alexseitsinger/react-render-controller/commit/ea498a159d2adb5809064982d51d706ad1d6c11b))
+
+
 <a name="v5.6.1"></a>
 ## [v5.6.1](https://github.com/alexseitsinger/react-render-controller/compare/v5.6.0...v5.6.1) (2019-11-01)
 
