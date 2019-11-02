@@ -1,6 +1,7 @@
 import _ from "underscore"
 
-var loaderMethods = []
+export var loaderMethods = []
+
 export const resetLoaderMethods = _.debounce(() => {
   loaderMethods = []
 }, 15000)

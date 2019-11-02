@@ -38,6 +38,22 @@ export const removeLeadingAndTrailingSlashes = url => {
   return updated
 }
 
+export const prepareSkippedPathnames = skippedPathnames => {
+  const prepared = []
+
+  skippedPathnames.forEach(obj => {
+    prepared.push(obj)
+    if (obj.reverse && obj.reverse === true) {
+      prepared.push({
+        from: obj.to,
+        to: obj.from,
+      })
+    }
+  })
+
+  return prepared
+}
+
 export const isMatchingPaths = (skippedPathname, currentPathname) => {
   const skipped = removeLeadingAndTrailingSlashes(skippedPathname)
   const current = removeLeadingAndTrailingSlashes(currentPathname)

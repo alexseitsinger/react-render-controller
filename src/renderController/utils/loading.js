@@ -4,10 +4,11 @@ import {
   updateLoadCount,
 } from "./counting"
 
-const runDelayAmount = 1100
+export const runLoadersDelay = 1100
 
-const loaders = {}
-const getTotalLoaders = () => {
+export const loaders = {}
+
+export const getTotalLoaders = () => {
   return Object.keys(loaders).length
 }
 
@@ -29,7 +30,7 @@ export const addLoader = ({ name, handler, callback }) => {
   }
 }
 
-const startRunningLoaders = () => {
+export const startRunningLoaders = () => {
   Object.keys(loaders).forEach(key => {
     loaders[key]()
     delete loaders[key]
@@ -38,11 +39,11 @@ const startRunningLoaders = () => {
 
 export const runLoaders = _.debounce(totalLoaders => {
   const currentTotalLoaders = getTotalLoaders()
-  var totalDelay = ((runDelayAmount * currentTotalLoaders) - runDelayAmount)
+  var totalDelay = ((runLoadersDelay * currentTotalLoaders) - runLoadersDelay)
   if (totalDelay < 0) {
     totalDelay = 0
   }
 
   setTimeout(startRunningLoaders, totalDelay)
-}, runDelayAmount)
+}, runLoadersDelay)
 

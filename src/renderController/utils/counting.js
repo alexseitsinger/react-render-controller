@@ -1,4 +1,4 @@
-const loadCounts = {}
+export const loadCounts = {}
 
 export const getLoadCount = name => {
   if (!(name in loadCounts)) {

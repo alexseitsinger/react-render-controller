@@ -5,97 +5,35 @@ import _ from "underscore"
 import {
   getLoadCount,
   resetLoadCount,
-} from "./counting"
+} from "./utils/counting"
 import {
   runUnloaders,
   addUnloader,
-} from "./unloading"
+} from "./utils/unloading"
 import {
   runLoaders,
   addLoader,
-} from "./loading"
+} from "./utils/loading"
 import {
   isEmpty,
-} from "./utils"
+} from "./utils/general"
 
 /**
  * Renders a component after its data has loaded.
  *
  * @param {object} props
  * @param {array} props.targets
- * Objects to load data for with their respective loaders & unloaders.
  * @param {function} [props.children]
- * Component(s) to render when data is non-empty.
  * @param {function} [props.renderFirst]
- * Function to invoke to render when data loading starts and is currently empty.
  * @param {function} [props.renderWith]
- * Function to invoke to render when data is loaded and non-empty.
  * @param {function} [props.renderWithout]
- * Function to invoke when data loading fails to produce non-empty data.
- * @param {string} [props.lastPathname]
- * The previous page's pathname.
- * @param {string} [props.currentPathname]
- * The current page's pathname.
+ * @param {string} props.lastPathname
+ * @param {string} props.currentPathname
  * @param {array} [props.skippedPathnames]
- * The pathnames to skip unloading for.
+ * @param {number} [props.failDelay]
+ * @param {number} [props.totalTargets]
  *
  * @example
- * import { RenderController } from "@alexseitsinger/react-render-controller"
- *
- * function PageOne({
- *    pageData, getPageData, setPageData, last, current,
- * }) {
- *   return (
- *     <RenderController
- *       targets={[
- *         {
- *           name: "data",
- *           data: pageData,
- *           load: () => getPageData(),
- *           unload: () => setPageData({}),
- *         }
- *       ]}
- *       lastPathname={last.pathname}
- *       currentPathname={current.pathname}
- *       skippedPathnames={[
- *         {
- *           from: "/about",
- *           to: "/",
- *         },
- *         {
- *            from: "/",
- *            to: "/about",
- *         },
- *       ]}
- *       renderFirst={() => (
- *          <div>Loading page data...</div>
- *       )}
- *       renderWith={() => (
- *          pageData.map((obj, i) => {
- *            const key = "data" + i.toString()
- *            return (
- *              <div key={key}>{obj.name}</div>
- *            )
- *          })
- *       )}
- *       renderWithout={() => (
- *          <div>No page data</div>
- *       )}
- *     />
- *   )
- * }
- *
- * const mapState = state => ({
-*     pageData: state.pageData,
-*     locations: state.locations,
- * })
- *
- * const mapDispatch = dispatch => ({
- *    getPageData: () => dispatch(getPageData()),
- *    setPageData: obj => dispatch(setPageData(obj)),
- * })
- *
- * export default connect(mapState, mapDispatch)(PageOne)
  */
 export class RenderController extends React.Component {
   static propTypes = {
@@ -122,7 +60,7 @@ export class RenderController extends React.Component {
       from: PropTypes.string.isRequired,
       to: PropTypes.string.isRequired,
     })),
-    totalLoaders: PropTypes.number,
+    totalTargets: PropTypes.number,
   }
 
   static defaultProps = {
@@ -132,7 +70,7 @@ export class RenderController extends React.Component {
     renderWith: null,
     renderWithout: null,
     failDelay: 6000,
-    totalLoaders: null,
+    totalTargets: null,
   }
 
   state = {
@@ -220,16 +158,16 @@ export class RenderController extends React.Component {
     })
   }
 
-  getTotalLoaders = () => {
+  getTotalTargets = () => {
     const {
-      totalLoaders,
+      totalTargets,
       targets,
     } = this.props
 
-    if (!totalLoaders) {
+    if (!totalTargets) {
       return targets.length
     }
-    return totalLoaders
+    return totalTargets
   }
 
   processLoaders = () => {
@@ -249,7 +187,7 @@ export class RenderController extends React.Component {
       })
 
       if (arr.length === (i + 1)) {
-        runLoaders(this.getTotalLoaders())
+        runLoaders(this.getTotalTargets())
       }
     })
   }
@@ -273,21 +211,6 @@ export class RenderController extends React.Component {
       return false
     }
     return true
-  }
-
-  getMasterName = () => {
-    const {
-      currentPathname,
-      targets,
-    } = this.props
-
-    var masterName = `${currentPathname}`
-
-    targets.forEach(obj => {
-      masterName = `${masterName}_${obj.name}`
-    })
-
-    return masterName
   }
 
   processUnloaders = () => {

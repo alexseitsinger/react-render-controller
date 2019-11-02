@@ -1,12 +1,15 @@
-import { isMatchingPaths } from "./utils"
+import {
+  isMatchingPaths,
+  prepareSkippedPathnames,
+} from "./general"
 import { resetLoadCount } from "./counting"
 
-const pathnames = {
+export const pathnames = {
   last: "",
   current: "",
 }
 
-const unloaders = {}
+export const unloaders = {}
 
 export const addUnloader = ({
   lastPathname,
@@ -19,22 +22,24 @@ export const addUnloader = ({
     return
   }
 
-  skippedPathnames.forEach((obj, i, arr) => {
-    if (obj.reverse && obj.reverse === true) {
-      arr.push({
-        from: obj.to,
-        to: obj.from,
-      })
-    }
-  })
+  const prepared = prepareSkippedPathnames(skippedPathnames)
 
   const shouldUnload = (from, to) => {
-    const isSkipped = skippedPathnames.map(skippedPathname => {
-      const isFromMatching = isMatchingPaths(skippedPathname.from, from)
-      const isToMatching = isMatchingPaths(skippedPathname.to, to)
-      return ((isFromMatching === true) && (isToMatching === true))
+    const isSkipped = prepared.map(obj => {
+      const isFrom = isMatchingPaths(obj.from, from)
+      const isTo = isMatchingPaths(obj.to, to)
+      return ((isFrom === true) && (isTo === true))
     }).includes(true)
-    return ((isSkipped === false) || (lastPathname === currentPathname))
+
+    if (isSkipped === true) {
+      return false
+    }
+
+    if (lastPathname === currentPathname) {
+      return false
+    }
+
+    return true
   }
 
   unloaders[name] = (from, to) => {
