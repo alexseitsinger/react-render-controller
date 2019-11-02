@@ -4,9 +4,8 @@ import {
   applyMiddleware,
 } from "redux"
 
-import { rootReducer } from "./reducer"
-
 export const createStore = (history, initialState) => {
+  const rootReducer = createRootReducer(history)
   const middleware = []
   const storeEnhancers = compose(applyMiddleware(...middleware))
   return createReduxStore(rootReducer, initialState, storeEnhancers)
