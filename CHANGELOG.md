@@ -1,3 +1,10 @@
+<a name="v5.8.0"></a>
+## [v5.8.0](https://github.com/alexseitsinger/react-render-controller/compare/v5.7.0...v5.8.0) (2019-11-05)
+
+### Features
+- Adjusts modules. ([15bcd05](https://github.com/alexseitsinger/react-render-controller/commit/15bcd05d15455706c708dbd049c8ab5ea99a82c2))
+
+
 <a name="v5.7.0"></a>
 ## [v5.7.0](https://github.com/alexseitsinger/react-render-controller/compare/v5.6.1...v5.7.0) (2019-11-02)
 
