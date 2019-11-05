@@ -1,3 +1,7 @@
+<a name="v5.8.1"></a>
+## [v5.8.1](https://github.com/alexseitsinger/react-render-controller/compare/v5.8.0...v5.8.1) (2019-11-05)
+
+
 <a name="v5.8.0"></a>
 ## [v5.8.0](https://github.com/alexseitsinger/react-render-controller/compare/v5.7.0...v5.8.0) (2019-11-05)
 
