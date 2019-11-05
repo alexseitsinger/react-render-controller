@@ -37,7 +37,6 @@ export const removeLoadAttempted = (currentPathname, name) => {
 }
 
 export const resetLoadAttempted = _.debounce(currentPathname => {
-  console.log("resetting load attempted")
   if (!(currentPathname in attempted)) {
     attempted[currentPathname] = []
   }
