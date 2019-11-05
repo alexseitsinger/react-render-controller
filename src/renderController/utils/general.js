@@ -87,4 +87,13 @@ export const isMatchingPaths = (skippedPathname, currentPathname) => {
 }
 
 
+export const getMasterName = (currentPathname, targets) => {
+  var masterName = removeLeadingAndTrailingSlashes(currentPathname)
+  masterName = masterName.replace("/", "_")
 
+  targets.forEach(obj => {
+    masterName = `${masterName}__${obj.name}`
+  })
+
+  return masterName
+}

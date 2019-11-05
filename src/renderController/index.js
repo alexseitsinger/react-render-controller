@@ -3,6 +3,12 @@ import PropTypes from "prop-types"
 import _ from "underscore"
 
 import {
+  hasLoadAttempted,
+  addLoadAttempted,
+  removeAttempted,
+  resetLoadAttempted,
+} from "./utils/attempts"
+import {
   getLoadCount,
   resetLoadCount,
 } from "./utils/counting"
@@ -16,6 +22,8 @@ import {
 } from "./utils/loading"
 import {
   isEmpty,
+  removeLeadingAndTrailingSlashes,
+  getMasterName,
 } from "./utils/general"
 
 /**
@@ -73,10 +81,6 @@ export class RenderController extends React.Component {
     totalTargets: null,
   }
 
-  state = {
-    isLoadAttempted: false,
-  }
-
   constructor(props) {
     super(props)
 
@@ -95,10 +99,23 @@ export class RenderController extends React.Component {
       realSetState(...args)
     }
 
+    // If this component gets re-mounted and it already has empty data, the
+    // default state for isLoadAttempted will be false, so the loading screen
+    // will shopw. To avoid this, we track each mounted component and reset the
+    // default state if its already been mounted once.
+    const { currentPathname, name } = props
+    const isLoadAttempted = hasLoadAttempted(currentPathname, name)
+    this.state = {
+      isLoadAttempted,
+    }
+
     // After a certain delay, toggle our load attempted flag to change what gets
     // displayed (from renderFirst -> renderWithout)
     this.setLoadAttempted = _.debounce(() => {
-      this.setState({ isLoadAttempted: true })
+      if (isLoadAttempted === false) {
+        this.setState({ isLoadAttempted: true })
+        addLoadAttempted(currentPathname, name)
+      }
     }, props.failDelay)
 
     // Unload previous data first, then load new data.
@@ -107,7 +124,14 @@ export class RenderController extends React.Component {
   }
 
   componentDidMount() {
+    const {
+      currentPathname,
+      name,
+    } = this.props
+
     this._isMounted = true
+
+    resetLoadAttempted(currentPathname)
   }
 
   componentDidUpdate(prevProps) {
@@ -146,15 +170,17 @@ export class RenderController extends React.Component {
   }
 
   handleUnload = () => {
-    const { targets } = this.props
+    const {
+      targets,
+      currentPathname,
+    } = this.props
 
     targets.forEach(obj => {
       if (_.isFunction(obj.unload)) {
         obj.unload()
       }
 
-      const targetName = this.getTargetName(obj.name)
-      resetLoadCount(targetName)
+      resetLoadCount(currentPathname, obj.name)
     })
   }
 
@@ -173,21 +199,23 @@ export class RenderController extends React.Component {
   processLoaders = () => {
     const {
       targets,
+      currentPathname,
     } = this.props
 
     targets.forEach((obj, i, arr) => {
-      const targetName = this.getTargetName(obj.name)
+      const name = obj.name
 
-      this.cancellers[targetName] = addLoader({
-        name: targetName,
+      this.cancellers[name] = addLoader({
+        name,
+        currentPathname,
         handler: this.handleLoad,
         callback: () => {
-          this.cancellers[targetName] = null
+          this.cancellers[name] = null
         },
       })
 
       if (arr.length === (i + 1)) {
-        runLoaders(this.getTotalTargets())
+        runLoaders(currentPathname)
       }
     })
   }
@@ -200,14 +228,12 @@ export class RenderController extends React.Component {
     })
   }
 
-  getTargetName = name => {
-    const { currentPathname } = this.props
-    return `${currentPathname}_${name}`
-  }
-
   hasTargetLoadedBefore = name => {
-    const targetName = this.getTargetName(name)
-    if (getLoadCount(targetName) <= 0) {
+    const {
+      currentPathname,
+    } = this.props
+
+    if (getLoadCount(currentPathname, name) <= 0) {
       return false
     }
     return true
@@ -225,7 +251,7 @@ export class RenderController extends React.Component {
 
     targets.forEach(obj => {
       addUnloader({
-        name: this.getTargetName(obj.name),
+        name: obj.name,
         handler: this.handleUnload,
         lastPathname,
         currentPathname,
@@ -236,7 +262,6 @@ export class RenderController extends React.Component {
 
   isTargetsLoaded = () => {
     const { targets } = this.props
-
     return targets.map(obj => {
       if (!obj.data || isEmpty(obj.data) === true) {
         return false
@@ -246,12 +271,14 @@ export class RenderController extends React.Component {
   }
 
   isFirstLoad = () => {
-    const { targets } = this.props
+    const {
+      targets,
+      currentPathname,
+    } = this.props
 
     var total = 0
     targets.forEach(obj => {
-      const targetName = this.getTargetName(obj.name)
-      total += getLoadCount(targetName)
+      total += getLoadCount(currentPathname, obj.name)
     })
 
     if (total <= 0) {

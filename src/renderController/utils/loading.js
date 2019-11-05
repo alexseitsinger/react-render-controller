@@ -8,20 +8,29 @@ export const runLoadersDelay = 1100
 
 export const loaders = {}
 
-export const getTotalLoaders = () => {
-  return Object.keys(loaders).length
+export const getTotalLoaders = currentPathname => {
+  if (!(currentPathname in loaders)) {
+    loaders[currentPathname] = {}
+  }
+  const fns = loaders[currentPathname]
+  return Object.keys(fns).length
 }
 
-export const addLoader = ({ name, handler, callback }) => {
+export const addLoader = ({ currentPathname, name, handler, callback }) => {
   var isLoadCancelled = false
 
-  loaders[name] = () => {
-    delete loaders[name]
+  if (!(currentPathname in loaders)) {
+    loaders[currentPathname] = {}
+  }
+  const fns = loaders[currentPathname]
+
+  fns[name] = () => {
+    delete fns[name]
     if (isLoadCancelled === true) {
       return
     }
     handler()
-    updateLoadCount(name)
+    updateLoadCount(currentPathname, name)
     callback()
   }
 
@@ -30,20 +39,29 @@ export const addLoader = ({ name, handler, callback }) => {
   }
 }
 
-export const startRunningLoaders = () => {
-  Object.keys(loaders).forEach(key => {
-    loaders[key]()
-    delete loaders[key]
+export const startRunningLoaders = currentPathname => {
+  if (!(currentPathname in loaders)) {
+    loaders[currentPathname] = {}
+  }
+  const fns = loaders[currentPathname]
+
+  Object.keys(fns).forEach(key => {
+    fns[key]()
+    delete fns[key]
+
   })
 }
 
-export const runLoaders = _.debounce(totalLoaders => {
-  const currentTotalLoaders = getTotalLoaders()
+export const runLoaders = _.debounce((currentPathname) => {
+  const currentTotalLoaders = getTotalLoaders(currentPathname)
+
   var totalDelay = ((runLoadersDelay * currentTotalLoaders) - runLoadersDelay)
   if (totalDelay < 0) {
     totalDelay = 0
   }
 
-  setTimeout(startRunningLoaders, totalDelay)
+  setTimeout(() => {
+    startRunningLoaders(currentPathname)
+  }, totalDelay)
 }, runLoadersDelay)
 

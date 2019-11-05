@@ -1,24 +1,34 @@
 export const loadCounts = {}
 
-export const getLoadCount = name => {
-  if (!(name in loadCounts)) {
-    loadCounts[name] = -1
+export const getLoadCount = (currentPathname, name) => {
+  if (!(currentPathname in loadCounts)) {
+    loadCounts[currentPathname] = {}
   }
-  return loadCounts[name]
+  var lc = loadCounts[currentPathname]
+  if (!(name in lc)) {
+    lc[name] = -1
+  }
+  return lc[name]
 }
 
-export const resetLoadCount = name => {
-  if (name in loadCounts) {
-    loadCounts[name] = -1
+export const resetLoadCount = (currentPathname, name) => {
+  if (!(currentPathname in loadCounts)) {
+    loadCounts[currentPathname] = {}
   }
+  var lc = loadCounts[currentPathname]
+  lc[name] = -1
 }
 
-export const updateLoadCount = name => {
-  if (!(name in loadCounts)) {
-    loadCounts[name] = -1
+export const updateLoadCount = (currentPathname, name) => {
+  if (!(currentPathname in loadCounts)) {
+    loadCounts[currentPathname] = {}
   }
-  loadCounts[name] += 1
-  return loadCounts[name]
+  var lc = loadCounts[currentPathname]
+  if (!(name in lc)) {
+    lc[name] = -1
+  }
+  lc[name] += 1
+  return lc[name]
 }
 
 

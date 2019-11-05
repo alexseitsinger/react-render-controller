@@ -3,13 +3,27 @@ import {
   prepareSkippedPathnames,
 } from "./general"
 import { resetLoadCount } from "./counting"
+import { resetLoadAttempted } from "./attempts"
 
 export const pathnames = {
-  last: "",
-  current: "",
+  last: "/",
+  current: "/",
 }
 
 export const unloaders = {}
+
+export const shouldUnload = (from, to, lastPathname, currentPathname, skippedPathnames) => {
+  const prepared = prepareSkippedPathnames(skippedPathnames)
+  const isSkipped = prepared.map(obj => {
+    const isFrom = isMatchingPaths(obj.from, from)
+    const isTo = isMatchingPaths(obj.to, to)
+    return ((isFrom === true) && (isTo === true))
+  }).includes(true)
+  if (isSkipped === true || lastPathname === currentPathname) {
+    return false
+  }
+  return true
+}
 
 export const addUnloader = ({
   lastPathname,
@@ -18,51 +32,52 @@ export const addUnloader = ({
   handler,
   name,
 }) => {
-  if (name in unloaders) {
+  if (!(currentPathname in unloaders)) {
+    unloaders[currentPathname] = {}
+  }
+  const unloadersForPage = unloaders[currentPathname]
+
+  if (name in unloadersForPage) {
     return
   }
 
-  const prepared = prepareSkippedPathnames(skippedPathnames)
-
-  const shouldUnload = (from, to) => {
-    const isSkipped = prepared.map(obj => {
-      const isFrom = isMatchingPaths(obj.from, from)
-      const isTo = isMatchingPaths(obj.to, to)
-      return ((isFrom === true) && (isTo === true))
-    }).includes(true)
-
-    if (isSkipped === true) {
-      return false
-    }
-
-    if (lastPathname === currentPathname) {
-      return false
-    }
-
-    return true
-  }
-
-  unloaders[name] = (from, to) => {
-    if (shouldUnload(from, to) === true) {
+  function targetUnloader(from, to) {
+    if (shouldUnload(from, to, lastPathname, currentPathname, skippedPathnames) === true) {
       handler()
       resetLoadCount()
-      delete unloaders[name]
+      delete unloadersForPage[name]
     }
   }
+
+  unloadersForPage[name] = targetUnloader
 }
 
 export const runUnloaders = (from, to) => {
+  // If we use multiple renderControllers on the same page, each one will invoke
+  // the others unloaders unless we have this call to prevent unnecessary
+  // repeated loading/unloading.
   if (pathnames.current === to) {
     return
   }
 
-  // Save the pathanmes
+  // Ensure our unloaders are already there.
+  if (!(from in unloaders)) {
+    unloaders[from] = {}
+  }
+  const unloadersForPage = unloaders[from]
+
+  // To ensure that our unloaders run before we add any others, make it a
+  // synchronous action by using a while loop. These are also more efficient.
+  var keys = Object.keys(unloadersForPage)
+  var key
+  while (keys.length) {
+    key = keys.shift()
+    unloadersForPage[key](from, to)
+  }
+
+  // Finally, update our saved pathnames for the next unloaders to use to
+  // determine if they should run or not.
   pathnames.last = from
   pathnames.current = to
-
-  // Run unloaders
-  Object.keys(unloaders).forEach(k => {
-    unloaders[k](from, to)
-  })
 }
 
