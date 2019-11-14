@@ -1,3 +1,10 @@
+<a name="v5.8.2"></a>
+## [v5.8.2](https://github.com/alexseitsinger/react-render-controller/compare/v5.8.1...v5.8.2) (2019-11-14)
+
+### Bug Fixes
+- Adds from-less skipped Pathnames. ([434b1bc](https://github.com/alexseitsinger/react-render-controller/commit/434b1bcd8f3699a516f02606d532f9d5688ef52d))
+
+
 <a name="v5.8.1"></a>
 ## [v5.8.1](https://github.com/alexseitsinger/react-render-controller/compare/v5.8.0...v5.8.1) (2019-11-05)
 
