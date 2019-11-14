@@ -3,23 +3,15 @@ import PropTypes from "prop-types"
 import _ from "underscore"
 
 import {
-  getLoadCount,
-  resetLoadCount,
-} from "./utils/counting"
-import {
-  runUnloaders,
-  addUnloader,
-} from "./utils/unloading"
-import {
-  runLoaders,
-  addLoader,
-} from "./utils/loading"
-import {
   isEmpty,
   removeLeadingAndTrailingSlashes,
   getMasterName,
   createCancellableMethod,
 } from "./utils/general"
+import {
+  getLoadCount,
+  resetLoadCount,
+} from "./utils/counting"
 import {
   hasControllerBeenSeen,
   addControllerSeen,
@@ -30,6 +22,14 @@ import {
   removeMounted,
   hasBeenMounted,
 } from "./utils/mounted"
+import {
+  runUnloaders,
+  addUnloader,
+} from "./utils/unloading"
+import {
+  runLoaders,
+  addLoader,
+} from "./utils/loading"
 
 /**
  * Renders a component after its data has loaded.
@@ -140,14 +140,12 @@ export class RenderController extends React.Component {
     // re-rendered.
     this.setControllerSeen = _.debounce(() => {
       if (isControllerSeen === false) {
-        if (this.isControllerMounted() === true) {
-          addControllerSeen(name)
+        addControllerSeen(name)
 
-          // Toggle the components state to True so our renderFirst() method
-          // finished, and is replaced with either renderWith() or
-          // renderWithout().
-          this.setState({ isControllerSeen: true })
-        }
+        // Toggle the components state to True so our renderFirst() method
+        // finished, and is replaced with either renderWith() or
+        // renderWithout().
+        this.setState({ isControllerSeen: true })
       }
     }, failDelay)
 
@@ -155,16 +153,6 @@ export class RenderController extends React.Component {
     // Unload previous data first, then load new data.
     this.processUnloaders()
     this.processLoaders()
-  }
-
-  isControllerMounted = () => {
-    const { name } = this.props
-
-    if (this._isMounted === true && hasBeenMounted(name) === true) {
-      return true
-    }
-
-    return false
   }
 
   componentWillUnmount() {
@@ -213,6 +201,15 @@ export class RenderController extends React.Component {
     }
   }
 
+  isControllerMounted = () => {
+    const { name } = this.props
+
+    if (this._isMounted === true && hasBeenMounted(name) === true) {
+      return true
+    }
+
+    return false
+  }
 
   handleLoad = () => {
     const { targets, name } = this.props
@@ -221,15 +218,13 @@ export class RenderController extends React.Component {
       return
     }
 
-    targets.forEach(obj => {
+    targets.forEach((obj, i) => {
       if (this.hasTargetLoadedBefore(obj.name) === true) {
         return
       }
 
       obj.load()
     })
-
-    addControllerSeen(name)
   }
 
   handleUnload = () => {
@@ -323,14 +318,16 @@ export class RenderController extends React.Component {
     })
   }
 
+  hasTargetLoaded = obj => {
+    if (!obj.data || isEmpty(obj.data) === true) {
+      return false
+    }
+    return true
+  }
+
   isTargetsLoaded = () => {
     const { targets } = this.props
-    return targets.map(obj => {
-      if (!obj.data || isEmpty(obj.data) === true) {
-        return false
-      }
-      return true
-    }).every(result => result === true)
+    return targets.map(obj => this.hasTargetLoaded(obj)).every(result => result === true)
   }
 
   isFirstLoad = () => {
@@ -357,10 +354,10 @@ export class RenderController extends React.Component {
       renderWith,
       renderFirst,
     } = this.props
+
     const {
       isControllerSeen
     } = this.state
-    const isFirstLoad = this.isFirstLoad()
 
     if (this.isTargetsLoaded() === true) {
       if (_.isFunction(renderWith)) {
@@ -369,6 +366,7 @@ export class RenderController extends React.Component {
       return children
     }
 
+    const isFirstLoad = this.isFirstLoad()
     if (isFirstLoad === true && isControllerSeen === false) {
       if (_.isFunction(renderFirst)) {
         return renderFirst()
