@@ -1,3 +1,10 @@
+<a name="v6.0.1"></a>
+## [v6.0.1](https://github.com/alexseitsinger/react-render-controller/compare/v6.0.0...v6.0.1) (2019-11-14)
+
+### Bug Fixes
+- Fixes renderFirst not changing. ([5d1995f](https://github.com/alexseitsinger/react-render-controller/commit/5d1995fe4930c524e9b36ca325dce297d8758940))
+
+
 <a name="v6.0.0"></a>
 ## [v6.0.0](https://github.com/alexseitsinger/react-render-controller/compare/v5.8.2...v6.0.0) (2019-11-14)
 
