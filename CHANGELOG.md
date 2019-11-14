@@ -1,3 +1,10 @@
+<a name="v6.0.0"></a>
+## [v6.0.0](https://github.com/alexseitsinger/react-render-controller/compare/v5.8.2...v6.0.0) (2019-11-14)
+
+### Features
+- Tracks mounts/seen. ([5523d81](https://github.com/alexseitsinger/react-render-controller/commit/5523d817b8bdb3f9336b9ce7afd524476af4b2c9))
+
+
 <a name="v5.8.2"></a>
 ## [v5.8.2](https://github.com/alexseitsinger/react-render-controller/compare/v5.8.1...v5.8.2) (2019-11-14)
 
