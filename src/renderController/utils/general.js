@@ -42,7 +42,11 @@ export const prepareSkippedPathnames = skippedPathnames => {
   const prepared = []
 
   skippedPathnames.forEach(obj => {
-    prepared.push(obj)
+    prepared.push({
+      from: obj.from,
+      to: obj.to,
+    })
+
     if (obj.reverse && obj.reverse === true) {
       prepared.push({
         from: obj.to,
@@ -97,3 +101,25 @@ export const getMasterName = (currentPathname, targets) => {
 
   return masterName
 }
+
+export const createCancellableMethod = (delay, callback)  => {
+  var isCancelled = false
+
+  const method = _.debounce(() => {
+    if (isCancelled === true) {
+      return
+    }
+
+    callback()
+  }, delay)
+
+  const canceller = () => {
+    isCancelled = true
+  }
+
+  return {
+    method,
+    canceller,
+  }
+}
+

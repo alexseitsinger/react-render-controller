@@ -13,22 +13,23 @@ export const pathnames = {
 export const unloaders = {}
 
 export const shouldUnload = (from, to, lastPathname, currentPathname, skippedPathnames) => {
+  // Prepare our pathnames inc ase reverse or toEither or fromEither is  used.
   const prepared = prepareSkippedPathnames(skippedPathnames)
 
-  const isSkipped = prepared.map(obj => {
-    if (obj.to) {
-      const isTo = isMatchingPaths(obj.to, to)
-      if (obj.from) {
-        const isFrom = isMatchingPaths(obj.from, from)
-        return ((isFrom === true) && (isTo === true))
-      }
-      return (isTo === true)
-    }
-    return false
+  // Check if any of hte prepared pathnames are skipped.
+  const isSkippedPathname = prepared.map(obj => {
+    const isTo = isMatchingPaths(obj.to, to)
+    const isFrom = isMatchingPaths(obj.from, from)
+    return ((isFrom === true) && (isTo === true))
   }).includes(true)
-  if (isSkipped === true || lastPathname === currentPathname) {
+
+  // If the pathname is labeled as skipped or its the same pathanme, then dont
+  // unload.
+  if (isSkippedPathname === true || lastPathname === currentPathname) {
     return false
   }
+
+  // Otherwise, do unloading.
   return true
 }
 
@@ -39,17 +40,19 @@ export const addUnloader = ({
   handler,
   name,
 }) => {
+
   if (!(currentPathname in unloaders)) {
     unloaders[currentPathname] = {}
   }
-  const unloadersForPage = unloaders[currentPathname]
 
+  const unloadersForPage = unloaders[currentPathname]
   if (name in unloadersForPage) {
     return
   }
 
   function targetUnloader(from, to) {
-    if (shouldUnload(from, to, lastPathname, currentPathname, skippedPathnames) === true) {
+    const should = shouldUnload(from, to, lastPathname, currentPathname, skippedPathnames)
+    if (should === true) {
       handler()
       resetLoadCount()
       delete unloadersForPage[name]

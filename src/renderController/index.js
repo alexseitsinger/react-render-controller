@@ -3,12 +3,6 @@ import PropTypes from "prop-types"
 import _ from "underscore"
 
 import {
-  hasLoadAttempted,
-  addLoadAttempted,
-  removeAttempted,
-  resetLoadAttempted,
-} from "./utils/attempts"
-import {
   getLoadCount,
   resetLoadCount,
 } from "./utils/counting"
@@ -24,7 +18,18 @@ import {
   isEmpty,
   removeLeadingAndTrailingSlashes,
   getMasterName,
+  createCancellableMethod,
 } from "./utils/general"
+import {
+  hasControllerBeenSeen,
+  addControllerSeen,
+  removeControllerSeen,
+} from "./utils/seen"
+import {
+  addMounted,
+  removeMounted,
+  hasBeenMounted,
+} from "./utils/mounted"
 
 /**
  * Renders a component after its data has loaded.
@@ -40,8 +45,6 @@ import {
  * @param {array} [props.skippedPathnames]
  * @param {number} [props.failDelay]
  * @param {number} [props.totalTargets]
- *
- * @example
  */
 export class RenderController extends React.Component {
   static propTypes = {
@@ -69,6 +72,7 @@ export class RenderController extends React.Component {
       to: PropTypes.string.isRequired,
     })),
     totalTargets: PropTypes.number,
+    name: PropTypes.string.isRequired,
   }
 
   static defaultProps = {
@@ -83,6 +87,9 @@ export class RenderController extends React.Component {
 
   constructor(props) {
     super(props)
+
+    // Use some props for the contstructor below...
+    const { name, failDelay } = props
 
     // Store a set of canceller functions to run when our debounced load
     // functions should not continue due to unmounting, etc.
@@ -99,39 +106,100 @@ export class RenderController extends React.Component {
       realSetState(...args)
     }
 
+
     // If this component gets re-mounted and it already has empty data, the
-    // default state for isLoadAttempted will be false, so the loading screen
+    // default state for isControllerSeen will be false, so the loading screen
     // will shopw. To avoid this, we track each mounted component and reset the
     // default state if its already been mounted once.
-    const { currentPathname, name } = props
-    const isLoadAttempted = hasLoadAttempted(currentPathname, name)
+    const isControllerSeen = hasControllerBeenSeen(name)
     this.state = {
-      isLoadAttempted,
+      isControllerSeen,
     }
 
-    // After a certain delay, toggle our load attempted flag to change what gets
-    // displayed (from renderFirst -> renderWithout)
-    this.setLoadAttempted = _.debounce(() => {
-      if (isLoadAttempted === false) {
-        this.setState({ isLoadAttempted: true })
-        addLoadAttempted(currentPathname, name)
+    // Create a set of methods to remove this controller name from a list of
+    // mounted controllers. When this controller is mounted again, it will
+    // cancel this removal. Otherwise, following a delay from unmounting, this
+    // controllers name will be removed. This allows the renderFirst() method to
+    // be shown again. Save these methods to the instance for use elsewhere.
+    const {
+      method: unsetControllerSeen,
+      canceller: cancelUnsetControllerSeen,
+    } = createCancellableMethod((failDelay * 2), () => {
+      if (isControllerSeen === true) {
+        if (this.isControllerMounted() === false) {
+          removeControllerSeen(name)
+        }
       }
-    }, props.failDelay)
+    })
+    this.cancelUnsetControllerSeen = cancelUnsetControllerSeen
+    this.unsetControllerSeen = unsetControllerSeen
+
+    // Save an instance method that adds this controllers name to a list of
+    // controllers seen. This prevents the renderFirst() method from displaying
+    // again, after the data has already been loaded, but this cmponent gets
+    // re-rendered.
+    this.setControllerSeen = _.debounce(() => {
+      if (isControllerSeen === false) {
+        if (this.isControllerMounted() === true) {
+          addControllerSeen(name)
+
+          // Toggle the components state to True so our renderFirst() method
+          // finished, and is replaced with either renderWith() or
+          // renderWithout().
+          this.setState({ isControllerSeen: true })
+        }
+      }
+    }, failDelay)
+
 
     // Unload previous data first, then load new data.
     this.processUnloaders()
     this.processLoaders()
   }
 
+  isControllerMounted = () => {
+    const { name } = this.props
+
+    if (this._isMounted === true && hasBeenMounted(name) === true) {
+      return true
+    }
+
+    return false
+  }
+
+  componentWillUnmount() {
+    // Set our falg to false so setState doesn't work after this.
+    this._isMounted = false
+
+    // Remove this controllers name from the list of mounbted controllers so
+    // unsetControllerSeen() can run for this controller.
+    const { name } = this.props
+    removeMounted(name)
+
+    // Before any unmounting, cancel any pending loads.
+    this.runCancellers()
+
+    // Remove this controllers name from the seen controllers list to allow for
+    // renderFirst() methods to work again.
+    this.unsetControllerSeen()
+  }
+
   componentDidMount() {
     const {
-      currentPathname,
       name,
     } = this.props
 
+    // Set the flag to allow setState to work.
     this._isMounted = true
 
-    resetLoadAttempted(currentPathname)
+    // Add this controller to the list of mounted controllers.
+    addMounted(name)
+
+    // Cancel any previous calls to unsetControllerSeen for thi controller.
+    this.cancelUnsetControllerSeen()
+
+    // Add this controller to the list of seen controllers.
+    this.setControllerSeen()
   }
 
   componentDidUpdate(prevProps) {
@@ -145,15 +213,9 @@ export class RenderController extends React.Component {
     }
   }
 
-  componentWillUnmount() {
-    this._isMounted = false
-
-    // Before any unmounting, cancel any pending loads.
-    this.runCancellers()
-  }
 
   handleLoad = () => {
-    const { targets } = this.props
+    const { targets, name } = this.props
 
     if (this.isTargetsLoaded() === true) {
       return
@@ -165,8 +227,9 @@ export class RenderController extends React.Component {
       }
 
       obj.load()
-      this.setLoadAttempted()
     })
+
+    addControllerSeen(name)
   }
 
   handleUnload = () => {
@@ -295,8 +358,9 @@ export class RenderController extends React.Component {
       renderFirst,
     } = this.props
     const {
-      isLoadAttempted
+      isControllerSeen
     } = this.state
+    const isFirstLoad = this.isFirstLoad()
 
     if (this.isTargetsLoaded() === true) {
       if (_.isFunction(renderWith)) {
@@ -305,7 +369,7 @@ export class RenderController extends React.Component {
       return children
     }
 
-    if ((isLoadAttempted === false) && this.isFirstLoad() === true) {
+    if (isFirstLoad === true && isControllerSeen === false) {
       if (_.isFunction(renderFirst)) {
         return renderFirst()
       }
