@@ -14,10 +14,17 @@ export const unloaders = {}
 
 export const shouldUnload = (from, to, lastPathname, currentPathname, skippedPathnames) => {
   const prepared = prepareSkippedPathnames(skippedPathnames)
+
   const isSkipped = prepared.map(obj => {
-    const isFrom = isMatchingPaths(obj.from, from)
-    const isTo = isMatchingPaths(obj.to, to)
-    return ((isFrom === true) && (isTo === true))
+    if (obj.to) {
+      const isTo = isMatchingPaths(obj.to, to)
+      if (obj.from) {
+        const isFrom = isMatchingPaths(obj.from, from)
+        return ((isFrom === true) && (isTo === true))
+      }
+      return (isTo === true)
+    }
+    return false
   }).includes(true)
   if (isSkipped === true || lastPathname === currentPathname) {
     return false
