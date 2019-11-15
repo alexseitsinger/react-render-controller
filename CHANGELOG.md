@@ -1,3 +1,10 @@
+<a name="v6.1.0"></a>
+## [v6.1.0](https://github.com/alexseitsinger/react-render-controller/compare/v6.0.1...v6.1.0) (2019-11-15)
+
+### Features
+- Adds custom target names. ([c9b6d31](https://github.com/alexseitsinger/react-render-controller/commit/c9b6d314660687115eedad2dd70c3bbd59185ec5))
+
+
 <a name="v6.0.1"></a>
 ## [v6.0.1](https://github.com/alexseitsinger/react-render-controller/compare/v6.0.0...v6.0.1) (2019-11-14)
 
