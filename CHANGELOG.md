@@ -1,3 +1,13 @@
+<a name="v6.1.1"></a>
+## [v6.1.1](https://github.com/alexseitsinger/react-render-controller/compare/v6.1.0...v6.1.1) (2019-11-15)
+
+### Bug Fixes
+- Fixes counting. ([a7958b4](https://github.com/alexseitsinger/react-render-controller/commit/a7958b4adfc1750fe33ccae918b9aa4714f9e9d5))
+
+### Code Refactoring
+- Changes loading process. ([35750f6](https://github.com/alexseitsinger/react-render-controller/commit/35750f6b16726f6cead19bf157266acd1f51fa46))
+
+
 <a name="v6.1.0"></a>
 ## [v6.1.0](https://github.com/alexseitsinger/react-render-controller/compare/v6.0.1...v6.1.0) (2019-11-15)
 
