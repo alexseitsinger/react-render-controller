@@ -126,10 +126,9 @@ export class RenderController extends React.Component {
       method: unsetControllerSeen,
       canceller: cancelUnsetControllerSeen,
     } = createCancellableMethod((failDelay * 2), () => {
-      if (isControllerSeen === true) {
-        if (this.isControllerMounted() === false) {
-          removeControllerSeen(name)
-        }
+      if (this.isControllerMounted() === false) {
+        console.log("remove controller seen")
+        removeControllerSeen(name)
       }
     })
     this.cancelUnsetControllerSeen = cancelUnsetControllerSeen
@@ -141,6 +140,7 @@ export class RenderController extends React.Component {
     // re-rendered.
     this.setControllerSeen = _.debounce(() => {
       if (isControllerSeen === false) {
+        console.log("add controller seen")
         addControllerSeen(name)
 
         // Toggle the components state to True so our renderFirst() method
@@ -189,6 +189,8 @@ export class RenderController extends React.Component {
 
     // Add this controller to the list of seen controllers.
     this.setControllerSeen()
+
+    console.log("mounted")
   }
 
   componentDidUpdate(prevProps) {
@@ -226,8 +228,11 @@ export class RenderController extends React.Component {
 
     targets.forEach((obj, i) => {
       if (this.hasTargetLoadedBefore(obj.name) === true) {
+        console.log("target has loaded before: ", obj.name)
         return
       }
+
+      console.log("loading: ", obj.name)
 
       obj.load()
     })
@@ -244,7 +249,8 @@ export class RenderController extends React.Component {
         obj.unload()
       }
 
-      resetLoadCount(currentPathname, obj.name)
+      const fullTargetName = this.getFullTargetName(obj.name)
+      resetLoadCount(fullTargetName)
     })
   }
 
@@ -293,12 +299,8 @@ export class RenderController extends React.Component {
   }
 
   hasTargetLoadedBefore = name => {
-    const {
-      currentPathname,
-    } = this.props
-
     const fullTargetName = this.getFullTargetName(name)
-    if (getLoadCount(currentPathname, fullTargetName) <= 0) {
+    if (getLoadCount(fullTargetName) <= 0) {
       return false
     }
     return true
@@ -342,13 +344,12 @@ export class RenderController extends React.Component {
   isFirstLoad = () => {
     const {
       targets,
-      currentPathname,
     } = this.props
 
     var total = 0
     targets.forEach(obj => {
       const fullTargetName = this.getFullTargetName(obj.name)
-      total += getLoadCount(currentPathname, fullTargetName)
+      total += getLoadCount(fullTargetName)
     })
 
     if (total <= 0) {
