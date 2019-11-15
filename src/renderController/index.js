@@ -127,7 +127,6 @@ export class RenderController extends React.Component {
       canceller: cancelUnsetControllerSeen,
     } = createCancellableMethod((failDelay * 2), () => {
       if (this.isControllerMounted() === false) {
-        console.log("remove controller seen")
         removeControllerSeen(name)
       }
     })
@@ -140,7 +139,6 @@ export class RenderController extends React.Component {
     // re-rendered.
     this.setControllerSeen = _.debounce(() => {
       if (isControllerSeen === false) {
-        console.log("add controller seen")
         addControllerSeen(name)
 
         // Toggle the components state to True so our renderFirst() method
@@ -189,8 +187,6 @@ export class RenderController extends React.Component {
 
     // Add this controller to the list of seen controllers.
     this.setControllerSeen()
-
-    console.log("mounted")
   }
 
   componentDidUpdate(prevProps) {
@@ -228,11 +224,8 @@ export class RenderController extends React.Component {
 
     targets.forEach((obj, i) => {
       if (this.hasTargetLoadedBefore(obj.name) === true) {
-        console.log("target has loaded before: ", obj.name)
         return
       }
-
-      console.log("loading: ", obj.name)
 
       obj.load()
     })

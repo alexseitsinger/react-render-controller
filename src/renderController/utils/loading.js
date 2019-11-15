@@ -30,7 +30,7 @@ export const addLoader = ({ currentPathname, name, handler, callback }) => {
       return
     }
     handler()
-    updateLoadCount(currentPathname, name)
+    updateLoadCount(name)
     callback()
   }
 
@@ -48,7 +48,6 @@ export const startRunningLoaders = currentPathname => {
   Object.keys(fns).forEach(key => {
     fns[key]()
     delete fns[key]
-
   })
 }
 

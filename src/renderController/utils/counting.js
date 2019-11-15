@@ -10,7 +10,7 @@ export const resetLoadCount = name => {
 }
 
 export const updateLoadCount = name => {
-  const lc = loadCounts[name] = loadCounts[name] || -1
+  var lc = loadCounts[name] = loadCounts[name] || -1
   lc += 1
   return lc
 }
