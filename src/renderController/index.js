@@ -83,6 +83,7 @@ export class RenderController extends React.Component {
     renderWithout: null,
     failDelay: 6000,
     totalTargets: null,
+    name: _.uniqueId(),
   }
 
   constructor(props) {
@@ -201,6 +202,11 @@ export class RenderController extends React.Component {
     }
   }
 
+  getFullTargetName = targetName => {
+    const { name } = this.props
+    return `${name}_${targetName}`
+  }
+
   isControllerMounted = () => {
     const { name } = this.props
 
@@ -261,14 +267,14 @@ export class RenderController extends React.Component {
     } = this.props
 
     targets.forEach((obj, i, arr) => {
-      const name = obj.name
+      const fullTargetName = this.getFullTargetName(obj.name)
 
-      this.cancellers[name] = addLoader({
-        name,
+      this.cancellers[fullTargetName] = addLoader({
+        name: fullTargetName,
         currentPathname,
         handler: this.handleLoad,
         callback: () => {
-          this.cancellers[name] = null
+          this.cancellers[fullTargetName] = null
         },
       })
 
@@ -291,7 +297,8 @@ export class RenderController extends React.Component {
       currentPathname,
     } = this.props
 
-    if (getLoadCount(currentPathname, name) <= 0) {
+    const fullTargetName = this.getFullTargetName(name)
+    if (getLoadCount(currentPathname, fullTargetName) <= 0) {
       return false
     }
     return true
@@ -308,8 +315,10 @@ export class RenderController extends React.Component {
     runUnloaders(lastPathname, currentPathname)
 
     targets.forEach(obj => {
+      const fullTargetName = this.getFullTargetName(obj.name)
+
       addUnloader({
-        name: obj.name,
+        name: fullTargetName,
         handler: this.handleUnload,
         lastPathname,
         currentPathname,
@@ -338,7 +347,8 @@ export class RenderController extends React.Component {
 
     var total = 0
     targets.forEach(obj => {
-      total += getLoadCount(currentPathname, obj.name)
+      const fullTargetName = this.getFullTargetName(obj.name)
+      total += getLoadCount(currentPathname, fullTargetName)
     })
 
     if (total <= 0) {
