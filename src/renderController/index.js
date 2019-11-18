@@ -27,6 +27,8 @@ import {
   addUnloader,
 } from "./utils/unloading"
 import {
+  kickoff,
+  kickoffDelay,
   runLoaders,
   addLoader,
 } from "./utils/loading"
@@ -146,12 +148,13 @@ export class RenderController extends React.Component {
         // renderWithout().
         this.setState({ isControllerSeen: true })
       }
-    }, failDelay)
-
+    }, failDelay + kickoffDelay)
 
     // Unload previous data first, then load new data.
-    this.processUnloaders()
-    this.processLoaders()
+    kickoff(name, () => {
+      this.processUnloaders()
+      this.processLoaders()
+    })
   }
 
   componentWillUnmount() {
@@ -223,7 +226,8 @@ export class RenderController extends React.Component {
     }
 
     targets.forEach((obj, i) => {
-      if (this.hasTargetLoadedBefore(obj.name) === true) {
+      const fullTargetName = this.getFullTargetName(obj.name)
+      if (this.hasTargetLoadedBefore(fullTargetName) === true) {
         return
       }
 
@@ -268,17 +272,12 @@ export class RenderController extends React.Component {
     targets.forEach((obj, i, arr) => {
       const fullTargetName = this.getFullTargetName(obj.name)
 
-      this.cancellers[fullTargetName] = addLoader({
-        name: fullTargetName,
-        currentPathname,
-        handler: this.handleLoad,
-        callback: () => {
-          this.cancellers[fullTargetName] = null
-        },
+      this.cancellers[fullTargetName] = addLoader(fullTargetName, this.handleLoad, () => {
+        this.cancellers[fullTargetName] = null
       })
 
       if (arr.length === (i + 1)) {
-        runLoaders(currentPathname)
+        runLoaders()
       }
     })
   }
@@ -291,9 +290,8 @@ export class RenderController extends React.Component {
     })
   }
 
-  hasTargetLoadedBefore = name => {
-    const fullTargetName = this.getFullTargetName(name)
-    if (getLoadCount(fullTargetName) <= 0) {
+  hasTargetLoadedBefore = fullTargetName => {
+    if (getLoadCount(fullTargetName) < 0) {
       return false
     }
     return true
@@ -313,11 +311,11 @@ export class RenderController extends React.Component {
       const fullTargetName = this.getFullTargetName(obj.name)
 
       addUnloader({
-        name: fullTargetName,
-        handler: this.handleUnload,
         lastPathname,
         currentPathname,
         skippedPathnames,
+        handler: this.handleLoad,
+        name: fullTargetName,
       })
     })
   }
