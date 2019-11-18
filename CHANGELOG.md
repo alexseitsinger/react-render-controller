@@ -1,3 +1,12 @@
+<a name="v6.2.0"></a>
+## [v6.2.0](https://github.com/alexseitsinger/react-render-controller/compare/v6.1.1...v6.2.0) (2019-11-18)
+
+### Code Refactoring
+- Changes kickoff delay. ([5dec2b9](https://github.com/alexseitsinger/react-render-controller/commit/5dec2b9d3de60839734c44ddf02af598192d5914))
+- Updates counting methods. ([ff13157](https://github.com/alexseitsinger/react-render-controller/commit/ff13157761105971aad025ec35d7acdfa9ed5b41))
+- Uses fullTargetName instead of path. ([6282ebc](https://github.com/alexseitsinger/react-render-controller/commit/6282ebcb5e9afc9d1bb0e96c4d5ae497e7fdd315))
+
+
 <a name="v6.1.1"></a>
 ## [v6.1.1](https://github.com/alexseitsinger/react-render-controller/compare/v6.1.0...v6.1.1) (2019-11-15)
 
