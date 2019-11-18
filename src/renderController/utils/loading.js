@@ -8,30 +8,32 @@ export const runLoadersDelay = 1100
 
 export const loaders = {}
 
-export const getTotalLoaders = currentPathname => {
-  if (!(currentPathname in loaders)) {
-    loaders[currentPathname] = {}
+let kickedOff = []
+const clearKickedOff = _.debounce(() => {
+  kickedOff = []
+}, 3000)
+
+export const kickoff = (name, f) => {
+  const i = kickedOff.indexOf(name)
+  if (i < 0) {
+    kickedOff.push(name)
+    f()
   }
-  const fns = loaders[currentPathname]
-  return Object.keys(fns).length
 }
 
-export const addLoader = ({ currentPathname, name, handler, callback }) => {
+export const addLoader = (name, handler, callback) => {
   var isLoadCancelled = false
 
-  if (!(currentPathname in loaders)) {
-    loaders[currentPathname] = {}
-  }
-  const fns = loaders[currentPathname]
-
-  fns[name] = () => {
-    delete fns[name]
-    if (isLoadCancelled === true) {
-      return
-    }
-    handler()
-    updateLoadCount(name)
-    callback()
+  if (!(name in loaders)) {
+    loaders[name] = _.once(() => {
+      delete loaders[name]
+      if (isLoadCancelled === true) {
+        return
+      }
+      handler()
+      updateLoadCount(name)
+      callback()
+    })
   }
 
   return () => {
@@ -39,28 +41,19 @@ export const addLoader = ({ currentPathname, name, handler, callback }) => {
   }
 }
 
-export const startRunningLoaders = currentPathname => {
-  if (!(currentPathname in loaders)) {
-    loaders[currentPathname] = {}
-  }
-  const fns = loaders[currentPathname]
-
-  Object.keys(fns).forEach(key => {
-    fns[key]()
-    delete fns[key]
+export const startRunningLoaders = () => {
+  Object.keys(loaders).forEach(key => {
+    loaders[key]()
   })
 }
 
-export const runLoaders = _.debounce((currentPathname) => {
-  const currentTotalLoaders = getTotalLoaders(currentPathname)
-
-  var totalDelay = ((runLoadersDelay * currentTotalLoaders) - runLoadersDelay)
+export const runLoaders = _.debounce(() => {
+  const totalLoaders = Object.keys(loaders).length
+  var totalDelay = ((runLoadersDelay * totalLoaders) - runLoadersDelay)
   if (totalDelay < 0) {
     totalDelay = 0
   }
 
-  setTimeout(() => {
-    startRunningLoaders(currentPathname)
-  }, totalDelay)
+  setTimeout(startRunningLoaders, totalDelay)
 }, runLoadersDelay)
 
