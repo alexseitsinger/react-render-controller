@@ -1,3 +1,10 @@
+<a name="v6.3.1"></a>
+## [v6.3.1](https://github.com/alexseitsinger/react-render-controller/compare/v6.3.0...v6.3.1) (2019-11-22)
+
+### Bug Fixes
+- Fixes delay. ([e59039d](https://github.com/alexseitsinger/react-render-controller/commit/e59039dc156badbf671e3a4c0d17125f8d48df78))
+
+
 <a name="v6.3.0"></a>
 ## [v6.3.0](https://github.com/alexseitsinger/react-render-controller/compare/v6.2.0...v6.3.0) (2019-11-22)
 
