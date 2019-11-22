@@ -4,7 +4,10 @@ module.exports = {
   root: true,
   parser: "babel-eslint",
   env: {
-    "jest/globals": true,
+    browser: true,
+    node: true,
+    jest: true,
+    //"jest/globals": true,
   },
   globals: {
     describe: true,
@@ -16,7 +19,7 @@ module.exports = {
     render: true,
   },
   plugins: [
-    "jest",
+    //"jest",
   ],
   settings: {
     "react": {
@@ -31,6 +34,6 @@ module.exports = {
   extends: [
     "@alexseitsinger/eslint-config-base",
     "@alexseitsinger/eslint-config-react",
-    "plugins:jest/recommended",
+    //"plugins:jest/recommended",
   ],
 }
