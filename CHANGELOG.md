@@ -1,3 +1,10 @@
+<a name="v6.3.0"></a>
+## [v6.3.0](https://github.com/alexseitsinger/react-render-controller/compare/v6.2.0...v6.3.0) (2019-11-22)
+
+### Code Refactoring
+- Moves methods to utils modules. ([be342bf](https://github.com/alexseitsinger/react-render-controller/commit/be342bfbf5cb6b24f494a099ab81111190c1825c))
+
+
 <a name="v6.2.0"></a>
 ## [v6.2.0](https://github.com/alexseitsinger/react-render-controller/compare/v6.1.1...v6.2.0) (2019-11-18)
 
