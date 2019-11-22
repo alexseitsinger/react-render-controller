@@ -30,7 +30,7 @@ const clearLoaders = _.debounce(() => {
   Object.keys(loaders).forEach(key => {
     delete loaders[key]
   })
-}, 2000)
+}, 1000)
 
 export const addLoader = (name, handler, callback) => {
   var isLoadCancelled = false
