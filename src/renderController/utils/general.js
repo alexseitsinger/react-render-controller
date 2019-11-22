@@ -1,5 +1,9 @@
 import _ from "underscore"
 
+export const getFullName = (controllerName, targetName) => {
+  return `${controllerName}__${targetName}`
+}
+
 export const isEmpty = data => {
   var result = false
   if (!data) {

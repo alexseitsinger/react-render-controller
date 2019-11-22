@@ -25,12 +25,17 @@ import {
 import {
   runUnloaders,
   addUnloader,
+  handleUnload,
+  processUnloaders,
 } from "./utils/unloading"
 import {
   kickoff,
   kickoffDelay,
   runLoaders,
   addLoader,
+  checkTargetsLoaded,
+  checkForFirstLoad,
+  processLoaders,
 } from "./utils/loading"
 
 /**
@@ -92,7 +97,14 @@ export class RenderController extends React.Component {
     super(props)
 
     // Use some props for the contstructor below...
-    const { name, failDelay } = props
+    const {
+      name,
+      targets,
+      failDelay,
+      currentPathname,
+      lastPathname,
+      skippedPathnames,
+    } = props
 
     // Store a set of canceller functions to run when our debounced load
     // functions should not continue due to unmounting, etc.
@@ -128,9 +140,10 @@ export class RenderController extends React.Component {
       method: unsetControllerSeen,
       canceller: cancelUnsetControllerSeen,
     } = createCancellableMethod((failDelay * 2), () => {
-      if (this.isControllerMounted() === false) {
-        removeControllerSeen(name)
+      if (this._isMounted === true && hasBeenMounted(name) === true) {
+        return
       }
+      removeControllerSeen(name)
     })
     this.cancelUnsetControllerSeen = cancelUnsetControllerSeen
     this.unsetControllerSeen = unsetControllerSeen
@@ -151,27 +164,8 @@ export class RenderController extends React.Component {
     }, failDelay + kickoffDelay)
 
     // Unload previous data first, then load new data.
-    kickoff(name, () => {
-      this.processUnloaders()
-      this.processLoaders()
-    })
-  }
-
-  componentWillUnmount() {
-    // Set our falg to false so setState doesn't work after this.
-    this._isMounted = false
-
-    // Remove this controllers name from the list of mounbted controllers so
-    // unsetControllerSeen() can run for this controller.
-    const { name } = this.props
-    removeMounted(name)
-
-    // Before any unmounting, cancel any pending loads.
-    this.runCancellers()
-
-    // Remove this controllers name from the seen controllers list to allow for
-    // renderFirst() methods to work again.
-    this.unsetControllerSeen()
+    processUnloaders(name, targets, lastPathname, currentPathname, skippedPathnames)
+    processLoaders(name, targets, this.setCanceller)
   }
 
   componentDidMount() {
@@ -203,84 +197,24 @@ export class RenderController extends React.Component {
     }
   }
 
-  getFullTargetName = targetName => {
+  componentWillUnmount() {
+    // Set our falg to false so setState doesn't work after this.
+    this._isMounted = false
+
+    // Remove this controllers name from the list of mounbted controllers so
+    // unsetControllerSeen() can run for this controller.
     const { name } = this.props
-    return `${name}_${targetName}`
+    removeMounted(name)
+
+    // Before any unmounting, cancel any pending loads.
+    this.runCancellers()
+
+    // Remove this controllers name from the seen controllers list to allow for
+    // renderFirst() methods to work again.
+    this.unsetControllerSeen()
   }
 
-  isControllerMounted = () => {
-    const { name } = this.props
-
-    if (this._isMounted === true && hasBeenMounted(name) === true) {
-      return true
-    }
-
-    return false
-  }
-
-  handleLoad = () => {
-    const { targets, name } = this.props
-
-    if (this.isTargetsLoaded() === true) {
-      return
-    }
-
-    targets.forEach((obj, i) => {
-      const fullTargetName = this.getFullTargetName(obj.name)
-      if (this.hasTargetLoadedBefore(fullTargetName) === true) {
-        return
-      }
-
-      obj.load()
-    })
-  }
-
-  handleUnload = () => {
-    const {
-      targets,
-      currentPathname,
-    } = this.props
-
-    targets.forEach(obj => {
-      if (_.isFunction(obj.unload)) {
-        obj.unload()
-      }
-
-      const fullTargetName = this.getFullTargetName(obj.name)
-      resetLoadCount(fullTargetName)
-    })
-  }
-
-  getTotalTargets = () => {
-    const {
-      totalTargets,
-      targets,
-    } = this.props
-
-    if (!totalTargets) {
-      return targets.length
-    }
-    return totalTargets
-  }
-
-  processLoaders = () => {
-    const {
-      targets,
-      currentPathname,
-    } = this.props
-
-    targets.forEach((obj, i, arr) => {
-      const fullTargetName = this.getFullTargetName(obj.name)
-
-      this.cancellers[fullTargetName] = addLoader(fullTargetName, this.handleLoad, () => {
-        this.cancellers[fullTargetName] = null
-      })
-
-      if (arr.length === (i + 1)) {
-        runLoaders()
-      }
-    })
-  }
+  setCanceller = (name, fn) => this.cancellers[name] = fn
 
   runCancellers = () => {
     this.cancellers.forEach(f => {
@@ -290,67 +224,10 @@ export class RenderController extends React.Component {
     })
   }
 
-  hasTargetLoadedBefore = fullTargetName => {
-    if (getLoadCount(fullTargetName) < 0) {
-      return false
-    }
-    return true
-  }
-
-  processUnloaders = () => {
-    const {
-      targets,
-      lastPathname,
-      currentPathname,
-      skippedPathnames,
-    } = this.props
-
-    runUnloaders(lastPathname, currentPathname)
-
-    targets.forEach(obj => {
-      const fullTargetName = this.getFullTargetName(obj.name)
-
-      addUnloader({
-        lastPathname,
-        currentPathname,
-        skippedPathnames,
-        handler: this.handleLoad,
-        name: fullTargetName,
-      })
-    })
-  }
-
-  hasTargetLoaded = obj => {
-    if (!obj.data || isEmpty(obj.data) === true) {
-      return false
-    }
-    return true
-  }
-
-  isTargetsLoaded = () => {
-    const { targets } = this.props
-    return targets.map(obj => this.hasTargetLoaded(obj)).every(result => result === true)
-  }
-
-  isFirstLoad = () => {
-    const {
-      targets,
-    } = this.props
-
-    var total = 0
-    targets.forEach(obj => {
-      const fullTargetName = this.getFullTargetName(obj.name)
-      total += getLoadCount(fullTargetName)
-    })
-
-    if (total <= 0) {
-      return true
-    }
-    return false
-  }
-
   render() {
     const {
+      name,
+      targets,
       children,
       renderWithout,
       renderWith,
@@ -358,20 +235,21 @@ export class RenderController extends React.Component {
     } = this.props
 
     const {
-      isControllerSeen
+      isControllerSeen,
     } = this.state
 
-    if (this.isTargetsLoaded() === true) {
+    if (checkTargetsLoaded(targets) === true) {
       if (_.isFunction(renderWith)) {
         return renderWith()
       }
       return children
     }
 
-    const isFirstLoad = this.isFirstLoad()
-    if (isFirstLoad === true && isControllerSeen === false) {
-      if (_.isFunction(renderFirst)) {
-        return renderFirst()
+    if (checkForFirstLoad(name, targets) === true) {
+      if (isControllerSeen === false) {
+        if (_.isFunction(renderFirst)) {
+          return renderFirst()
+        }
       }
     }
 

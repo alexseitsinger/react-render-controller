@@ -1,6 +1,9 @@
+import _ from "underscore"
+
 import {
   isMatchingPaths,
   prepareSkippedPathnames,
+  getFullName,
 } from "./general"
 import { resetLoadCount } from "./counting"
 import { resetLoadAttempted } from "./attempts"
@@ -90,4 +93,38 @@ export const runUnloaders = (from, to) => {
   pathnames.last = from
   pathnames.current = to
 }
+
+export const handleUnload = _.debounce((controllerName, targets, currentPathname) => {
+  targets.forEach(obj => {
+    if (_.isFunction(obj.unload)) {
+      obj.unload()
+    }
+
+    const fullTargetName = getFullName(controllerName, obj.name)
+    resetLoadCount(fullTargetName)
+  })
+}, 1000)
+
+export const processUnloaders = (
+  controllerName,
+  targets,
+  lastPathname,
+  currentPathname,
+  skippedPathnames,
+) => {
+  runUnloaders(lastPathname, currentPathname)
+
+  targets.forEach(obj => {
+    const fullTargetName = getFullName(controllerName, obj.name)
+
+    addUnloader({
+      lastPathname,
+      currentPathname,
+      skippedPathnames,
+      handler: () => handleUnload(controllerName, targets, currentPathname),
+      name: fullTargetName,
+    })
+  })
+}
+
 
