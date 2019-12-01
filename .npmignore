@@ -1,9 +1,0 @@
-src/
-node_modules/
-.babelrc
-webpack.config.js
-yarn-error.log
-yarn.lock
-jest.setup.js
-jest.config.js
-tests/
