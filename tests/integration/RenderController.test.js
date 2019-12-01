@@ -2,15 +2,8 @@ import React from "react"
 
 import { RenderController } from "../src"
 import { setup } from "./page/setup"
-import {
-  FailedRender,
-  SuccessfulRender,
-  FirstRender,
-} from "./page/components"
 
-const failDelay = 6000
-
-describe("<RenderController />", () => {
+describe("RenderController", () => {
 
   it("should run each loader once, even when defined multiple times on the same page", () => {
 
