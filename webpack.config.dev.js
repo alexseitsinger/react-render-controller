@@ -1,4 +1,5 @@
 const path = require("path")
+const nodeExternals = require("webpack-node-externals")
 
 module.exports = {
   entry: "./src/index.js",
@@ -7,17 +8,31 @@ module.exports = {
   devtool: "source-map",
   output: {
     path: path.resolve("./dist"),
+    sourceMapFilename: "[name].dev.js.map",
     filename: "[name].dev.js",
     libraryTarget: "commonjs2",
-    sourceMapFilename: "[name].dev.js.map",
   },
   module: {
     rules: [
       {
         test: /\.jsx?$/,
-        exclude: /node_modules/,
+        include: [path.resolve("./src")],
         use: "babel-loader",
       },
     ],
+  },
+  externals: [
+    nodeExternals({
+      modulesFromFile: {
+        include: ["devDependencies", "peerDependencies"],
+        exclude: ["dependencies"],
+      },
+    }),
+  ],
+  resolve: {
+    alias: {
+      tests: path.resolve("./tests"),
+      src: path.resolve("./src"),
+    },
   },
 }
