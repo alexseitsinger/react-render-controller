@@ -1,17 +1,15 @@
 import React from "react"
 import PropTypes from "prop-types"
-import _ from "underscore"
+import {
+  isFunction,
+  uniqueId,
+  isEqual,
+  debounce,,
+} from "underscore"
 
 import {
-  isEmpty,
-  removeLeadingAndTrailingSlashes,
-  getMasterName,
   createCancellableMethod,
 } from "./utils/general"
-import {
-  getLoadCount,
-  resetLoadCount,
-} from "./utils/counting"
 import {
   hasControllerBeenSeen,
   addControllerSeen,
@@ -23,36 +21,14 @@ import {
   hasBeenMounted,
 } from "./utils/mounted"
 import {
-  runUnloaders,
-  addUnloader,
-  handleUnload,
   processUnloaders,
 } from "./utils/unloading"
 import {
-  kickoff,
-  kickoffDelay,
-  runLoaders,
-  addLoader,
   checkTargetsLoaded,
   checkForFirstLoad,
   processLoaders,
 } from "./utils/loading"
 
-/**
- * Renders a component after its data has loaded.
- *
- * @param {object} props
- * @param {array} props.targets
- * @param {function} [props.children]
- * @param {function} [props.renderFirst]
- * @param {function} [props.renderWith]
- * @param {function} [props.renderWithout]
- * @param {string} props.lastPathname
- * @param {string} props.currentPathname
- * @param {array} [props.skippedPathnames]
- * @param {number} [props.failDelay]
- * @param {number} [props.totalTargets]
- */
 export class RenderController extends React.Component {
   static propTypes = {
     children: PropTypes.oneOfType([
@@ -90,7 +66,7 @@ export class RenderController extends React.Component {
     renderWithout: null,
     failDelay: 6000,
     totalTargets: null,
-    name: _.uniqueId(),
+    name: uniqueId(),
   }
 
   constructor(props) {
@@ -152,7 +128,7 @@ export class RenderController extends React.Component {
     // controllers seen. This prevents the renderFirst() method from displaying
     // again, after the data has already been loaded, but this cmponent gets
     // re-rendered.
-    this.setControllerSeen = _.debounce(() => {
+    this.setControllerSeen = debounce(() => {
       if (isControllerSeen === false) {
         addControllerSeen(name)
 
@@ -192,7 +168,7 @@ export class RenderController extends React.Component {
     // If we have pending loads, and then we navigate away from that controller
     // before the load completes, the data will clear, and then load again.
     // To avoid this, cancel any pending loads everytime our targets change.
-    if (_.isEqual(targets, prevProps.targets) === false) {
+    if (isEqual(targets, prevProps.targets) === false) {
       this.runCancellers()
     }
   }
@@ -218,7 +194,7 @@ export class RenderController extends React.Component {
 
   runCancellers = () => {
     this.cancellers.forEach(f => {
-      if (_.isFunction(f)) {
+      if (isFunction(f)) {
         f()
       }
     })
@@ -239,7 +215,7 @@ export class RenderController extends React.Component {
     } = this.state
 
     if (checkTargetsLoaded(targets) === true) {
-      if (_.isFunction(renderWith)) {
+      if (isFunction(renderWith)) {
         return renderWith()
       }
       return children
@@ -247,13 +223,13 @@ export class RenderController extends React.Component {
 
     if (checkForFirstLoad(name, targets) === true) {
       if (isControllerSeen === false) {
-        if (_.isFunction(renderFirst)) {
+        if (isFunction(renderFirst)) {
           return renderFirst()
         }
       }
     }
 
-    if (_.isFunction(renderWithout)) {
+    if (isFunction(renderWithout)) {
       return renderWithout()
     }
     return null

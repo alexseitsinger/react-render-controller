@@ -1,3 +1,3 @@
-import "core-js/stable"
+//import "core-js/stable"
 
-export { RenderController } from "./renderController"
+export { RenderController } from "./RenderController"
