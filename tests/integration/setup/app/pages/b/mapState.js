@@ -1,5 +1,5 @@
 export default state => ({
-  page: state.pageA,
+  page: state.pageB,
   locations: state.locations,
 })
 

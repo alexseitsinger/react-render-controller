@@ -1,67 +1,38 @@
 import React from "react"
 
-import { RenderController } from "../../src"
-import { SuccessfulRender, FailedRender, FirstRender } from "../components"
+import { RenderController } from "src"
+import { SuccessfulRender, FailedRender, FirstRender } from "tests/integration/setup/components"
 
-export function Component({
-  oneData,
-  loadOneData,
-  unloadOneData,
+const skippedPathnames = []
 
-  twoData,
-  loadTwoData,
-  unloadTwoData,
-
-  threeData,
-  loadThreeData,
-  unloadThreeData,
+export default function PageA({
+  page: {
+    oneData,
+  },
+  getOneData,
+  setOneData,
+  locations: {
+    current,
+    last,
+  },
 }) {
   return (
     <React.Fragment>
       <RenderController
-        targets={[
-          {
-            name: "threeData",
-            data: threeData,
-            load: () => loadThreeData(),
-            unload: () => unloadThreeData(),
-          },
-        ]}
-        currentPathname={"/"}
-        lastPathname={"/"}
-        skippedPathnames={null}
-        renderWith={() => <SuccessfulRender />}
-        renderWithout={() => <FailedRender />}
-        renderFirst={() => <FirstRender />}
-      />
-      <RenderController
-        targets={[
-          {
-            name: "twoData",
-            data: twoData,
-            load: () => loadTwoData(),
-            unload: () => unloadTwoData(),
-          },
-        ]}
-        currentPathname={"/"}
-        lastPathname={"/"}
-        skippedPathnames={null}
-        renderWith={() => <SuccessfulRender />}
-        renderWithout={() => <FailedRender />}
-        renderFirst={() => <FirstRender />}
-      />
-      <RenderController
+        name={"pageA"}
         targets={[
           {
             name: "oneData",
             data: oneData,
-            load: () => loadOneData(),
-            unload: () => unloadOneData(),
+            empty: {},
+            cached: true,
+            getter: () => getOneData(),
+            setter: data => setOneData(data),
           },
         ]}
-        currentPathname={"/"}
-        lastPathname={"/"}
-        skippedPathnames={null}
+        currentPathname={current.pathname}
+        lastPathname={last.pathname}
+        skippedPathnames={skippedPathnames}
         renderWith={() => <SuccessfulRender />}
         renderWithout={() => <FailedRender />}
         renderFirst={() => <FirstRender />}

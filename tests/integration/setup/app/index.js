@@ -1,18 +1,35 @@
 import React from "react"
 import { Provider } from "react-redux"
-import { MemoryRouter, Route } from "react-router"
+import { Router, MemoryRouter, Route } from "react-router"
 
 import PageA from "./pages/a"
 import PageB from "./pages/b"
 import PageC from "./pages/c"
 
-export const App = (store, history) => (
+const App = ({ store, history, mocked }) => (
   <Provider store={store}>
-    <MemoryRouter history={history}>
-      <Route path={"/page-a"} component={PageA} />
-      <Route path={"/page-b"} component={PageB} />
-      <Route path={"/page-c"} component={PageC} />
-    </MemoryRouter>
+    <Router history={history}>
+      <Route
+        path={"/page-a"}
+        render={routeProps => (
+          <PageA {...routeProps} mocked={mocked} />
+        )}
+      />
+      <Route
+        path={"/page-b"}
+        render={routeProps => (
+          <PageB {...routeProps} mocked={mocked} />
+        )}
+      />
+      <Route
+        path={"/page-c"}
+        render={routeProps => (
+          <PageC {...routeProps} mocked={mocked} />
+        )}
+      />
+    </Router>
   </Provider>
 )
+
+export default App
 
