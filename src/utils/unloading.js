@@ -1,4 +1,4 @@
-import _ from "underscore"
+import { isFunction, once } from "underscore"
 
 import {
   isMatchingPaths,
@@ -28,7 +28,7 @@ export const shouldUnload = (from, to, lastPathname, currentPathname, skippedPat
 
   // If the pathname is labeled as skipped or its the same pathanme, then dont
   // unload.
-  if (isSkippedPathname === true || lastPathname === currentPathname) {
+  if (isSkippedPathname === true) {
     return false
   }
 
@@ -37,56 +37,69 @@ export const shouldUnload = (from, to, lastPathname, currentPathname, skippedPat
 }
 
 export const addUnloader = ({
-  lastPathname,
-  currentPathname,
-  skippedPathnames,
+  //lastPathname,
+  //currentPathname,
+//  skippedPathnames,
   handler,
   name,
 }) => {
-
-  if (!(currentPathname in unloaders)) {
-    unloaders[currentPathname] = {}
-  }
-
-  const unloadersForPage = unloaders[currentPathname]
-  if (name in unloadersForPage) {
-    return
-  }
-
-  function targetUnloader(from, to) {
-    const should = shouldUnload(from, to, lastPathname, currentPathname, skippedPathnames)
-    if (should === true) {
+  if (!(name in unloaders)) {
+    console.log("adding unloader")
+    unloaders[name] = once(() => {
       handler()
-      resetLoadCount()
-      delete unloadersForPage[name]
-    }
+      //delete unloaders[name]
+    })
   }
 
-  unloadersForPage[name] = targetUnloader
+  //if (!(currentPathname in unloaders)) {
+    //unloaders[currentPathname] = {}
+  //}
+
+  //const unloadersForPage = unloaders[currentPathname]
+  //if (name in unloadersForPage) {
+    //return
+  //}
+
+  //function targetUnloader(from, to) {
+    //const should = shouldUnload(from, to, lastPathname, currentPathname, skippedPathnames)
+    //if (should === true) {
+      //handler()
+      //resetLoadCount()
+      //delete unloadersForPage[name]
+    //}
+  //}
+
+  //unloadersForPage[name] = targetUnloader
 }
 
 export const runUnloaders = (from, to) => {
+  console.log("running unloaders")
+
   // If we use multiple renderControllers on the same page, each one will invoke
   // the others unloaders unless we have this call to prevent unnecessary
   // repeated loading/unloading.
   if (pathnames.current === to) {
+    console.log("pathnames.current === to")
     return
   }
 
-  // Ensure our unloaders are already there.
-  if (!(from in unloaders)) {
-    unloaders[from] = {}
+  const keys = Object.keys(unloaders)
+  while (keys.length) {
+    unloaders[keys.shift()]()
   }
-  const unloadersForPage = unloaders[from]
+
+  // Ensure our unloaders are already there.
+  //if (!(from in unloaders)) {
+    //unloaders[from] = {}
+  //}
 
   // To ensure that our unloaders run before we add any others, make it a
   // synchronous action by using a while loop. These are also more efficient.
-  var keys = Object.keys(unloadersForPage)
-  var key
-  while (keys.length) {
-    key = keys.shift()
-    unloadersForPage[key](from, to)
-  }
+  //const unloadersForPage = unloaders[from]
+  //const keys = Object.keys(unloadersForPage)
+  //while (keys.length) {
+    //unloadersForPage[keys.shift()](from, to)
+  //}
 
   // Finally, update our saved pathnames for the next unloaders to use to
   // determine if they should run or not.
@@ -94,6 +107,7 @@ export const runUnloaders = (from, to) => {
   pathnames.current = to
 }
 
+/*
 export const handleUnload = _.debounce((controllerName, targets, currentPathname) => {
   targets.forEach(obj => {
     if (_.isFunction(obj.unload)) {
@@ -104,6 +118,7 @@ export const handleUnload = _.debounce((controllerName, targets, currentPathname
     resetLoadCount(fullTargetName)
   })
 }, 1000)
+  */
 
 export const processUnloaders = (
   controllerName,
@@ -115,14 +130,16 @@ export const processUnloaders = (
   runUnloaders(lastPathname, currentPathname)
 
   targets.forEach(obj => {
-    const fullTargetName = getFullName(controllerName, obj.name)
-
     addUnloader({
       lastPathname,
       currentPathname,
       skippedPathnames,
-      handler: () => handleUnload(controllerName, targets, currentPathname),
-      name: fullTargetName,
+      handler: () => {
+        if(isFunction(obj.unload)) {
+          obj.unload()
+        }
+      },
+      name: getFullName(controllerName, obj.name),
     })
   })
 }

@@ -1,4 +1,8 @@
-import _ from "underscore"
+import {
+  debounce,
+  once,
+  isFunction,
+} from "underscore"
 
 import {
   getFullName,
@@ -7,44 +11,78 @@ import {
 import {
   getLoadCount,
   updateLoadCount,
+  resetLoadCount,
 } from "./counting"
 
-export const runLoadersDelay = 1100
+const runLoadersDelay = 1100
 
-export const loaders = {}
+const loaders = {}
 
-let kickedOff = []
-const clearKickedOff = _.debounce(() => {
-  kickedOff = []
-}, 3000)
-
-export const kickoff = (name, f) => {
-  const i = kickedOff.indexOf(name)
-  if (i < 0) {
-    kickedOff.push(name)
-    f()
+const cachedData = {}
+const setCachedData = (fullName, data) => {
+  cachedData[fullName] = {
+    date: (new Date(Date.now()).toISOString()),
+    data: data,
+  }
+}
+const getCachedData = fullName => {
+  if (fullName in cachedData) {
+    return cachedData[fullName].data
   }
 }
 
-const clearLoaders = _.debounce(() => {
-  Object.keys(loaders).forEach(key => {
-    delete loaders[key]
-  })
-}, 0)
+const shouldDataBeCached = (fullName, target) => {
+  if (doesTargetHaveData(target) === true) {
+    if (target.cache && target.cache === true) {
+      // check data expiration here.
+      if (!(fullName in cachedData)) {
+        consle.log("shouldDataBeCached: true", fullName)
+        return true
+      }
+      // if expired -> true
+    }
+  }
+  console.log("shouldDataBeCached: false", fullName)
+  return false
+}
+
+export const doesTargetHaveData = target => {
+  if (!target.data || isEmpty(target.data) === true) {
+    return false
+  }
+  return true
+}
+
+
+export const checkTargetsLoaded = targets => (
+  targets.map(target => doesTargetHaveData(target)).every(b => b === true)
+)
+
+
+export const clearLoaders = () => {
+  console.log("clearing loaders...")
+  const keys = Object.keys(loaders)
+  var k
+  while (keys.length) {
+    k = keys.shift()
+    delete loaders[k]
+  }
+}
 
 export const addLoader = (name, handler, callback) => {
   var isLoadCancelled = false
 
   if (!(name in loaders)) {
-    loaders[name] = _.once(() => {
-      //delete loaders[name]
+    loaders[name] = () => {
+      console.log("Running method....")
+      delete loaders[name]
       if (isLoadCancelled === true) {
+        console.log("Method cancelled...")
         return
       }
       handler()
       callback()
-      updateLoadCount(name)
-    })
+    }
   }
 
   return () => {
@@ -53,77 +91,60 @@ export const addLoader = (name, handler, callback) => {
 }
 
 export const startRunningLoaders = () => {
-  Object.keys(loaders).forEach(key => {
-    loaders[key]()
-  })
-  clearLoaders()
-}
-
-export const hasTargetAttemptedLoad = fullTargetName => {
-  if (getLoadCount(fullTargetName) < 0) {
-    return false
+  console.log("running loaders")
+  const keys = Object.keys(loaders)
+  var k
+  while (keys.length) {
+    k = keys.shift()
+    loaders[k]()
   }
-  return true
 }
 
-export const doesTargetHaveData = obj => {
-  if (!obj.data || isEmpty(obj.data) === true) {
-    return false
-  }
-  return true
-}
+const loadTarget = (controllerName, target) => {
+  const fullName = getFullName(controllerName, target.name)
 
-export const checkTargetsLoaded = targets => {
-  return targets.map(obj => doesTargetHaveData(obj)).every(b => b === true)
-}
+  console.log(`loadTarget() (${target.name})`)
 
-export const checkForFirstLoad = (controllerName, targets) => {
-  var total = 0
-
-  targets.forEach(obj => {
-    const fullTargetName = getFullName(controllerName, obj.name)
-    total += getLoadCount(fullTargetName)
-  })
-
-  if (total <= 0) {
-    return true
-  }
-  return false
-}
-
-export const reportUnloaded = _.debounce(targets => {
-  targets.forEach(obj => {
-    if (doesTargetHaveData(obj) === false) {
-      console.log("Failed to load: ", obj.name)
+  if (doesTargetHaveData(target) === true) {
+    console.log(`doesTargetHaveData: true (${target.name})`)
+    if (shouldDataBeCached(fullName, target) === true) {
+      console.log(`shouldDataBeCached:  true`)
+      setCachedData(fullName, target.data)
     }
-  })
-}, 6000)
-
-const loadTarget = (controllerName, obj) => {
-  const fullTargetName = getFullName(controllerName, obj.name)
-  if (hasTargetAttemptedLoad(fullTargetName) === true) {
     return
   }
 
-  obj.load()
+  const cached = getCachedData(fullName)
+  if (cached) {
+    console.log("setting cached data instead of getting")
+    target.setter(cached)
+    return
+  }
+
+  // getting new data
+  console.log("getting new data")
+  target.getter(target.setter)
 }
 
-export const processLoaders = (controllerName, targets, setCanceller) => {
-  targets.forEach((obj, i, arr) => {
-    if (checkTargetsLoaded(targets) === true) {
-      return
-    }
+export const startLoading = (controllerName, targets, setCanceller) => {
+  const prepareTarget = target => {
+    const fullName = getFullName(controllerName, target.name)
+    const loadHandler = () => loadTarget(controllerName, target)
+    const loadHandlerCallback = () => setCanceller(fullName, null)
+    const canceller = addLoader(fullName, loadHandler, loadHandlerCallback)
+    setCanceller(fullName, canceller)
+  }
 
-    const fullTargetName = getFullName(controllerName, obj.name)
-    const handleLoad = () => loadTarget(controllerName, obj)
+  /**
+   * Start adding each target loader to the list.
+   */
+  const arr = [...targets]
+  var t
+  while (arr.length) {
+    t = arr.shift()
+    prepareTarget(t)
+  }
 
-    setCanceller(fullTargetName, addLoader(fullTargetName, handleLoad, () => {
-      setCanceller(fullTargetName, null)
-    }))
-
-    if (arr.length === (i + 1)) {
-      startRunningLoaders()
-    }
-  })
+  startRunningLoaders()
 }
 
