@@ -13,38 +13,15 @@ import {
   updateLoadCount,
   resetLoadCount,
 } from "./counting"
+import {
+  setCachedData,
+  getCachedData,
+  shouldBeCached,
+} from "./cache"
 
 const runLoadersDelay = 1100
 
 const loaders = {}
-
-const cachedData = {}
-const setCachedData = (fullName, data) => {
-  cachedData[fullName] = {
-    date: (new Date(Date.now()).toISOString()),
-    data: data,
-  }
-}
-const getCachedData = fullName => {
-  if (fullName in cachedData) {
-    return cachedData[fullName].data
-  }
-}
-
-const shouldDataBeCached = (fullName, target) => {
-  if (doesTargetHaveData(target) === true) {
-    if (target.cache && target.cache === true) {
-      // check data expiration here.
-      if (!(fullName in cachedData)) {
-        consle.log("shouldDataBeCached: true", fullName)
-        return true
-      }
-      // if expired -> true
-    }
-  }
-  console.log("shouldDataBeCached: false", fullName)
-  return false
-}
 
 export const doesTargetHaveData = target => {
   if (!target.data || isEmpty(target.data) === true) {
@@ -107,8 +84,8 @@ const loadTarget = (controllerName, target) => {
 
   if (doesTargetHaveData(target) === true) {
     console.log(`doesTargetHaveData: true (${target.name})`)
-    if (shouldDataBeCached(fullName, target) === true) {
-      console.log(`shouldDataBeCached:  true`)
+    if (shouldBeCached(fullName, target) === true) {
+      console.log(`shouldBeCached:  true`)
       setCachedData(fullName, target.data)
     }
     return
