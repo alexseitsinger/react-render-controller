@@ -37,7 +37,6 @@ export const checkTargetsLoaded = targets => (
 
 
 export const clearLoaders = () => {
-  console.log("clearing loaders...")
   const keys = Object.keys(loaders)
   var k
   while (keys.length) {
@@ -51,10 +50,8 @@ export const addLoader = (name, handler, callback) => {
 
   if (!(name in loaders)) {
     loaders[name] = () => {
-      console.log("Running method....")
       delete loaders[name]
       if (isLoadCancelled === true) {
-        console.log("Method cancelled...")
         return
       }
       handler()
@@ -68,7 +65,6 @@ export const addLoader = (name, handler, callback) => {
 }
 
 export const startRunningLoaders = () => {
-  console.log("running loaders")
   const keys = Object.keys(loaders)
   var k
   while (keys.length) {
@@ -80,12 +76,9 @@ export const startRunningLoaders = () => {
 const loadTarget = (controllerName, target) => {
   const fullName = getFullName(controllerName, target.name)
 
-  console.log(`loadTarget() (${target.name})`)
 
   if (doesTargetHaveData(target) === true) {
-    console.log(`doesTargetHaveData: true (${target.name})`)
     if (shouldBeCached(fullName, target) === true) {
-      console.log(`shouldBeCached:  true`)
       setCachedData(fullName, target.data)
     }
     return
@@ -93,13 +86,11 @@ const loadTarget = (controllerName, target) => {
 
   const cached = getCachedData(fullName)
   if (cached) {
-    console.log("setting cached data instead of getting")
     target.setter(cached)
     return
   }
 
   // getting new data
-  console.log("getting new data")
   target.getter(target.setter)
 }
 

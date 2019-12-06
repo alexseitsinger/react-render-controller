@@ -8,6 +8,7 @@ import {
   throttle,
 } from "underscore"
 
+import { Context } from "./Provider"
 import {
   clearCachedData,
 } from "./utils/cache"
@@ -63,6 +64,8 @@ const skippedPathnameShape = PropTypes.shape({
   reverse: PropTypes.bool.isRequired,
 })
 
+import { providerShape } from "./Provider"
+
 export class RenderController extends React.Component {
   static propTypes = {
     children: PropTypes.oneOfType([
@@ -78,7 +81,7 @@ export class RenderController extends React.Component {
     currentPathname: PropTypes.string.isRequired,
     skippedPathnames: PropTypes.arrayOf(skippedPathnameShape),
     name: PropTypes.string.isRequired,
-    isCacheClearedWhenUnmounted: PropTypes.bool.isRequired
+    context: providerShape.isRequired,
   }
 
   static defaultProps = {
@@ -88,7 +91,6 @@ export class RenderController extends React.Component {
     renderWith: null,
     renderWithout: null,
     failDelay: 4000,
-    isCacheClearedWhenUnmounted: false,
   }
 
   constructor(props) {
@@ -206,7 +208,7 @@ export class RenderController extends React.Component {
       lastPathname,
       currentPathname,
       skippedPathnames,
-      isCacheClearedWhenUnmounted,
+      context,
     } = this.props
 
     // Set our falg to false so setState doesn't work after this.
@@ -223,11 +225,6 @@ export class RenderController extends React.Component {
     // Remove this controllers name from the seen controllers list to allow for
     // renderFirst() methods to work again.
     //this.unsetControllerSeen()
-    //
-
-    if (isCacheClearedWhenUnmounted) {
-      clearCachedData()
-    }
   }
 
   addUnloaders = () => {

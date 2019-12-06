@@ -1,7 +1,6 @@
 const cachedData = {}
 
 export const setCachedData = (fullName, data) => {
-  console.log("caching...", fullName)
   cachedData[fullName] = {
     name: fullName,
     date: (new Date(Date.now()).toISOString()),
@@ -11,7 +10,6 @@ export const setCachedData = (fullName, data) => {
 
 export const getCachedData = fullName => {
   if (fullName in cachedData) {
-    console.log("using cached", fullName)
     return cachedData[fullName].data
   }
 }
@@ -31,13 +29,11 @@ export const shouldBeCached = (fullName, target) => {
     if (target.cached && target.cached === true) {
       // check data expiration here.
       if (!(fullName in cachedData)) {
-        console.log("shouldBeCached: true", fullName)
         return true
       }
       // if expired -> true
     }
   }
-  console.log("shouldBeCached: false", fullName)
   return false
 }
 

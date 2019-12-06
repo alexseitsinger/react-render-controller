@@ -44,7 +44,6 @@ export const addUnloader = ({
   name,
 }) => {
   if (!(name in unloaders)) {
-    console.log("adding unloader")
     unloaders[name] = once(() => {
       handler()
       //delete unloaders[name]
@@ -73,13 +72,10 @@ export const addUnloader = ({
 }
 
 export const runUnloaders = (from, to) => {
-  console.log("running unloaders")
-
   // If we use multiple renderControllers on the same page, each one will invoke
   // the others unloaders unless we have this call to prevent unnecessary
   // repeated loading/unloading.
   if (pathnames.current === to) {
-    console.log("pathnames.current === to")
     return
   }
 
