@@ -3,6 +3,7 @@ const cachedData = {}
 export const setCachedData = (fullName, data) => {
   console.log("caching...", fullName)
   cachedData[fullName] = {
+    name: fullName,
     date: (new Date(Date.now()).toISOString()),
     data: data,
   }
@@ -19,7 +20,7 @@ export const unsetCachedData = fullName => {
   cachedData[fullName] = null
 }
 
-export const resetCachedData = () => {
+export const clearCachedData = () => {
   Object.keys(cachedData).forEach(key => {
     cachedData[key] = null
   })
@@ -30,7 +31,7 @@ export const shouldBeCached = (fullName, target) => {
     if (target.cached && target.cached === true) {
       // check data expiration here.
       if (!(fullName in cachedData)) {
-        consle.log("shouldBeCached: true", fullName)
+        console.log("shouldBeCached: true", fullName)
         return true
       }
       // if expired -> true
