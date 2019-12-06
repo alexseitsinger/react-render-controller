@@ -1,3 +1,18 @@
+<a name="v6.4.0"></a>
+## [v6.4.0](https://github.com/alexseitsinger/react-render-controller/compare/v6.3.2...v6.4.0) (2019-12-06)
+
+### Code Refactoring
+- Cleans up modules. ([03ac49e](https://github.com/alexseitsinger/react-render-controller/commit/03ac49e1ea5e5158e297969d717b350802508df2))
+- Moves cache to own module. ([f57f335](https://github.com/alexseitsinger/react-render-controller/commit/f57f33578176373b7462f567e3ca16c26f0f2733))
+- Removes unused context prop. ([64431c2](https://github.com/alexseitsinger/react-render-controller/commit/64431c2c3de20284d3833550755ab48e3407856c))
+- Renames modules. ([762f390](https://github.com/alexseitsinger/react-render-controller/commit/762f39079763512a7687f071542c655eaeac1428))
+- Updates. ([c3ebcec](https://github.com/alexseitsinger/react-render-controller/commit/c3ebcecfd474b296085560837937a7c80ffafa2f))
+
+### Features
+- Adds cache module. ([a4df6a7](https://github.com/alexseitsinger/react-render-controller/commit/a4df6a7437612739bca2bce1158009113196de6f))
+- Adds flag to clear cache. ([3407f7b](https://github.com/alexseitsinger/react-render-controller/commit/3407f7b57cd58069812a0421ffbac3577c605ee7))
+
+
 <a name="v6.3.2"></a>
 ## [v6.3.2](https://github.com/alexseitsinger/react-render-controller/compare/v6.3.1...v6.3.2) (2019-11-22)
 
