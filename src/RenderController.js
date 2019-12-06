@@ -81,7 +81,6 @@ export class RenderController extends React.Component {
     currentPathname: PropTypes.string.isRequired,
     skippedPathnames: PropTypes.arrayOf(skippedPathnameShape),
     name: PropTypes.string.isRequired,
-    context: providerShape.isRequired,
   }
 
   static defaultProps = {
@@ -208,7 +207,6 @@ export class RenderController extends React.Component {
       lastPathname,
       currentPathname,
       skippedPathnames,
-      context,
     } = this.props
 
     // Set our falg to false so setState doesn't work after this.
