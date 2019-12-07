@@ -10,6 +10,11 @@ import {
   FailedRender,
 } from "tests/integration/setup/components"
 
+// test:
+// 1) data is unloaded on when navigated away, then data is re-loaded when
+// navigated back.
+// 2) doesnt use cached data if the cached is empty.
+
 describe("RenderController", () => {
   it("should load data, then after success, use renderWith", async () => {
     const { wrapper, store, history } = setup()
