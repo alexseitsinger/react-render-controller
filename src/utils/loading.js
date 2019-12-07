@@ -1,6 +1,7 @@
+import { isEmpty } from "underscore"
+
 import {
   getFullName,
-  isDataEmpty,
 } from "./general"
 import {
   setCachedData,
@@ -10,16 +11,10 @@ import {
 
 const loaders = {}
 
-export const doesTargetHaveData = target => {
-  if (!target.data || isDataEmpty(target.data) === true) {
-    return false
-  }
-  return true
-}
-
+const targetHasData = obj => (isEmpty(obj) === false)
 
 export const checkTargetsLoaded = targets => (
-  targets.map(target => doesTargetHaveData(target)).every(b => b === true)
+  targets.map(target => targetHasData(target.data)).every(b => b === true)
 )
 
 
@@ -35,15 +30,17 @@ const clearLoaders = () => {
 const addLoader = (name, handler, callback) => {
   var isLoadCancelled = false
 
-  if (!(name in loaders)) {
-    loaders[name] = () => {
-      delete loaders[name]
-      if (isLoadCancelled === true) {
-        return
-      }
-      handler()
-      callback()
+  if (name in loaders) {
+    return
+  }
+
+  loaders[name] = () => {
+    delete loaders[name]
+    if (isLoadCancelled === true) {
+      return
     }
+    handler()
+    callback()
   }
 
   return () => {
@@ -63,6 +60,19 @@ const startRunningLoaders = () => {
 const loadTarget = (controllerName, target) => {
   const fullName = getFullName(controllerName, target.name)
 
+  if (targetHasData(target.data) === true) {
+    /**
+     * If we are re-using state across multiple RenderControllers, that state
+     * may be changed after the reference to the data is passed here. When this
+     * ahppens, it thinks the data exists in the redux store, but it actually
+     * doesn't. Therefore, to avoid this problem, when data exists already,
+     * re-set it using the setter.
+     */
+    target.setter(target.data)
+    return
+  }
+
+  /*
   if (doesTargetHaveData(target) === true) {
     if (shouldBeCached(fullName, target) === true) {
       setCachedData(fullName, target.data)
@@ -74,8 +84,7 @@ const loadTarget = (controllerName, target) => {
     target.setter(cached)
     return
   }
-
-  // getting new data
+  */
   target.getter()
 }
 

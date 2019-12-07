@@ -33,7 +33,7 @@ const shouldUnload = (from, to, lastPathname, currentPathname, skippedPathnames)
 
   // If the pathname is labeled as skipped or its the same pathanme, then dont
   // unload.
-  if (isSkippedPathname === true || currentPathname === lastPathname) {
+  if (isSkippedPathname === true) {
     return false
   }
 
@@ -97,9 +97,10 @@ export const startUnloading = (
     const handler = () => {
       if (isFunction(target.setter) && (isObject(target.empty) || isArray(target.empty))) {
         target.setter(target.empty)
+        resetLoadCount(name)
       }
-      resetLoadCount(name)
     }
+
     addUnloader({
       lastPathname,
       currentPathname,

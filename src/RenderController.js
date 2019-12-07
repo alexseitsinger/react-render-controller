@@ -149,15 +149,15 @@ export class RenderController extends React.Component {
       skippedPathnames,
     } = this.props
 
+    // Unload previous data first, then load new data.
+    startUnloading(name, targets, lastPathname, currentPathname, skippedPathnames)
+    startLoading(name, targets, this.setCanceller)
+
     this._isMounted = true
 
     // Toggle the state to ensure renderFirst is changed to renderWith or
     // renderWithout.
     this.setControllerSeen()
-
-    // Unload previous data first, then load new data.
-    startUnloading(name, targets, lastPathname, currentPathname, skippedPathnames)
-    startLoading(name, targets, this.setCanceller)
 
     // Add this controller to the list of mounted controllers.
     addMounted(name)
@@ -170,7 +170,7 @@ export class RenderController extends React.Component {
     const { targets } = this.props
 
     // After load is attempted, change state to render the correct output.
-    this.setControllerSeen()
+    //this.setControllerSeen()
 
     // If we have pending loads, and then we navigate away from that controller
     // before the load completes, the data will clear, and then load again.

@@ -1,40 +1,7 @@
-import {
-  isArray,
-  isEmpty,
-  isObject,
-  debounce,
-} from "underscore"
+import { debounce } from "underscore"
 
 export const getFullName = (controllerName, targetName) => {
   return `${controllerName}__${targetName}`
-}
-
-export const isDataEmpty = data => {
-  var result = false
-  if (!data) {
-    return true
-  }
-  if (isArray(data)) {
-    // If its an empty array, set true
-    if (isEmpty(data) === true) {
-      result = true
-    }
-    else {
-      // If its an array of items, re-run this fn on each item.
-      data.forEach(obj => {
-        if (result === true) {
-          return
-        }
-        result = isEmpty(obj)
-      })
-    }
-  }
-  else if (isObject(data)) {
-    if (isEmpty(data) === true) {
-      result = true
-    }
-  }
-  return result
 }
 
 export const removeLeadingAndTrailingSlashes = url => {
@@ -111,7 +78,7 @@ export const getMasterName = (currentPathname, targets) => {
   return masterName
 }
 
-export const createCancellableMethod = (delay, callback)  => {
+export const createCancellableMethod = (delay, callback) => {
   var isCancelled = false
 
   const method = debounce(() => {
