@@ -32,7 +32,7 @@ describe("RenderController", () => {
     })
   })
 
-  it.only("should unload first then load data for each target", async () => {
+  it("should unload first then load data for each target", async () => {
     const getOneDataMock = jest.fn()
     const setOneDataMock = jest.fn()
     const getTwoDataMock = jest.fn()
