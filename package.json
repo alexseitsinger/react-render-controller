@@ -4,20 +4,20 @@
     "name": "Alex Seitsinger"
   },
   "dependencies": {
-    "@babel/runtime-corejs3": "7.7.4",
+    "@babel/runtime-corejs3": "7.7.5",
     "core-js": "3.4.7",
     "prop-types": "15.7.2",
     "underscore": "1.9.1"
   },
   "description": "A render controller for components that use data.",
   "devDependencies": {
-    "@alexseitsinger/eslint-config-base": "^0.18.0",
+    "@alexseitsinger/eslint-config-base": "^0.20.0",
     "@alexseitsinger/eslint-config-react": "^0.11.0",
     "@alexseitsinger/redux-locations": "^0.3.0",
-    "@babel/core": "7.7.4",
+    "@babel/core": "7.7.5",
     "@babel/plugin-proposal-class-properties": "7.7.4",
-    "@babel/plugin-transform-runtime": "7.7.4",
-    "@babel/preset-env": "7.7.4",
+    "@babel/plugin-transform-runtime": "7.7.5",
+    "@babel/preset-env": "7.7.5",
     "@babel/preset-react": "7.7.4",
     "babel-eslint": "^10.0.3",
     "babel-jest": "^24.9.0",
