@@ -1,3 +1,10 @@
+<a name="v6.5.1"></a>
+## [v6.5.1](https://github.com/alexseitsinger/react-render-controller/compare/v6.5.0...v6.5.1) (2019-12-07)
+
+### Bug Fixes
+- Checks for empty cached data. ([b556673](https://github.com/alexseitsinger/react-render-controller/commit/b5566737c5e740694d3279c2418c33691e876913))
+
+
 <a name="v6.5.0"></a>
 ## [v6.5.0](https://github.com/alexseitsinger/react-render-controller/compare/v6.4.0...v6.5.0) (2019-12-07)
 
