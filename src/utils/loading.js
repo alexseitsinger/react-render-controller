@@ -67,7 +67,6 @@ const loadTarget = (controllerName, target) => {
     if (shouldBeCached(fullName, target) === true) {
       setCachedData(fullName, target.data)
     }
-    return
   }
 
   const cached = getCachedData(fullName)
@@ -77,7 +76,7 @@ const loadTarget = (controllerName, target) => {
   }
 
   // getting new data
-  target.getter(target.setter)
+  target.getter()
 }
 
 export const startLoading = (controllerName, targets, setCanceller) => {
