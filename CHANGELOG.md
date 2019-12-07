@@ -1,3 +1,10 @@
+<a name="v6.5.2"></a>
+## [v6.5.2](https://github.com/alexseitsinger/react-render-controller/compare/v6.5.1...v6.5.2) (2019-12-07)
+
+### Bug Fixes
+- Fixes setter. ([e8bf582](https://github.com/alexseitsinger/react-render-controller/commit/e8bf5821f08b38a84a52ccc29db97bc7e9f0470e))
+
+
 <a name="v6.5.1"></a>
 ## [v6.5.1](https://github.com/alexseitsinger/react-render-controller/compare/v6.5.0...v6.5.1) (2019-12-07)
 
