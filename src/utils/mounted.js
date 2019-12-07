@@ -1,15 +1,15 @@
-import _ from "underscore"
+import { debounce } from "underscore"
 
 const mounted = []
 
-export const addMounted = _.debounce(name => {
+export const addMounted = debounce(name => {
   const i = mounted.indexOf(name)
   if (i === -1) {
     mounted.push(name)
   }
 }, 1000)
 
-export const removeMounted = _.debounce(name => {
+export const removeMounted = debounce(name => {
   const i = mounted.indexOf(name)
   if (i > -1) {
     mounted.splice(i, 1)

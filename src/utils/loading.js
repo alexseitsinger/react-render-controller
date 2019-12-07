@@ -1,30 +1,17 @@
 import {
-  debounce,
-  once,
-  isFunction,
-} from "underscore"
-
-import {
   getFullName,
-  isEmpty,
+  isDataEmpty,
 } from "./general"
-import {
-  getLoadCount,
-  updateLoadCount,
-  resetLoadCount,
-} from "./counting"
 import {
   setCachedData,
   getCachedData,
   shouldBeCached,
 } from "./cache"
 
-const runLoadersDelay = 1100
-
 const loaders = {}
 
 export const doesTargetHaveData = target => {
-  if (!target.data || isEmpty(target.data) === true) {
+  if (!target.data || isDataEmpty(target.data) === true) {
     return false
   }
   return true
@@ -36,7 +23,7 @@ export const checkTargetsLoaded = targets => (
 )
 
 
-export const clearLoaders = () => {
+const clearLoaders = () => {
   const keys = Object.keys(loaders)
   var k
   while (keys.length) {
@@ -45,7 +32,7 @@ export const clearLoaders = () => {
   }
 }
 
-export const addLoader = (name, handler, callback) => {
+const addLoader = (name, handler, callback) => {
   var isLoadCancelled = false
 
   if (!(name in loaders)) {
@@ -64,7 +51,7 @@ export const addLoader = (name, handler, callback) => {
   }
 }
 
-export const startRunningLoaders = () => {
+const startRunningLoaders = () => {
   const keys = Object.keys(loaders)
   var k
   while (keys.length) {
@@ -95,6 +82,8 @@ const loadTarget = (controllerName, target) => {
 }
 
 export const startLoading = (controllerName, targets, setCanceller) => {
+  clearLoaders()
+
   const prepareTarget = target => {
     const fullName = getFullName(controllerName, target.name)
     const loadHandler = () => loadTarget(controllerName, target)

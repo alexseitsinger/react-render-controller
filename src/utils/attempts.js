@@ -1,4 +1,4 @@
-import _ from "underscore"
+import { debounce } from "underscore"
 
 export const resetDelay = 12000
 export const attempted = {}
@@ -36,7 +36,7 @@ export const removeLoadAttempted = (currentPathname, name) => {
   }
 }
 
-export const resetLoadAttempted = _.debounce(currentPathname => {
+export const resetLoadAttempted = debounce(currentPathname => {
   if (!(currentPathname in attempted)) {
     attempted[currentPathname] = []
   }

@@ -1,6 +1,4 @@
-import {
-  getFullName,
-} from "./general"
+import { getFullName } from "./general"
 
 export const loadCounts = {}
 

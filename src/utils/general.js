@@ -1,17 +1,22 @@
-import _ from "underscore"
+import {
+  isArray,
+  isEmpty,
+  isObject,
+  debounce,
+} from "underscore"
 
 export const getFullName = (controllerName, targetName) => {
   return `${controllerName}__${targetName}`
 }
 
-export const isEmpty = data => {
+export const isDataEmpty = data => {
   var result = false
   if (!data) {
     return true
   }
-  if (_.isArray(data)) {
+  if (isArray(data)) {
     // If its an empty array, set true
-    if (_.isEmpty(data) === true) {
+    if (isEmpty(data) === true) {
       result = true
     }
     else {
@@ -24,8 +29,8 @@ export const isEmpty = data => {
       })
     }
   }
-  else if (_.isObject(data)) {
-    if (_.isEmpty(data) === true) {
+  else if (isObject(data)) {
+    if (isEmpty(data) === true) {
       result = true
     }
   }
@@ -109,7 +114,7 @@ export const getMasterName = (currentPathname, targets) => {
 export const createCancellableMethod = (delay, callback)  => {
   var isCancelled = false
 
-  const method = _.debounce(() => {
+  const method = debounce(() => {
     if (isCancelled === true) {
       return
     }

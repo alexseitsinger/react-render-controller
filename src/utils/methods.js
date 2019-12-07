@@ -1,8 +1,8 @@
-import _ from "underscore"
+import { debounce } from "underscore"
 
 export var loaderMethods = []
 
-export const resetLoaderMethods = _.debounce(() => {
+export const resetLoaderMethods = debounce(() => {
   loaderMethods = []
 }, 15000)
 
