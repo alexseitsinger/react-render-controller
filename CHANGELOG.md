@@ -1,3 +1,10 @@
+<a name="v6.5.3"></a>
+## [v6.5.3](https://github.com/alexseitsinger/react-render-controller/compare/v6.5.2...v6.5.3) (2019-12-07)
+
+### Bug Fixes
+- Fixes loading/unloading. ([1c8627b](https://github.com/alexseitsinger/react-render-controller/commit/1c8627b2eaff4f2dbf629c058d773ac1c3365d01))
+
+
 <a name="v6.5.2"></a>
 ## [v6.5.2](https://github.com/alexseitsinger/react-render-controller/compare/v6.5.1...v6.5.2) (2019-12-07)
 
