@@ -63,7 +63,6 @@ const startRunningLoaders = () => {
 const loadTarget = (controllerName, target) => {
   const fullName = getFullName(controllerName, target.name)
 
-
   if (doesTargetHaveData(target) === true) {
     if (shouldBeCached(fullName, target) === true) {
       setCachedData(fullName, target.data)
@@ -72,7 +71,7 @@ const loadTarget = (controllerName, target) => {
   }
 
   const cached = getCachedData(fullName)
-  if (cached) {
+  if (isDataEmpty(cached) === false) {
     target.setter(cached)
     return
   }
