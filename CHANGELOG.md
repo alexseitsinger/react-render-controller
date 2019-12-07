@@ -1,3 +1,10 @@
+<a name="v6.5.0"></a>
+## [v6.5.0](https://github.com/alexseitsinger/react-render-controller/compare/v6.4.0...v6.5.0) (2019-12-07)
+
+### Code Refactoring
+- Cleans up modules. ([c602bc9](https://github.com/alexseitsinger/react-render-controller/commit/c602bc9506dacc50c8e306040d7759207d175ad5))
+
+
 <a name="v6.4.0"></a>
 ## [v6.4.0](https://github.com/alexseitsinger/react-render-controller/compare/v6.3.2...v6.4.0) (2019-12-06)
 
