@@ -1,3 +1,10 @@
+<a name="v6.6.0"></a>
+## [v6.6.0](https://github.com/alexseitsinger/react-render-controller/compare/v6.5.3...v6.6.0) (2019-12-14)
+
+### Features
+- Adds forced loading. ([d1b89c9](https://github.com/alexseitsinger/react-render-controller/commit/d1b89c90395d1b0a91ef46107b554245d1dd9e46))
+
+
 <a name="v6.5.3"></a>
 ## [v6.5.3](https://github.com/alexseitsinger/react-render-controller/compare/v6.5.2...v6.5.3) (2019-12-07)
 
