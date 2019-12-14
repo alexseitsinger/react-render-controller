@@ -77,5 +77,5 @@
     "build:development": "./node_modules/.bin/webpack --config=webpack.config.dev.js",
     "test": "./node_modules/.bin/jest test"
   },
-  "version": "6.5.3"
+  "version": "6.6.0"
 }
