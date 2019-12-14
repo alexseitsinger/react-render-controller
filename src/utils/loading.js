@@ -1,4 +1,8 @@
-import { isEmpty } from "underscore"
+import {
+  isEmpty,
+  isArray,
+  isObject,
+} from "underscore"
 
 import {
   getFullName,
@@ -11,10 +15,24 @@ import {
 
 const loaders = {}
 
-const targetHasData = obj => (isEmpty(obj) === false)
+const targetHasData = target => {
+  const targetData = {
+    ...target.data,
+  }
+
+  if (target.excluded) {
+    target.excluded.forEach(name => {
+      delete targetData[name]
+    })
+  }
+
+  return (isEmpty(targetData) === false)
+}
 
 export const checkTargetsLoaded = targets => (
-  targets.map(target => targetHasData(target.data)).every(b => b === true)
+  targets
+    .map(targetHasData)
+    .every(b => b === true)
 )
 
 
@@ -60,7 +78,14 @@ const startRunningLoaders = () => {
 const loadTarget = (controllerName, target) => {
   const fullName = getFullName(controllerName, target.name)
 
-  if (targetHasData(target.data) === true) {
+  if (targetHasData(target) === true) {
+    if (target.forced && target.forced === true) {
+      if (!target.attempted || target.attempted === false) {
+        target.attempted = true
+        target.getter()
+        return
+      }
+    }
     /**
      * If we are re-using state across multiple RenderControllers, that state
      * may be changed after the reference to the data is passed here. When this
