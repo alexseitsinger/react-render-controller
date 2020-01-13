@@ -3,7 +3,7 @@ const cachedData = {}
 export const setCachedData = (fullName, data) => {
   cachedData[fullName] = {
     name: fullName,
-    date: (new Date(Date.now()).toISOString()),
+    date: new Date(Date.now()).toISOString(),
     data: data,
   }
 }
@@ -36,4 +36,3 @@ export const shouldBeCached = (fullName, target) => {
   }
   return false
 }
-

@@ -1,10 +1,11 @@
 import { debounce } from "underscore"
 
-export const getFullName = (controllerName, targetName) => {
-  return `${controllerName}__${targetName}`
-}
+export const getFullName = (
+  controllerName: string,
+  targetName: string
+): string => `${controllerName}__${targetName}`
 
-export const removeLeadingAndTrailingSlashes = url => {
+export const removeLeadingAndTrailingSlashes = (url: string): string => {
   var updated = url
   if (updated.length === 1 && updated === "/") {
     return updated
@@ -14,8 +15,8 @@ export const removeLeadingAndTrailingSlashes = url => {
   return updated
 }
 
-export const prepareSkippedPathnames = skippedPathnames => {
-  const prepared = []
+export const prepareSkippedPathnames = (skippedPathnames: Pathname[]) => {
+  const prepared: Pathname[] = []
 
   skippedPathnames.forEach(obj => {
     prepared.push({
@@ -34,7 +35,10 @@ export const prepareSkippedPathnames = skippedPathnames => {
   return prepared
 }
 
-export const isMatchingPaths = (skippedPathname, currentPathname) => {
+export const isMatchingPaths = (
+  skippedPathname: string,
+  currentPathname: string
+): boolean => {
   const skipped = removeLeadingAndTrailingSlashes(skippedPathname)
   const current = removeLeadingAndTrailingSlashes(currentPathname)
 
@@ -42,32 +46,33 @@ export const isMatchingPaths = (skippedPathname, currentPathname) => {
     return true
   }
 
-  var currentBits
+  let currentBits: string[]
   if (current === "/") {
     currentBits = ["/"]
-  }
-  else {
+  } else {
     currentBits = current.split("/")
   }
   currentBits = currentBits.filter(bit => bit.length > 0)
 
-  const isTrue = result => (result === true)
+  const isTrue = (result: boolean) => result === true
 
-  return skipped.split("/").map((skippedBit, i) => {
-    if (skippedBit === "*") {
-      return true
-    }
-    const isMatching = (
-      currentBits.length
-      && currentBits[i]
-      && currentBits[i] === skippedBit
-    )
-    return (isMatching === true)
-  }).every(isTrue)
+  return skipped
+    .split("/")
+    .map((skippedBit, i) => {
+      if (skippedBit === "*") {
+        return true
+      }
+      const isMatching =
+        currentBits.length && currentBits[i] && currentBits[i] === skippedBit
+      return isMatching === true
+    })
+    .every(isTrue)
 }
 
-
-export const getMasterName = (currentPathname, targets) => {
+export const getMasterName = (
+  currentPathname: string,
+  targets: LoadTarget[]
+) => {
   var masterName = removeLeadingAndTrailingSlashes(currentPathname)
   masterName = masterName.replace("/", "_")
 
@@ -78,7 +83,10 @@ export const getMasterName = (currentPathname, targets) => {
   return masterName
 }
 
-export const createCancellableMethod = (delay, callback) => {
+export const createCancellableMethod = (
+  delay: number,
+  callback: () => void
+) => {
   var isCancelled = false
 
   const method = debounce(() => {
@@ -98,4 +106,3 @@ export const createCancellableMethod = (delay, callback) => {
     canceller,
   }
 }
-

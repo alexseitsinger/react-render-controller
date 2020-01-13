@@ -2,19 +2,19 @@ import { getFullName } from "./general"
 
 export const loadCounts = {}
 
-export const getLoadCount = name => {
+export const getLoadCount = (name: string): number => {
   if (!(name in loadCounts)) {
     loadCounts[name] = -1
   }
   return loadCounts[name]
 }
 
-export const resetLoadCount = name => {
+export const resetLoadCount = (name: string): number => {
   loadCounts[name] = -1
   return -1
 }
 
-export const updateLoadCount = name => {
+export const updateLoadCount = (name: string): number => {
   if (!(name in loadCounts)) {
     loadCounts[name] = -1
   }
@@ -22,10 +22,13 @@ export const updateLoadCount = name => {
   return loadCounts[name]
 }
 
-export const checkForFirstLoad = (controllerName, targets) => {
+export const checkForFirstLoad = (
+  controllerName: string,
+  targets: LoadTarget[]
+): boolean => {
   var total = 0
 
-  targets.forEach(target => {
+  targets.forEach((target: LoadTarget) => {
     const fullName = getFullName(controllerName, target.name)
     total += getLoadCount(fullName)
   })
@@ -36,10 +39,9 @@ export const checkForFirstLoad = (controllerName, targets) => {
   return false
 }
 
-export const hasTargetAttemptedLoad = fullName => {
+export const hasTargetAttemptedLoad = (fullName: string): boolean => {
   if (getLoadCount(fullName) < 0) {
     return false
   }
   return true
 }
-

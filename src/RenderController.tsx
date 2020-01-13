@@ -1,44 +1,26 @@
-import React from "react"
+import React, { ReactNode, ReactElement } from "react"
 import PropTypes from "prop-types"
-import {
-  isFunction,
-  isEqual,
-  debounce,
-} from "underscore"
+import { isFunction, isEqual, debounce } from "underscore"
 
-import {
-  createCancellableMethod,
-} from "./utils/general"
-import {
-  hasControllerBeenSeen,
-  removeControllerSeen,
-} from "./utils/seen"
-import {
-  addMounted,
-  removeMounted,
-  hasBeenMounted,
-} from "./utils/mounted"
-import {
-  startUnloading,
-} from "./utils/unloading"
-import {
-  checkTargetsLoaded,
-  startLoading,
-} from "./utils/loading"
-import {
-  checkForFirstLoad,
-} from "./utils/counting"
+import { createCancellableMethod } from "./utils/general"
+import { hasControllerBeenSeen, removeControllerSeen } from "./utils/seen"
+import { addMounted, removeMounted, hasBeenMounted } from "./utils/mounted"
+import { startUnloading } from "./utils/unloading"
+import { checkTargetsLoaded, startLoading } from "./utils/loading"
+import { checkForFirstLoad } from "./utils/counting"
+
+
+const defaultContext = {
+  onRenderFirst: () => <></>,
+  onRenderWithout: () => <></>,
+}
+
+export const Context = React.createContext(defaultContext)
 
 const targetShape = PropTypes.shape({
   name: PropTypes.string.isRequired,
-  data: PropTypes.oneOfType([
-    PropTypes.array,
-    PropTypes.object,
-  ]),
-  empty: PropTypes.oneOfType([
-    PropTypes.array,
-    PropTypes.object,
-  ]),
+  data: PropTypes.oneOfType([PropTypes.array, PropTypes.object]),
+  empty: PropTypes.oneOfType([PropTypes.array, PropTypes.object]),
   cached: PropTypes.bool.isRequired,
   //expiration: PropTypes.number.isRequired,
   setter: PropTypes.func.isRequired,
@@ -51,7 +33,24 @@ const skippedPathnameShape = PropTypes.shape({
   reverse: PropTypes.bool,
 })
 
-export class RenderController extends React.Component {
+export interface Props {
+  children?: React.ReactNode | React.ReactNode[];
+  targets: LoadTarget[];
+  failDelay?: number;
+  renderFirst?: () => React.ReactElement;
+  renderWith?: () => React.ReactElement;
+  renderWithout?: () => React.ReactElement;
+  lastPathname: string;
+  currentPathname: string;
+  skippedPathnames: Pathname[];
+  name: string;
+}
+
+export interface State {
+  isControllerSeen: boolean;
+}
+  
+export class RenderController extends React.Component<Props, State> {
   static propTypes = {
     children: PropTypes.oneOfType([
       PropTypes.arrayOf(PropTypes.node),
@@ -77,21 +76,23 @@ export class RenderController extends React.Component {
     failDelay: 4000,
   }
 
-  constructor(props) {
+  // Store a set of canceller functions to run when our debounced load
+  // functions should not continue due to unmounting, etc.
+  cancellers = []
+
+  // Control our setState method with a variable to prevent memroy leaking
+  // from our debounced methods running after the components are removed.
+  _isMounted = false
+
+  cancelUnsetControllerSeen: null | (() => void) = null
+  unsetControllerSeen: null | (() => void) = null
+  setControllerSeen: null | (() => void) = null
+
+  constructor(props: Props) {
     super(props)
 
-    const {
-      name,
-      failDelay,
-    } = props
+    const { name, failDelay } = props
 
-    // Store a set of canceller functions to run when our debounced load
-    // functions should not continue due to unmounting, etc.
-    this.cancellers = []
-
-    // Control our setState method with a variable to prevent memroy leaking
-    // from our debounced methods running after the components are removed.
-    this._isMounted = false
     const realSetState = this.setState.bind(this)
     this.setState = (...args) => {
       if (this._isMounted === false) {
@@ -117,7 +118,7 @@ export class RenderController extends React.Component {
     const {
       method: unsetControllerSeen,
       canceller: cancelUnsetControllerSeen,
-    } = createCancellableMethod((failDelay * 2), () => {
+    } = createCancellableMethod((failDelay as number) * 2, () => {
       if (this._isMounted === true && hasBeenMounted(name) === true) {
         return
       }
@@ -137,10 +138,10 @@ export class RenderController extends React.Component {
         // renderWithout().
         this.setState({ isControllerSeen: true })
       }
-    }, failDelay)
+    }, (failDelay as number))
   }
 
-  componentDidMount() {
+  componentDidMount(): void {
     const {
       name,
       targets,
@@ -150,23 +151,29 @@ export class RenderController extends React.Component {
     } = this.props
 
     // Unload previous data first, then load new data.
-    startUnloading(name, targets, lastPathname, currentPathname, skippedPathnames)
+    startUnloading(
+      name,
+      targets,
+      lastPathname,
+      currentPathname,
+      skippedPathnames
+    )
     startLoading(name, targets, this.setCanceller)
 
     this._isMounted = true
 
     // Toggle the state to ensure renderFirst is changed to renderWith or
     // renderWithout.
-    this.setControllerSeen()
+    this.setControllerSeen!()
 
     // Add this controller to the list of mounted controllers.
     addMounted(name)
 
     // Cancel any previous calls to unsetControllerSeen for thi controller.
-    this.cancelUnsetControllerSeen()
+    this.cancelUnsetControllerSeen!()
   }
 
-  componentDidUpdate(prevProps) {
+  componentDidUpdate(prevProps: Props): void {
     const { targets } = this.props
 
     // After load is attempted, change state to render the correct output.
@@ -180,7 +187,7 @@ export class RenderController extends React.Component {
     }
   }
 
-  componentWillUnmount() {
+  componentWillUnmount(): void {
     const { name } = this.props
 
     // Set our falg to false so setState doesn't work after this.
@@ -195,22 +202,22 @@ export class RenderController extends React.Component {
 
     // Remove this controllers name from the seen controllers list to allow for
     // renderFirst() methods to work again.
-    this.unsetControllerSeen()
+    this.unsetControllerSeen!()
   }
 
-  setCanceller = (name, fn) => {
+  setCanceller = (name: string, fn: () => void): void => {
     this.cancellers[name] = fn
   }
 
   runCancellers = () => {
-    this.cancellers.forEach(f => {
+    this.cancellers.forEach((f: () => void) => {
       if (isFunction(f)) {
         f()
       }
     })
   }
 
-  render() {
+  render(): ReactElement | ReactNode {
     const {
       name,
       targets,
@@ -220,9 +227,7 @@ export class RenderController extends React.Component {
       renderFirst,
     } = this.props
 
-    const {
-      isControllerSeen,
-    } = this.state
+    const { isControllerSeen } = this.state
 
     if (checkTargetsLoaded(targets) === true) {
       if (isFunction(renderWith)) {
@@ -231,18 +236,23 @@ export class RenderController extends React.Component {
       return children
     }
 
-    if (checkForFirstLoad(name, targets) === true) {
-      if (isControllerSeen === false) {
-        if (isFunction(renderFirst)) {
-          return renderFirst()
-        }
-      }
-    }
-
-    if (isFunction(renderWithout)) {
-      return renderWithout()
-    }
-    return null
+    return (
+      <Context.Consumer>
+        {({ onRenderFirst, onRenderWithout }): ReactNode => {
+          if (checkForFirstLoad(name, targets) === true) {
+            if (isControllerSeen === false) {
+              if (isFunction(renderFirst)) {
+                return renderFirst()
+              }
+              return onRenderFirst()
+            }
+          }
+          if (isFunction(renderWithout)) {
+            return renderWithout()
+          }
+          return onRenderWithout()
+        }}
+      </Context.Consumer>
+    )
   }
 }
-

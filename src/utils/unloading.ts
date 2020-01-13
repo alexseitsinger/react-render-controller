@@ -1,17 +1,11 @@
-import {
-  isFunction,
-  isObject,
-  isArray,
-} from "underscore"
+import { isFunction, isObject, isArray } from "underscore"
 
 import {
   isMatchingPaths,
   prepareSkippedPathnames,
   getFullName,
 } from "./general"
-import {
-  resetLoadCount,
-} from "./counting"
+import { resetLoadCount } from "./counting"
 
 const pathnames = {
   last: "/",
@@ -20,16 +14,22 @@ const pathnames = {
 
 const unloaders = {}
 
-const shouldUnload = (from, to, lastPathname, currentPathname, skippedPathnames) => {
+const shouldUnload = (
+  from: string,
+  to: string,
+  skippedPathnames: Pathname[]
+): boolean => {
   // Prepare our pathnames inc ase reverse or toEither or fromEither is  used.
   const prepared = prepareSkippedPathnames(skippedPathnames)
 
   // Check if any of hte prepared pathnames are skipped.
-  const isSkippedPathname = prepared.map(obj => {
-    const isTo = isMatchingPaths(obj.to, to)
-    const isFrom = isMatchingPaths(obj.from, from)
-    return ((isFrom === true) && (isTo === true))
-  }).includes(true)
+  const isSkippedPathname = prepared
+    .map((obj: Pathname): boolean => {
+      const isTo = isMatchingPaths(obj.to, to)
+      const isFrom = isMatchingPaths(obj.from, from)
+      return isFrom === true && isTo === true
+    })
+    .includes(true)
 
   // If the pathname is labeled as skipped or its the same pathanme, then dont
   // unload.
@@ -41,28 +41,26 @@ const shouldUnload = (from, to, lastPathname, currentPathname, skippedPathnames)
   return true
 }
 
-const addUnloader = ({
-  lastPathname,
-  currentPathname,
-  skippedPathnames,
-  handler,
-  name,
-}) => {
+const addUnloader = (
+  skippedPathnames: Pathname[],
+  handler: () => void,
+  name: string
+) => {
   if (name in unloaders) {
     return
   }
 
-  unloaders[name] = (from, to) => {
-    const should = shouldUnload(from, to, lastPathname, currentPathname, skippedPathnames)
+  unloaders[name] = (from: string, to: string) => {
+    const should = shouldUnload(from, to, skippedPathnames)
     if (should) {
       handler()
-      resetLoadCount()
+      resetLoadCount(name)
       delete unloaders[name]
     }
   }
 }
 
-const runUnloaders = (from, to) => {
+const runUnloaders = (from: string, to: string) => {
   // If we use multiple renderControllers on the same page, each one will invoke
   // the others unloaders unless we have this call to prevent unnecessary
   // repeated loading/unloading.
@@ -84,33 +82,28 @@ const runUnloaders = (from, to) => {
 }
 
 export const startUnloading = (
-  controllerName,
-  targets,
-  lastPathname,
-  currentPathname,
-  skippedPathnames,
+  controllerName: string,
+  targets: LoadTarget[],
+  lastPathname: string,
+  currentPathname: string,
+  skippedPathnames: Pathname[]
 ) => {
   runUnloaders(lastPathname, currentPathname)
 
-  const prepareTarget = target => {
+  const prepareTarget = (target: LoadTarget) => {
     const name = getFullName(controllerName, target.name)
     const handler = () => {
-      if (isFunction(target.setter) && (isObject(target.empty) || isArray(target.empty))) {
+      if (
+        isFunction(target.setter) &&
+        (isObject(target.empty) || isArray(target.empty))
+      ) {
         target.setter(target.empty)
         resetLoadCount(name)
       }
     }
 
-    addUnloader({
-      lastPathname,
-      currentPathname,
-      skippedPathnames,
-      handler,
-      name,
-    })
+    addUnloader(skippedPathnames, handler, name)
   }
 
   targets.forEach(prepareTarget)
 }
-
-

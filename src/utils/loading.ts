@@ -1,40 +1,25 @@
-import {
-  isEmpty,
-  isArray,
-  isObject,
-} from "underscore"
+import { isEmpty } from "underscore"
 
-import {
-  getFullName,
-} from "./general"
-import {
-  setCachedData,
-  getCachedData,
-  shouldBeCached,
-} from "./cache"
+import { getFullName } from "./general"
 
 const loaders = {}
 
-const targetHasData = target => {
+const targetHasData = (target: LoadTarget): boolean => {
   const targetData = {
     ...target.data,
   }
 
   if (target.excluded) {
-    target.excluded.forEach(name => {
+    target.excluded.forEach((name: string) => {
       delete targetData[name]
     })
   }
 
-  return (isEmpty(targetData) === false)
+  return isEmpty(targetData) === false
 }
 
-export const checkTargetsLoaded = targets => (
-  targets
-    .map(targetHasData)
-    .every(b => b === true)
-)
-
+export const checkTargetsLoaded = (targets: LoadTarget[]) =>
+  targets.map(targetHasData).every(b => b === true)
 
 const clearLoaders = () => {
   const keys = Object.keys(loaders)
@@ -45,7 +30,7 @@ const clearLoaders = () => {
   }
 }
 
-const addLoader = (name, handler, callback) => {
+const addLoader = (name: string, handler: () => void, callback: () => void) => {
   var isLoadCancelled = false
 
   if (name in loaders) {
@@ -75,12 +60,12 @@ const startRunningLoaders = () => {
   }
 }
 
-const loadTarget = (controllerName, target) => {
+const loadTarget = (controllerName: string, target: LoadTarget) => {
   const fullName = getFullName(controllerName, target.name)
 
   if (targetHasData(target) === true) {
     if (target.forced && target.forced === true) {
-      if (!target.attempted || target.attempted === false) {
+      if (!target.attempted) {
         target.attempted = true
         target.getter()
         return
@@ -97,29 +82,33 @@ const loadTarget = (controllerName, target) => {
     return
   }
 
-  /*
-  if (doesTargetHaveData(target) === true) {
-    if (shouldBeCached(fullName, target) === true) {
-      setCachedData(fullName, target.data)
-    }
-  }
-
-  const cached = getCachedData(fullName)
-  if (isDataEmpty(cached) === false) {
-    target.setter(cached)
-    return
-  }
-  */
+  //
+  // if (doesTargetHaveData(target) === true) {
+  // if (shouldBeCached(fullName, target) === true) {
+  //     setCachedData(fullName, target.data)
+  // }
+  // }
+  //
+  // const cached = getCachedData(fullName)
+  // if (isDataEmpty(cached) === false) {
+  // target.setter(cached)
+  // return
+  // }
+  //
   target.getter()
 }
 
-export const startLoading = (controllerName, targets, setCanceller) => {
+export const startLoading = (
+  controllerName: string,
+  targets: LoadTarget[],
+  setCanceller: (name: string, f?: () => void) => void
+) => {
   clearLoaders()
 
-  const prepareTarget = target => {
+  const prepareTarget = (target: LoadTarget) => {
     const fullName = getFullName(controllerName, target.name)
     const loadHandler = () => loadTarget(controllerName, target)
-    const loadHandlerCallback = () => setCanceller(fullName, null)
+    const loadHandlerCallback = () => setCanceller(fullName, undefined)
     const canceller = addLoader(fullName, loadHandler, loadHandlerCallback)
     setCanceller(fullName, canceller)
   }
@@ -136,4 +125,3 @@ export const startLoading = (controllerName, targets, setCanceller) => {
 
   startRunningLoaders()
 }
-
