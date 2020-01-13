@@ -2,38 +2,20 @@ const path = require("path")
 
 module.exports = {
   root: true,
-  parser: "babel-eslint",
-  env: {
-    browser: true,
-    node: true,
-    jest: true,
-    //"jest/globals": true,
+  parser: "@typescript-eslint/parser",
+  parserOptions: {
+    project: "./tsconfig.json",
   },
-  globals: {
-    describe: true,
-    expect: true,
-    it: true,
-    test: true,
-    mount: true,
-    shallow: true,
-    render: true,
-  },
-  plugins: [
-    //"jest",
-  ],
+  plugins: ["import", "react", "@typescript-eslint/eslint-plugin"],
   settings: {
-    "react": {
-      "version": "detect",
+    "import/parsers": {
+      "@typescript-eslint/parser": [".ts", ".tsx", ".js", ".jsx"],
     },
     "import/resolver": {
       webpack: {
         config: path.resolve("./webpack.config.dev.js"),
-      }
+      },
     },
   },
-  extends: [
-    "@alexseitsinger/eslint-config-base",
-    "@alexseitsinger/eslint-config-react",
-    //"plugins:jest/recommended",
-  ],
+  extends: ["@alexseitsinger/eslint-config"],
 }
