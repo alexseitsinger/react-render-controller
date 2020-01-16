@@ -9,11 +9,12 @@
   dependencies:
     confusing-browser-globals "^1.0.7"
 
-"@alexseitsinger/redux-locations@^0.3.0":
-  version "0.3.0"
-  resolved "https://registry.yarnpkg.com/@alexseitsinger/redux-locations/-/redux-locations-0.3.0.tgz#f831a93c61828e4cfce89e365bbd7967b2ed65f1"
-  integrity sha512-H+RGl35d8sZev5yYJjsmDBw6+sTP6RCpaelvXEVrZXSLhM9JOH9NiXzGJ70yqPV5SotYDqCYyvfSc+OHQHJT2g==
+"@alexseitsinger/redux-locations@^2.0.0":
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/@alexseitsinger/redux-locations/-/redux-locations-2.0.0.tgz#0b23d8a38e600023dc81d4bf05fe4f28a8c0afc4"
+  integrity sha512-7vXq1/4HZku9z3Hajdy0AUIiY3jkYMHCrFTcvndLwUB1nzuGuKfeMNZGz/oh2gWFtQCKVhAUiWLpJPF+dCB/Ig==
   dependencies:
+    core-js "^3.6.4"
     prop-types "15.7.2"
 
 "@babel/code-frame@^7.0.0", "@babel/code-frame@^7.5.5":
@@ -2326,6 +2327,11 @@ core-js@3:
   version "3.6.3"
   resolved "https://registry.yarnpkg.com/core-js/-/core-js-3.6.3.tgz#cebda69dd069bf90066414d2b2425ffd1f3dcd79"
   integrity sha512-DOO9b18YHR+Wk5kJ/c5YFbXuUETreD4TrvXb6edzqZE3aAEd0eJIAWghZ9HttMuiON8SVCnU3fqA4rPxRDD1HQ==
+
+core-js@^3.6.4:
+  version "3.6.4"
+  resolved "https://registry.yarnpkg.com/core-js/-/core-js-3.6.4.tgz#440a83536b458114b9cb2ac1580ba377dc470647"
+  integrity sha512-4paDGScNgZP2IXXilaffL9X7968RuvwlkK3xWtZRVqgd8SYNiVKRJvkFd1aqqEuPfN7E68ZHEp9hDj6lHj4Hyw==
 
 core-util-is@1.0.2, core-util-is@~1.0.0:
   version "1.0.2"

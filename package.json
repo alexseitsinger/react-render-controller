@@ -42,7 +42,7 @@
   },
   "devDependencies": {
     "@alexseitsinger/eslint-config": "^1.2.0",
-    "@alexseitsinger/redux-locations": "^0.3.0",
+    "@alexseitsinger/redux-locations": "^2.0.0",
     "@babel/core": "7.7.5",
     "@babel/plugin-proposal-class-properties": "7.7.4",
     "@babel/plugin-transform-runtime": "7.7.5",
