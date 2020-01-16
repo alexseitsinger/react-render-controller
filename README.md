@@ -1,14 +1,14 @@
-## RenderController
+# RenderController
 
 Renders a component after its data has been loaded.
 
-### Installation
+## Installation
 
 ```
 yarn add @alexseitsinger/react-render-controller
 ```
 
-### Props
+## Props
 
 1. __name__ - The name of the controller
 2. __targets__ - An array of objects with the Target shape (shown below).
@@ -25,7 +25,7 @@ failed to produce non-empty result.
 
 #### Shapes
 
-##### Target
+###### Target
 
 ```javascript
 {
@@ -38,7 +38,7 @@ failed to produce non-empty result.
 }
 ```
 
-##### Skipped Pathname
+###### Skipped Pathname
 
 ```javascript
 {
@@ -48,7 +48,7 @@ failed to produce non-empty result.
 }
 ```
 
-### Example
+#### Example
 
 ```javascript
 import { RenderController } from "@alexseitsinger/react-render-controler"
