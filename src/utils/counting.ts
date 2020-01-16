@@ -1,27 +1,31 @@
-import { LoadTarget } from "../.."
-
 import { getFullName } from "./general"
 
-export const loadCounts = {}
+import { LoadTarget } from "../.."
 
-export const getLoadCount = (name: string): number => {
-  if (!(name in loadCounts)) {
-    loadCounts[name] = -1
-  }
-  return loadCounts[name]
+interface LoadCounts {
+  [key: string]: number;
 }
 
-export const resetLoadCount = (name: string): number => {
-  loadCounts[name] = -1
+export const loadCounts: LoadCounts = {}
+
+export const getLoadCount = (controllerName: string): number => {
+  if (!(controllerName in loadCounts)) {
+    loadCounts[controllerName] = -1
+  }
+  return loadCounts[controllerName]
+}
+
+export const resetLoadCount = (controllerName: string): number => {
+  loadCounts[controllerName] = -1
   return -1
 }
 
-export const updateLoadCount = (name: string): number => {
-  if (!(name in loadCounts)) {
-    loadCounts[name] = -1
+export const updateLoadCount = (controllerName: string): number => {
+  if (!(controllerName in loadCounts)) {
+    loadCounts[controllerName] = -1
   }
-  loadCounts[name] += 1
-  return loadCounts[name]
+  loadCounts[controllerName] += 1
+  return loadCounts[controllerName]
 }
 
 export const checkForFirstLoad = (

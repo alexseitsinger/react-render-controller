@@ -1,7 +1,5 @@
 import { isArray, isFunction, isObject } from "underscore"
 
-import { LoadTarget, Pathname } from "../.."
-
 import { resetLoadCount } from "./counting"
 import {
   getFullName,
@@ -9,24 +7,30 @@ import {
   prepareSkippedPathnames,
 } from "./general"
 
+import { LoadTarget, SkippedPathname } from "../.."
+
 const pathnames = {
   last: "/",
   current: "/",
 }
 
-const unloaders = {}
+interface Unloaders {
+  [name: string]: (from: string, to: string) => void;
+}
+
+const unloaders: Unloaders = {}
 
 const shouldUnload = (
   from: string,
   to: string,
-  skippedPathnames: Pathname[]
+  skippedPathnames: SkippedPathname[]
 ): boolean => {
   // Prepare our pathnames inc ase reverse or toEither or fromEither is  used.
   const prepared = prepareSkippedPathnames(skippedPathnames)
 
   // Check if any of hte prepared pathnames are skipped.
   const isSkippedPathname = prepared
-    .map((obj: Pathname) => {
+    .map((obj: SkippedPathname) => {
       const isTo = isMatchingPaths(obj.to, to)
       const isFrom = isMatchingPaths(obj.from, from)
       return isFrom === true && isTo === true
@@ -44,20 +48,20 @@ const shouldUnload = (
 }
 
 const addUnloader = (
-  skippedPathnames: Pathname[],
+  skippedPathnames: SkippedPathname[],
   handler: () => void,
-  name: string
+  targetName: string
 ) => {
-  if (name in unloaders) {
+  if (targetName in unloaders) {
     return
   }
 
-  unloaders[name] = (from: string, to: string) => {
+  unloaders[targetName] = (from: string, to: string) => {
     const should = shouldUnload(from, to, skippedPathnames)
     if (should) {
       handler()
-      resetLoadCount(name)
-      delete unloaders[name]
+      resetLoadCount(targetName)
+      delete unloaders[targetName]
     }
   }
 }
@@ -74,7 +78,7 @@ const runUnloaders = (from: string, to: string) => {
   var k
   while (keys.length) {
     k = keys.shift()
-    unloaders[k](from, to)
+    unloaders[(k as string)](from, to)
   }
 
   // Finally, update our saved pathnames for the next unloaders to use to
@@ -88,23 +92,23 @@ export const startUnloading = (
   targets: LoadTarget[],
   lastPathname: string,
   currentPathname: string,
-  skippedPathnames: Pathname[]
+  skippedPathnames: SkippedPathname[]
 ) => {
   runUnloaders(lastPathname, currentPathname)
 
   const prepareTarget = (target: LoadTarget) => {
-    const name = getFullName(controllerName, target.name)
+    const fullControllerName = getFullName(controllerName, target.name)
     const handler = () => {
       if (
         isFunction(target.setter)
         && (isObject(target.empty) || isArray(target.empty))
       ) {
         target.setter(target.empty)
-        resetLoadCount(name)
+        resetLoadCount(fullControllerName)
       }
     }
 
-    addUnloader(skippedPathnames, handler, name)
+    addUnloader(skippedPathnames, handler, fullControllerName)
   }
 
   targets.forEach(prepareTarget)

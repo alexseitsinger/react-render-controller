@@ -1,6 +1,6 @@
 import { debounce } from "underscore"
 
-import { LoadTarget, Pathname } from "../.."
+import { LoadTarget, SkippedPathname } from "../.."
 
 export const getFullName = (
   controllerName: string,
@@ -17,8 +17,10 @@ export const removeLeadingAndTrailingSlashes = (url: string): string => {
   return updated
 }
 
-export const prepareSkippedPathnames = (skippedPathnames: Pathname[]) => {
-  const prepared: Pathname[] = []
+export const prepareSkippedPathnames = (
+  skippedPathnames: SkippedPathname[]
+) => {
+  const prepared: SkippedPathname[] = []
 
   skippedPathnames.forEach(obj => {
     prepared.push({

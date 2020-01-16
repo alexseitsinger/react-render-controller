@@ -1,21 +1,29 @@
 import { isEmpty } from "underscore"
 
-import { LoadTarget } from "../.."
-
 import { getFullName } from "./general"
 
-const loaders = {}
+import { LoadTarget } from "../.."
+
+interface Loaders {
+  [key: string]: () => void;
+}
+
+const loaders: Loaders = {}
+
+interface TargetData {
+  [key: string]: any;
+}
 
 const targetHasData = (target: LoadTarget): boolean => {
-  const targetData = {
-    ...target.data,
-  }
+  const targetData: TargetData = {}
+  const { data } = target
 
-  if (target.excluded) {
-    target.excluded.forEach((name: string) => {
-      delete targetData[name]
-    })
-  }
+  Object.keys(data).forEach(key => {
+    if (target.excluded && target.excluded.includes(key)) {
+      return
+    }
+    targetData[key] = data[key]
+  })
 
   return isEmpty(targetData) === false
 }
@@ -24,22 +32,27 @@ export const checkTargetsLoaded = (targets: LoadTarget[]) => targets.map(targetH
 
 const clearLoaders = () => {
   const keys = Object.keys(loaders)
-  var k
   while (keys.length) {
-    k = keys.shift()
-    delete loaders[k]
+    const k = keys.shift()
+    if (k) {
+      delete loaders[k]
+    }
   }
 }
 
-const addLoader = (name: string, handler: () => void, callback: () => void) => {
+const addLoader = (
+  targetName: string,
+  handler: () => void,
+  callback: () => void
+) => {
   var isLoadCancelled = false
 
-  if (name in loaders) {
+  if (targetName in loaders) {
     return
   }
 
-  loaders[name] = () => {
-    delete loaders[name]
+  loaders[targetName] = () => {
+    delete loaders[targetName]
     if (isLoadCancelled === true) {
       return
     }
@@ -54,15 +67,16 @@ const addLoader = (name: string, handler: () => void, callback: () => void) => {
 
 const startRunningLoaders = () => {
   const keys = Object.keys(loaders)
-  var k
   while (keys.length) {
-    k = keys.shift()
-    loaders[k]()
+    const key = keys.shift()
+    if (key) {
+      loaders[key]()
+    }
   }
 }
 
 const loadTarget = (controllerName: string, target: LoadTarget) => {
-  const fullName = getFullName(controllerName, target.name)
+  //const fullName = getFullName(controllerName, target.name)
 
   if (targetHasData(target) === true) {
     if (target.forced && target.forced === true) {
@@ -118,10 +132,11 @@ export const startLoading = (
    * Start adding each target loader to the list.
    */
   const arr = [...targets]
-  var t
   while (arr.length) {
-    t = arr.shift()
-    prepareTarget(t)
+    const target = arr.shift()
+    if (target) {
+      prepareTarget(target)
+    }
   }
 
   startRunningLoaders()

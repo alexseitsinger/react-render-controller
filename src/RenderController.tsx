@@ -2,14 +2,14 @@ import React, { ReactElement, ReactNode } from "react"
 import PropTypes from "prop-types"
 import { debounce, isEqual, isFunction } from "underscore"
 
-import { Props, State } from ".."
-
 import { checkForFirstLoad } from "./utils/counting"
 import { createCancellableMethod } from "./utils/general"
 import { checkTargetsLoaded, startLoading } from "./utils/loading"
 import { addMounted, hasBeenMounted, removeMounted } from "./utils/mounted"
 import { hasControllerBeenSeen, removeControllerSeen } from "./utils/seen"
 import { startUnloading } from "./utils/unloading"
+
+import { Props, State } from ".."
 
 const defaultContext = {
   onRenderFirst: () => <></>,
@@ -177,13 +177,13 @@ export class RenderController extends React.Component<Props, State> {
     this.unsetControllerSeen!()
   }
 
-  // Store a set of canceller functions to run when our debounced load
-  // functions should not continue due to unmounting, etc.
-  cancellers = []
-
   // Control our setState method with a variable to prevent memroy leaking
   // from our debounced methods running after the components are removed.
   _isMounted = false
+
+  // Store a set of canceller functions to run when our debounced load
+  // functions should not continue due to unmounting, etc.
+  cancellers: (() => void)[] = []
 
   cancelUnsetControllerSeen: null | (() => void) = null
 
@@ -191,8 +191,8 @@ export class RenderController extends React.Component<Props, State> {
 
   setControllerSeen: null | (() => void) = null
 
-  setCanceller = (name: string, fn: () => void): void => {
-    this.cancellers[name] = fn
+  setCanceller = (controllerName: string, fn: () => void): void => {
+    this.cancellers.push(fn)
   }
 
   runCancellers = () => {
