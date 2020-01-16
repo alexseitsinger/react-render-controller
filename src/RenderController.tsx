@@ -9,6 +9,7 @@ import { startUnloading } from "./utils/unloading"
 import { checkTargetsLoaded, startLoading } from "./utils/loading"
 import { checkForFirstLoad } from "./utils/counting"
 
+import { Props, State } from "../index"
 
 const defaultContext = {
   onRenderFirst: () => <></>,
@@ -33,23 +34,6 @@ const skippedPathnameShape = PropTypes.shape({
   reverse: PropTypes.bool,
 })
 
-export interface Props {
-  children?: React.ReactNode | React.ReactNode[];
-  targets: LoadTarget[];
-  failDelay?: number;
-  renderFirst?: () => React.ReactElement;
-  renderWith?: () => React.ReactElement;
-  renderWithout?: () => React.ReactElement;
-  lastPathname: string;
-  currentPathname: string;
-  skippedPathnames: Pathname[];
-  name: string;
-}
-
-export interface State {
-  isControllerSeen: boolean;
-}
-  
 export class RenderController extends React.Component<Props, State> {
   static propTypes = {
     children: PropTypes.oneOfType([
@@ -238,7 +222,7 @@ export class RenderController extends React.Component<Props, State> {
 
     return (
       <Context.Consumer>
-        {({ onRenderFirst, onRenderWithout }): ReactNode => {
+        {({ onRenderFirst, onRenderWithout }): ReactNode | ReactElement => {
           if (checkForFirstLoad(name, targets) === true) {
             if (isControllerSeen === false) {
               if (isFunction(renderFirst)) {

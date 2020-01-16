@@ -1,5 +1,7 @@
 import { isFunction, isObject, isArray } from "underscore"
 
+import { Pathname, LoadTarget } from "../../index"
+
 import {
   isMatchingPaths,
   prepareSkippedPathnames,
@@ -24,7 +26,7 @@ const shouldUnload = (
 
   // Check if any of hte prepared pathnames are skipped.
   const isSkippedPathname = prepared
-    .map((obj: Pathname): boolean => {
+    .map((obj: Pathname) => {
       const isTo = isMatchingPaths(obj.to, to)
       const isFrom = isMatchingPaths(obj.from, from)
       return isFrom === true && isTo === true

@@ -1,4 +1,5 @@
 import { debounce } from "underscore"
+import { Pathname, LoadTarget } from "../../index"
 
 export const getFullName = (
   controllerName: string,
