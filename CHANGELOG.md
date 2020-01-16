@@ -1,3 +1,17 @@
+<a name="v7.0.0"></a>
+## [v7.0.0](https://github.com/alexseitsinger/react-render-controller/compare/v6.6.0...v7.0.0) (2020-01-16)
+
+### Code Refactoring
+- Migrates to TS. ([b0bba8e](https://github.com/alexseitsinger/react-render-controller/commit/b0bba8e688b871f360c772fcdaf90c3f3a341797))
+- Resorts methods. ([22de43e](https://github.com/alexseitsinger/react-render-controller/commit/22de43e82681b5757377eaaa993ce99dbd9250c4))
+- Updates exported types. ([28dce1e](https://github.com/alexseitsinger/react-render-controller/commit/28dce1e03609efb0ae209028ed3d428179df157c))
+- Updates for TS. ([cde72c5](https://github.com/alexseitsinger/react-render-controller/commit/cde72c55a7d57f98d8dfdcd2e2eda6be3d15f755))
+- Updates for ts. ([4b49b62](https://github.com/alexseitsinger/react-render-controller/commit/4b49b6280327d38acc67cb054a9fafd24f043be3))
+- Updates for ts. ([95a63ed](https://github.com/alexseitsinger/react-render-controller/commit/95a63ed4a7c171ed72aa65243fc008e3bcc2c967))
+- Updates type. ([78e96c1](https://github.com/alexseitsinger/react-render-controller/commit/78e96c10ba25c481d60080d4cc259cc96b4a3f9c))
+- Updates types. ([91dd275](https://github.com/alexseitsinger/react-render-controller/commit/91dd2750ff9a4111577034b8371218008d1e436b))
+
+
 <a name="v6.6.0"></a>
 ## [v6.6.0](https://github.com/alexseitsinger/react-render-controller/compare/v6.5.3...v6.6.0) (2019-12-14)
 
