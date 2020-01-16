@@ -14,16 +14,20 @@ export interface AddUnloaderArgs {
   name: string;
 }
 
+export interface LoadTargetData {
+  [key: string]: any;
+}
+
 export interface LoadTarget {
   name: string;
-  data: object | [];
+  data: LoadTargetData;
   getter: (...args: any) => void;
   setter: (o: {} | []) => void;
   empty: {} | [];
   excluded?: string[];
   forced?: boolean;
-  attempted?: boolean;
   cached?: boolean;
+  attempted?: boolean;
 }
 
 export interface Props {
