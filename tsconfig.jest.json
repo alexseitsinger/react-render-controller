@@ -26,9 +26,9 @@
 
     "baseUrl": ".",
     "paths": {
-      "@Tests/*": ["tests/*"],
-      "@Src/*": ["src/*"],
-      "@Types": ["index.d.ts"]
+      "tests/*": ["tests/*"],
+      "src/*": ["src/*"],
+      "types": ["index.d.ts"]
     }
   },
   "exclude": [

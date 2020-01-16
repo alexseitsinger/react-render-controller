@@ -1,12 +1,12 @@
 {
   "compilerOptions": {
     "noEmitOnError": true,
-    "noErrorTruncation": true,
-    "noImplicitAny": true,
-    "noImplicitReturns": true,
-    "noImplicitThis": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
+    "noErrorTruncation": false,
+    "noImplicitAny": false,
+    "noImplicitReturns": false,
+    "noImplicitThis": false,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
 
     "removeComments": true,
     "resolveJsonModule": true,
@@ -25,14 +25,14 @@
 
     "baseUrl": ".",
     "paths": {
-      "@Tests/*": ["tests/*"],
-      "@Src/*": ["src/*"],
-      "@Types": ["index.d.ts"]
+      "src/*": ["src/*"],
+      "types": ["index.d.ts"]
     }
   },
   "exclude": [
     "node_modules",
     ".yalc",
-    "dist"
+    "dist",
+    "tests"
   ]
 }
