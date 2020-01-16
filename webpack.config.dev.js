@@ -17,7 +17,15 @@ module.exports = {
       {
         test: /\.(j|t)sx?$/,
         include: [path.resolve("./src")],
-        use: ["babel-loader", "ts-loader"],
+        use: [
+          {
+            loader: "babel-loader",
+            options: {
+              cacheDirectory: true,
+            },
+          },
+          "ts-loader",
+        ],
       },
     ],
   },
@@ -30,7 +38,7 @@ module.exports = {
     }),
   ],
   resolve: {
-    extensions: [".ts", ".tsx", ".js", ".jsx"],
+    extensions: [".ts", ".tsx", ".js", ".jsx", ".json"],
     alias: {
       tests: path.resolve("./tests"),
       src: path.resolve("./src"),
