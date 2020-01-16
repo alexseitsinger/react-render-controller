@@ -3,7 +3,6 @@ const typescriptConfig = require("./.eslintrc.typescript")
 
 module.exports = {
   root: true,
-  parser: "babel-eslint",
   parserOptions: {
     ecmaVersion: 9,
     sourceType: "module",
