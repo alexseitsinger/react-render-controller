@@ -1,6 +1,6 @@
 import React from "react"
 
-export interface Pathname {
+export interface SkippedPathname {
   from: string;
   to: string;
   reverse?: boolean;
@@ -9,7 +9,7 @@ export interface Pathname {
 export interface AddUnloaderArgs {
   lastPathname: string;
   currentPathname: string;
-  skippedPathnames: Pathname[];
+  skippedPathnames: SkippedPathname[];
   handler: () => void;
   name: string;
 }
@@ -35,7 +35,7 @@ export interface Props {
   renderWithout?: () => React.ReactElement;
   lastPathname: string;
   currentPathname: string;
-  skippedPathnames: Pathname[];
+  skippedPathnames: SkippedPathname[];
   name: string;
 }
 
