@@ -48,7 +48,7 @@ failed to produce non-empty result.
 }
 ```
 
-#### Example
+## Example
 
 ```javascript
 import { RenderController } from "@alexseitsinger/react-render-controler"
