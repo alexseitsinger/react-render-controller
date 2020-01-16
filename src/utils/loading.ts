@@ -1,5 +1,6 @@
 import { isEmpty } from "underscore"
-import { LoadTarget } from "../../index"
+
+import { LoadTarget } from "../.."
 
 import { getFullName } from "./general"
 
@@ -19,8 +20,7 @@ const targetHasData = (target: LoadTarget): boolean => {
   return isEmpty(targetData) === false
 }
 
-export const checkTargetsLoaded = (targets: LoadTarget[]) =>
-  targets.map(targetHasData).every(b => b === true)
+export const checkTargetsLoaded = (targets: LoadTarget[]) => targets.map(targetHasData).every(b => b === true)
 
 const clearLoaders = () => {
   const keys = Object.keys(loaders)

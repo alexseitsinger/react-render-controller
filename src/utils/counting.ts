@@ -1,5 +1,6 @@
+import { LoadTarget } from "../.."
+
 import { getFullName } from "./general"
-import { LoadTarget } from "../../index"
 
 export const loadCounts = {}
 

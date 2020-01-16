@@ -1,13 +1,13 @@
-import { isFunction, isObject, isArray } from "underscore"
+import { isArray, isFunction, isObject } from "underscore"
 
-import { Pathname, LoadTarget } from "../../index"
+import { LoadTarget, Pathname } from "../.."
 
+import { resetLoadCount } from "./counting"
 import {
+  getFullName,
   isMatchingPaths,
   prepareSkippedPathnames,
-  getFullName,
 } from "./general"
-import { resetLoadCount } from "./counting"
 
 const pathnames = {
   last: "/",
@@ -96,8 +96,8 @@ export const startUnloading = (
     const name = getFullName(controllerName, target.name)
     const handler = () => {
       if (
-        isFunction(target.setter) &&
-        (isObject(target.empty) || isArray(target.empty))
+        isFunction(target.setter)
+        && (isObject(target.empty) || isArray(target.empty))
       ) {
         target.setter(target.empty)
         resetLoadCount(name)

@@ -1,5 +1,6 @@
 import { debounce } from "underscore"
-import { Pathname, LoadTarget } from "../../index"
+
+import { LoadTarget, Pathname } from "../.."
 
 export const getFullName = (
   controllerName: string,
@@ -50,7 +51,8 @@ export const isMatchingPaths = (
   let currentBits: string[]
   if (current === "/") {
     currentBits = ["/"]
-  } else {
+  }
+  else {
     currentBits = current.split("/")
   }
   currentBits = currentBits.filter(bit => bit.length > 0)
@@ -63,8 +65,8 @@ export const isMatchingPaths = (
       if (skippedBit === "*") {
         return true
       }
-      const isMatching =
-        currentBits.length && currentBits[i] && currentBits[i] === skippedBit
+      const isMatching
+        = currentBits.length && currentBits[i] && currentBits[i] === skippedBit
       return isMatching === true
     })
     .every(isTrue)

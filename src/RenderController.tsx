@@ -1,15 +1,15 @@
-import React, { ReactNode, ReactElement } from "react"
+import React, { ReactElement, ReactNode } from "react"
 import PropTypes from "prop-types"
-import { isFunction, isEqual, debounce } from "underscore"
+import { debounce, isEqual, isFunction } from "underscore"
 
-import { createCancellableMethod } from "./utils/general"
-import { hasControllerBeenSeen, removeControllerSeen } from "./utils/seen"
-import { addMounted, removeMounted, hasBeenMounted } from "./utils/mounted"
-import { startUnloading } from "./utils/unloading"
-import { checkTargetsLoaded, startLoading } from "./utils/loading"
+import { Props, State } from ".."
+
 import { checkForFirstLoad } from "./utils/counting"
-
-import { Props, State } from "../index"
+import { createCancellableMethod } from "./utils/general"
+import { checkTargetsLoaded, startLoading } from "./utils/loading"
+import { addMounted, hasBeenMounted, removeMounted } from "./utils/mounted"
+import { hasControllerBeenSeen, removeControllerSeen } from "./utils/seen"
+import { startUnloading } from "./utils/unloading"
 
 const defaultContext = {
   onRenderFirst: () => <></>,
@@ -69,7 +69,9 @@ export class RenderController extends React.Component<Props, State> {
   _isMounted = false
 
   cancelUnsetControllerSeen: null | (() => void) = null
+
   unsetControllerSeen: null | (() => void) = null
+
   setControllerSeen: null | (() => void) = null
 
   constructor(props: Props) {
