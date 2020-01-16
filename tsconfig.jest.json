@@ -16,7 +16,8 @@
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
 
-    "jsx": "preserve",
+    "allowJs": true,
+    "jsx": "react",
 
     "lib": ["dom", "es2015"],
     "target": "es2015",
