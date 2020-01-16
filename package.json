@@ -41,7 +41,7 @@
     "underscore": "1.9.1"
   },
   "devDependencies": {
-    "@alexseitsinger/eslint-config": "^1.1.0",
+    "@alexseitsinger/eslint-config": "^1.2.0",
     "@alexseitsinger/redux-locations": "^0.3.0",
     "@babel/core": "7.7.5",
     "@babel/plugin-proposal-class-properties": "7.7.4",
@@ -99,6 +99,5 @@
   },
   "peerDependencies": {
     "react": "^16.12.0"
-  },
-  "types": "index.d.ts"
+  }
 }
