@@ -1,21 +1,43 @@
 const path = require("path")
+const typescriptConfig = require("./.eslintrc.typescript")
 
 module.exports = {
   root: true,
-  parser: "@typescript-eslint/parser",
+  parser: "babel-eslint",
   parserOptions: {
-    project: "./tsconfig.json",
+    ecmaVersion: 9,
+    sourceType: "module",
   },
-  plugins: ["import", "react", "@typescript-eslint/eslint-plugin"],
   settings: {
-    "import/parsers": {
-      "@typescript-eslint/parser": [".ts", ".tsx", ".js", ".jsx"],
-    },
     "import/resolver": {
       webpack: {
         config: path.resolve("./webpack.config.dev.js"),
       },
     },
   },
-  extends: ["@alexseitsinger/eslint-config"],
+  plugins: [
+    "import",
+    "react",
+    "node",
+    "package-json",
+    "jest",
+    "jest-formatting",
+    "simple-import-sort",
+  ],
+  extends: [
+    "@alexseitsinger/eslint-config/eslint",
+    "@alexseitsinger/eslint-config/react",
+    "@alexseitsinger/eslint-config/node",
+    "@alexseitsinger/eslint-config/import",
+    "@alexseitsinger/eslint-config/package-json",
+    "@alexseitsinger/eslint-config/jest",
+    "@alexseitsinger/eslint-config/jest-formatting",
+    "@alexseitsinger/eslint-config/simple-import-sort",
+  ],
+  overrides: [
+    {
+      files: ["*.ts", "*.tsx"],
+      ...typescriptConfig,
+    },
+  ],
 }

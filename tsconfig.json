@@ -7,8 +7,8 @@
     "allowJs": false,
     "checkJs": false,
     "jsx": "preserve",
-    "lib": ["dom", "es2015"],
-    "target": "es2015",
+    "lib": ["dom", "es2016"],
+    "target": "es2016",
     "module": "esnext",
     "moduleResolution": "node",
     "esModuleInterop": true,
@@ -16,7 +16,7 @@
     "baseUrl": "."
   },
   "include": [
-    "src", "typings", "tests"
+    "src", "tests", "index.d.ts"
   ],
   "exclude": [
     "node_modules",
