@@ -1,14 +1,8 @@
-import React from "react"
+//import { RenderController } from "src"
 import waitForExpect from "wait-for-expect"
 
-import mapDispatch from "tests/integration/setup/app/pages/c/mapDispatch"
-//import { RenderController } from "src"
-import setup from "tests/integration/setup"
-import {
-  FirstRender,
-  SuccessfulRender,
-  FailedRender,
-} from "tests/integration/setup/components"
+import { FailedRender, FirstRender, SuccessfulRender } from "./setup/components"
+import setup from "./setup"
 
 // test:
 // 1) data is unloaded on when navigated away, then data is re-loaded when
@@ -17,22 +11,25 @@ import {
 
 describe("RenderController", () => {
   it("should load data, then after success, use renderWith", async () => {
-    const { wrapper, store, history } = setup()
+    const { wrapper } = setup()
 
     // FirstRender wont show because the mounting process is too fast.
     //expect(wrapper.find(FirstRender)).toHaveLength(1)
     await waitForExpect(() => {
       wrapper.update()
+
       expect(wrapper.find(SuccessfulRender)).toHaveLength(1)
     })
   })
 
   it("should attempt to load data, then after failure, use renderWithout", async () => {
-    const { wrapper, store, history } = setup("/page-b")
+    const { wrapper } = setup("/page-b")
 
     expect(wrapper.find(FirstRender)).toHaveLength(1)
+
     await waitForExpect(() => {
       wrapper.update()
+
       expect(wrapper.find(FailedRender)).toHaveLength(1)
     })
   })
@@ -43,7 +40,7 @@ describe("RenderController", () => {
     const getTwoDataMock = jest.fn()
     const setTwoDataMock = jest.fn()
 
-    const { wrapper, store, history } = setup("/page-c", {
+    const { wrapper } = setup("/page-c", {
       getOneData: getOneDataMock,
       setOneData: setOneDataMock,
       getTwoData: getTwoDataMock,
@@ -51,8 +48,10 @@ describe("RenderController", () => {
     })
 
     expect(wrapper.find(FirstRender)).toHaveLength(1)
+
     await waitForExpect(() => {
       wrapper.update()
+
       expect(getOneDataMock).toHaveBeenCalledTimes(1)
       expect(setOneDataMock).toHaveBeenCalledTimes(1)
       expect(getTwoDataMock).toHaveBeenCalledTimes(1)
@@ -61,32 +60,21 @@ describe("RenderController", () => {
     })
   })
 
-  it("should run each loader once, even when defined multiple times on the same page", () => {
+  it.todo(
+    "should run each loader once, even when defined multiple times on the same page"
+  )
 
-  })
+  it.todo("should reset load timer after 10 seconds of the load attempt")
 
-  it("should reset load timer after 10 seconds of the load attempt", () => {
+  it.todo("should render renderFirst when first mounted")
 
-  })
+  it.todo(
+    "should render renderWithout after failDelay is passed and no data is loaded"
+  )
 
-  it("should render renderFirst when first mounted", () => {
+  it.todo("should render renderWith after data is loaded successfully")
 
-  })
+  it.todo("should not run unloaders on skipped location change")
 
-  it("should render renderWithout after failDelay is passed and no data is loaded", () => {
-
-  })
-
-  it("should render renderWith after data is loaded successfully", () => {
-
-  })
-
-  it("should not run unloaders on skipped location change", () => {
-
-  })
-
-  it("should run unloaders on unskipped location change", () => {
-
-  })
-
+  it.todo("should run unloaders on unskipped location change")
 })
