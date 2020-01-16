@@ -11,15 +11,12 @@ module.exports = {
     "import/parsers": {
       "@typescript-eslint/parser": [".ts", ".tsx"],
     },
+    "import/resolver": {
+      typescript: {
+        alwaysTryTypes: true,
+      },
+    },
   },
-  plugins: [
-    "@typescript-eslint/eslint-plugin",
-    "import",
-    "react",
-    "jest",
-    "jest-formatting",
-    "node",
-  ],
   extends: [
     "@alexseitsinger/eslint-config/eslint",
     "@alexseitsinger/eslint-config/import",
