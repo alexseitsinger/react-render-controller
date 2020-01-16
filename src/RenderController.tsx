@@ -60,20 +60,6 @@ export class RenderController extends React.Component<Props, State> {
     failDelay: 4000,
   }
 
-  // Store a set of canceller functions to run when our debounced load
-  // functions should not continue due to unmounting, etc.
-  cancellers = []
-
-  // Control our setState method with a variable to prevent memroy leaking
-  // from our debounced methods running after the components are removed.
-  _isMounted = false
-
-  cancelUnsetControllerSeen: null | (() => void) = null
-
-  unsetControllerSeen: null | (() => void) = null
-
-  setControllerSeen: null | (() => void) = null
-
   constructor(props: Props) {
     super(props)
 
@@ -190,6 +176,20 @@ export class RenderController extends React.Component<Props, State> {
     // renderFirst() methods to work again.
     this.unsetControllerSeen!()
   }
+
+  // Store a set of canceller functions to run when our debounced load
+  // functions should not continue due to unmounting, etc.
+  cancellers = []
+
+  // Control our setState method with a variable to prevent memroy leaking
+  // from our debounced methods running after the components are removed.
+  _isMounted = false
+
+  cancelUnsetControllerSeen: null | (() => void) = null
+
+  unsetControllerSeen: null | (() => void) = null
+
+  setControllerSeen: null | (() => void) = null
 
   setCanceller = (name: string, fn: () => void): void => {
     this.cancellers[name] = fn
