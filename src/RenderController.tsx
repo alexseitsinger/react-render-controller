@@ -79,7 +79,9 @@ export class RenderController extends React.Component<
 
     const { controllerName, targets } = props
 
-    const failDelay = targets.length * 600
+    // Require the delay to be at least 1100ms.
+    // Limit the delay to 4400ms
+    const failDelay = Math.max(1100, Math.min(4400, targets.length * 1100))
 
     const realSetState = this.setState.bind(this)
     this.setState = (...args) => {
