@@ -33,7 +33,6 @@ export interface LoadTarget {
 export interface Props {
   children?: React.ReactNode | React.ReactNode[];
   targets: LoadTarget[];
-  failDelay?: number;
   renderFirst?: () => React.ReactElement;
   renderWith?: () => React.ReactElement;
   renderWithout?: () => React.ReactElement;

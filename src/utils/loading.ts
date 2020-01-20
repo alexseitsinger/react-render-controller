@@ -115,29 +115,34 @@ const loadTarget = (controllerName: string, target: LoadTarget) => {
   target.getter()
 }
 
-export const startLoading = (
-  controllerName: string,
-  targets: LoadTarget[],
-  setCanceller: (name: string, f?: () => void) => void,
-  setControllerSeen: (bool: boolean) => void
-) => {
-  clearLoaders()
+interface StartLoadingArgs {
+  controllerName: string;
+  targets: LoadTarget[];
+  setCanceller: (name: string, f?: () => void) => void;
+  setControllerSeen: () => void;
+  currentPathname: string;
+}
 
-  const handleAttempt = (target: LoadTarget) => {
-    setAttempted(controllerName, target.name)
-    const result = areAttempted(controllerName, targets)
-    setControllerSeen(result)
-    if (result) {
-      resetAttempted(controllerName)
-    }
-  }
+export const startLoading = ({
+  controllerName,
+  targets,
+  setCanceller,
+  setControllerSeen,
+  currentPathname,
+}: StartLoadingArgs) => {
+  clearLoaders()
 
   const prepareTarget = (target: LoadTarget) => {
     const fullName = getFullName(controllerName, target.name)
     const loadHandler = () => loadTarget(controllerName, target)
     const loadHandlerCallback = () => {
       setCanceller(fullName, undefined)
-      handleAttempt(target)
+      setAttempted(controllerName, target.name)
+      const result = areAttempted(controllerName, targets)
+      if (result) {
+        setControllerSeen()
+        resetAttempted(controllerName)
+      }
     }
     const canceller = addLoader(fullName, loadHandler, loadHandlerCallback)
     setCanceller(fullName, canceller)

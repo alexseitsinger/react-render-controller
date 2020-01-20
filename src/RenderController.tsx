@@ -35,14 +35,34 @@ const skippedPathnameShape = PropTypes.shape({
   reverse: PropTypes.bool,
 })
 
-export class RenderController extends React.Component<Props, State> {
+interface DefaultProps {
+  children: null;
+  skippedPathnames: [];
+  renderFirst?: () => void;
+  renderWith?: () => void;
+  renderWithout?: () => void;
+}
+
+const defaultProps: DefaultProps = {
+  children: null,
+  skippedPathnames: [],
+  renderFirst: undefined,
+  renderWith: undefined,
+  renderWithout: undefined,
+}
+
+type PropsWithDefaults = Props & DefaultProps
+
+export class RenderController extends React.Component<
+  PropsWithDefaults,
+  State
+> {
   static propTypes = {
     children: PropTypes.oneOfType([
       PropTypes.arrayOf(PropTypes.node),
       PropTypes.node,
     ]),
     targets: PropTypes.arrayOf(targetShape).isRequired,
-    failDelay: PropTypes.number,
     renderFirst: PropTypes.func,
     renderWith: PropTypes.func,
     renderWithout: PropTypes.func,
@@ -52,19 +72,14 @@ export class RenderController extends React.Component<Props, State> {
     controllerName: PropTypes.string.isRequired,
   }
 
-  static defaultProps = {
-    children: null,
-    skippedPathnames: [],
-    renderFirst: null,
-    renderWith: null,
-    renderWithout: null,
-    failDelay: 4000,
-  }
+  static defaultProps = defaultProps
 
-  constructor(props: Props) {
+  constructor(props: PropsWithDefaults) {
     super(props)
 
-    const { controllerName, failDelay } = props
+    const { controllerName, targets } = props
+
+    const failDelay = targets.length * 600
 
     const realSetState = this.setState.bind(this)
     this.setState = (...args) => {
@@ -91,7 +106,7 @@ export class RenderController extends React.Component<Props, State> {
     const {
       method: unsetControllerSeen,
       canceller: cancelUnsetControllerSeen,
-    } = createCancellableMethod((failDelay as number) * 2, () => {
+    } = createCancellableMethod(failDelay, () => {
       if (this._isMounted === true && hasBeenMounted(controllerName) === true) {
         return
       }
@@ -107,11 +122,10 @@ export class RenderController extends React.Component<Props, State> {
     this.setControllerSeen = debounce(() => {
       if (isControllerSeen === false) {
         // Toggle the components state to True so our renderFirst() method
-        // finished, and is replaced with either renderWith() or
-        // renderWithout().
+        // finished, and is replaced with either renderWith() or renderWithout().
         this.setState({ isControllerSeen: true })
       }
-    }, (failDelay as number))
+    }, failDelay)
   }
 
   componentDidMount(): void {
@@ -133,24 +147,22 @@ export class RenderController extends React.Component<Props, State> {
       currentPathname,
       skippedPathnames
     )
-    startLoading(controllerName, targets, this.setCanceller, (bool: boolean) => {
-      // Shortcut to run renderWihtout if we successfuly run getData(), but it
-      // returns empty data. Normally we would have to wait for <failDelay>
-      // beofre the renderWithout() method is called, but with this, we can do
-      // it sooner.
-      this.setState({ isControllerSeen: bool })
+    startLoading({
+      controllerName,
+      targets,
+      setCanceller: this.setCanceller,
+      setControllerSeen: () => {
+        if (this.setControllerSeen) {
+          this.setControllerSeen()
+        }
+      },
+      currentPathname,
     })
-
-    // Toggle the state to ensure renderFirst is changed to renderWith or
-    // renderWithout.
-    if (this.setControllerSeen) {
-      this.setControllerSeen()
-    }
 
     // Add this controller to the list of mounted controllers.
     addMounted(controllerName)
 
-    // Cancel any previous calls to unsetControllerSeen for thi controller.
+    // Cancel any previous calls to unsetControllerSeen for this controller.
     if (this.cancelUnsetControllerSeen) {
       this.cancelUnsetControllerSeen()
     }
@@ -159,13 +171,15 @@ export class RenderController extends React.Component<Props, State> {
   componentDidUpdate(prevProps: Props): void {
     const { targets } = this.props
 
-    // After load is attempted, change state to render the correct output.
-    //this.setControllerSeen()
+    if (this.setControllerSeen) {
+      this.setControllerSeen()
+    }
 
     // If we have pending loads, and then we navigate away from that controller
     // before the load completes, the data will clear, and then load again.
     // To avoid this, cancel any pending loads everytime our targets change.
-    if (isEqual(targets, prevProps.targets) === false) {
+    const isTargetsChanged = isEqual(targets, prevProps.targets)
+    if (isTargetsChanged === false) {
       this.runCancellers()
     }
   }
@@ -180,7 +194,7 @@ export class RenderController extends React.Component<Props, State> {
     this.runCancellers()
 
     // Remove this controllers name from the list of mounbted controllers so
-    // unsetControllerSeen() can run for this controller.
+    // unsetLoadingComplete() can run for this controller.
     removeMounted(controllerName)
 
     // Remove this controllers name from the seen controllers list to allow for
@@ -198,11 +212,11 @@ export class RenderController extends React.Component<Props, State> {
   // functions should not continue due to unmounting, etc.
   cancellers: (() => void)[] = []
 
+  setControllerSeen: null | (() => void) = null
+
   cancelUnsetControllerSeen: null | (() => void) = null
 
   unsetControllerSeen: null | (() => void) = null
-
-  setControllerSeen: null | (() => void) = null
 
   setCanceller = (controllerName: string, fn: () => void): void => {
     this.cancellers.push(fn)
@@ -229,7 +243,6 @@ export class RenderController extends React.Component<Props, State> {
     const { isControllerSeen } = this.state
 
     if (checkTargetsLoaded(targets) === true) {
-      resetAttempted(controllerName)
       if (isFunction(renderWith)) {
         return renderWith()
       }
