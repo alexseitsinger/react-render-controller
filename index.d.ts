@@ -11,7 +11,7 @@ export interface AddUnloaderArgs {
   currentPathname: string;
   skippedPathnames: SkippedPathname[];
   handler: () => void;
-  targetName: string;
+  name: string;
 }
 
 export interface LoadTargetData {
@@ -19,7 +19,7 @@ export interface LoadTargetData {
 }
 
 export interface LoadTarget {
-  targetName: string;
+  name: string;
   data: LoadTargetData;
   getter: (...args: any) => void;
   setter: (o: {} | []) => void;

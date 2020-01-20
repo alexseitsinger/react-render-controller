@@ -98,7 +98,7 @@ export const startUnloading = (
   runUnloaders(lastPathname, currentPathname)
 
   const prepareTarget = (target: LoadTarget) => {
-    const fullControllerName = getFullName(controllerName, target.targetName)
+    const fullControllerName = getFullName(controllerName, target.name)
     const handler = () => {
       if (
         isFunction(target.setter) &&

@@ -124,7 +124,7 @@ export const startLoading = (
   clearLoaders()
 
   const handleAttempt = (target: LoadTarget) => {
-    setAttempted(controllerName, target.targetName)
+    setAttempted(controllerName, target.name)
     const result = areAttempted(controllerName, targets)
     setControllerSeen(result)
     if (result) {
@@ -133,7 +133,7 @@ export const startLoading = (
   }
 
   const prepareTarget = (target: LoadTarget) => {
-    const fullName = getFullName(controllerName, target.targetName)
+    const fullName = getFullName(controllerName, target.name)
     const loadHandler = () => loadTarget(controllerName, target)
     const loadHandlerCallback = () => {
       setCanceller(fullName, undefined)

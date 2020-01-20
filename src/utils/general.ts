@@ -81,7 +81,7 @@ export const getMasterName = (
   masterName = masterName.replace("/", "_")
 
   targets.forEach(obj => {
-    masterName = `${masterName}__${obj.targetName}`
+    masterName = `${masterName}__${obj.name}`
   })
 
   return masterName
