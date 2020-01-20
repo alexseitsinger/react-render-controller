@@ -62,7 +62,7 @@ function App({
 }) {
   return (
     <RenderController
-      name={"app"}
+      controllerName={"app"}
       targets={[
         {
           name: "dates",
