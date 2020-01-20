@@ -1,3 +1,16 @@
+<a name="v7.2.0"></a>
+## [v7.2.0](https://github.com/alexseitsinger/react-render-controller/compare/v7.1.0...v7.2.0) (2020-01-20)
+
+### Code Refactoring
+- Adjust the failDelay. ([5e52fdf](https://github.com/alexseitsinger/react-render-controller/commit/5e52fdf9dbed7af1caae25e7dffc523047b12a4b))
+- increases failDelay ([14167be](https://github.com/alexseitsinger/react-render-controller/commit/14167be00ce79a2358b2f78c822cc8a92a87fa22))
+- Renames variables. ([b6f6746](https://github.com/alexseitsinger/react-render-controller/commit/b6f6746a5bd93ca1095511b950b9c0099a6f0524))
+- Updates type. ([a439a91](https://github.com/alexseitsinger/react-render-controller/commit/a439a91f89e1825d85e6adcdc58d95a38e918247))
+
+### Features
+- Adds shortcut. ([08fd1c5](https://github.com/alexseitsinger/react-render-controller/commit/08fd1c53ff6d476bcf10deaa88b59d4e4197a802))
+
+
 <a name="v7.1.0"></a>
 ## [v7.1.0](https://github.com/alexseitsinger/react-render-controller/compare/v7.0.0...v7.1.0) (2020-01-16)
 
