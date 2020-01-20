@@ -10,6 +10,7 @@ import { hasControllerBeenSeen, removeControllerSeen } from "./utils/seen"
 import { startUnloading } from "./utils/unloading"
 
 import { Props, State } from ".."
+import { resetAttempted } from "src/utils/attempted"
 
 const defaultContext = {
   onRenderFirst: () => <></>,
@@ -19,7 +20,7 @@ const defaultContext = {
 export const Context = React.createContext(defaultContext)
 
 const targetShape = PropTypes.shape({
-  name: PropTypes.string.isRequired,
+  controllerName: PropTypes.string.isRequired,
   data: PropTypes.oneOfType([PropTypes.array, PropTypes.object]),
   empty: PropTypes.oneOfType([PropTypes.array, PropTypes.object]),
   cached: PropTypes.bool.isRequired,
@@ -48,7 +49,7 @@ export class RenderController extends React.Component<Props, State> {
     lastPathname: PropTypes.string.isRequired,
     currentPathname: PropTypes.string.isRequired,
     skippedPathnames: PropTypes.arrayOf(skippedPathnameShape),
-    name: PropTypes.string.isRequired,
+    controllerName: PropTypes.string.isRequired,
   }
 
   static defaultProps = {
@@ -63,7 +64,7 @@ export class RenderController extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props)
 
-    const { name, failDelay } = props
+    const { controllerName, failDelay } = props
 
     const realSetState = this.setState.bind(this)
     this.setState = (...args) => {
@@ -77,7 +78,7 @@ export class RenderController extends React.Component<Props, State> {
     // default state for isControllerSeen will be false, so the loading screen
     // will shopw. To avoid this, we track each mounted component and reset the
     // default state if its already been mounted once.
-    const isControllerSeen = hasControllerBeenSeen(name)
+    const isControllerSeen = hasControllerBeenSeen(controllerName)
     this.state = {
       isControllerSeen,
     }
@@ -91,10 +92,10 @@ export class RenderController extends React.Component<Props, State> {
       method: unsetControllerSeen,
       canceller: cancelUnsetControllerSeen,
     } = createCancellableMethod((failDelay as number) * 2, () => {
-      if (this._isMounted === true && hasBeenMounted(name) === true) {
+      if (this._isMounted === true && hasBeenMounted(controllerName) === true) {
         return
       }
-      removeControllerSeen(name)
+      removeControllerSeen(controllerName)
     })
     this.cancelUnsetControllerSeen = cancelUnsetControllerSeen
     this.unsetControllerSeen = unsetControllerSeen
@@ -115,34 +116,44 @@ export class RenderController extends React.Component<Props, State> {
 
   componentDidMount(): void {
     const {
-      name,
+      controllerName,
       targets,
       lastPathname,
       currentPathname,
       skippedPathnames,
     } = this.props
 
+    this._isMounted = true
+
     // Unload previous data first, then load new data.
     startUnloading(
-      name,
+      controllerName,
       targets,
       lastPathname,
       currentPathname,
       skippedPathnames
     )
-    startLoading(name, targets, this.setCanceller)
-
-    this._isMounted = true
+    startLoading(controllerName, targets, this.setCanceller, (bool: boolean) => {
+      // Shortcut to run renderWihtout if we successfuly run getData(), but it
+      // returns empty data. Normally we would have to wait for <failDelay>
+      // beofre the renderWithout() method is called, but with this, we can do
+      // it sooner.
+      this.setState({ isControllerSeen: bool })
+    })
 
     // Toggle the state to ensure renderFirst is changed to renderWith or
     // renderWithout.
-    this.setControllerSeen!()
+    if (this.setControllerSeen) {
+      this.setControllerSeen()
+    }
 
     // Add this controller to the list of mounted controllers.
-    addMounted(name)
+    addMounted(controllerName)
 
     // Cancel any previous calls to unsetControllerSeen for thi controller.
-    this.cancelUnsetControllerSeen!()
+    if (this.cancelUnsetControllerSeen) {
+      this.cancelUnsetControllerSeen()
+    }
   }
 
   componentDidUpdate(prevProps: Props): void {
@@ -160,7 +171,7 @@ export class RenderController extends React.Component<Props, State> {
   }
 
   componentWillUnmount(): void {
-    const { name } = this.props
+    const { controllerName } = this.props
 
     // Set our falg to false so setState doesn't work after this.
     this._isMounted = false
@@ -170,11 +181,13 @@ export class RenderController extends React.Component<Props, State> {
 
     // Remove this controllers name from the list of mounbted controllers so
     // unsetControllerSeen() can run for this controller.
-    removeMounted(name)
+    removeMounted(controllerName)
 
     // Remove this controllers name from the seen controllers list to allow for
     // renderFirst() methods to work again.
-    this.unsetControllerSeen!()
+    if (this.unsetControllerSeen) {
+      this.unsetControllerSeen()
+    }
   }
 
   // Control our setState method with a variable to prevent memroy leaking
@@ -205,7 +218,7 @@ export class RenderController extends React.Component<Props, State> {
 
   render(): ReactElement | ReactNode {
     const {
-      name,
+      controllerName,
       targets,
       children,
       renderWithout,
@@ -216,6 +229,7 @@ export class RenderController extends React.Component<Props, State> {
     const { isControllerSeen } = this.state
 
     if (checkTargetsLoaded(targets) === true) {
+      resetAttempted(controllerName)
       if (isFunction(renderWith)) {
         return renderWith()
       }
@@ -225,18 +239,24 @@ export class RenderController extends React.Component<Props, State> {
     return (
       <Context.Consumer>
         {({ onRenderFirst, onRenderWithout }): ReactNode | ReactElement => {
-          if (checkForFirstLoad(name, targets) === true) {
-            if (isControllerSeen === false) {
-              if (isFunction(renderFirst)) {
-                return renderFirst()
-              }
-              return onRenderFirst()
+          // If the controller is already seen, use renderWithout since the data
+          // is empty and a load was attempted, but failed to produce non-empty
+          // data.
+          if (isControllerSeen === true) {
+            if (isFunction(renderWithout)) {
+              return renderWithout()
             }
+            return onRenderWithout()
           }
-          if (isFunction(renderWithout)) {
-            return renderWithout()
+
+          // Otherwise, use renderFirst() to generate the output, until the data
+          // is finally loaded and changed to non-empty.
+          if (checkForFirstLoad(controllerName, targets) === true) {
+            if (isFunction(renderFirst)) {
+              return renderFirst()
+            }
+            return onRenderFirst()
           }
-          return onRenderWithout()
         }}
       </Context.Consumer>
     )

@@ -75,10 +75,11 @@ const runUnloaders = (from: string, to: string) => {
   }
 
   const keys = Object.keys(unloaders)
-  var k
   while (keys.length) {
-    k = keys.shift()
-    unloaders[(k as string)](from, to)
+    const k = keys.shift()
+    if (k) {
+      unloaders[k](from, to)
+    }
   }
 
   // Finally, update our saved pathnames for the next unloaders to use to
@@ -97,11 +98,11 @@ export const startUnloading = (
   runUnloaders(lastPathname, currentPathname)
 
   const prepareTarget = (target: LoadTarget) => {
-    const fullControllerName = getFullName(controllerName, target.name)
+    const fullControllerName = getFullName(controllerName, target.targetName)
     const handler = () => {
       if (
-        isFunction(target.setter)
-        && (isObject(target.empty) || isArray(target.empty))
+        isFunction(target.setter) &&
+        (isObject(target.empty) || isArray(target.empty))
       ) {
         target.setter(target.empty)
         resetLoadCount(fullControllerName)

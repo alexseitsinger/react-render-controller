@@ -1,6 +1,7 @@
 import { isEmpty } from "underscore"
 
 import { getFullName } from "./general"
+import { resetAttempted, areAttempted, setAttempted } from "./attempted"
 
 import { LoadTarget } from "../.."
 
@@ -28,7 +29,8 @@ const targetHasData = (target: LoadTarget): boolean => {
   return isEmpty(targetData) === false
 }
 
-export const checkTargetsLoaded = (targets: LoadTarget[]) => targets.map(targetHasData).every(b => b === true)
+export const checkTargetsLoaded = (targets: LoadTarget[]) =>
+  targets.map(targetHasData).every(b => b === true)
 
 const clearLoaders = () => {
   const keys = Object.keys(loaders)
@@ -116,14 +118,27 @@ const loadTarget = (controllerName: string, target: LoadTarget) => {
 export const startLoading = (
   controllerName: string,
   targets: LoadTarget[],
-  setCanceller: (name: string, f?: () => void) => void
+  setCanceller: (name: string, f?: () => void) => void,
+  setControllerSeen: (bool: boolean) => void
 ) => {
   clearLoaders()
 
+  const handleAttempt = (target: LoadTarget) => {
+    setAttempted(controllerName, target.targetName)
+    const result = areAttempted(controllerName, targets)
+    setControllerSeen(result)
+    if (result) {
+      resetAttempted(controllerName)
+    }
+  }
+
   const prepareTarget = (target: LoadTarget) => {
-    const fullName = getFullName(controllerName, target.name)
+    const fullName = getFullName(controllerName, target.targetName)
     const loadHandler = () => loadTarget(controllerName, target)
-    const loadHandlerCallback = () => setCanceller(fullName, undefined)
+    const loadHandlerCallback = () => {
+      setCanceller(fullName, undefined)
+      handleAttempt(target)
+    }
     const canceller = addLoader(fullName, loadHandler, loadHandlerCallback)
     setCanceller(fullName, canceller)
   }

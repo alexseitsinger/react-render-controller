@@ -35,7 +35,7 @@ export const checkForFirstLoad = (
   var total = 0
 
   targets.forEach((target: LoadTarget) => {
-    const fullName = getFullName(controllerName, target.name)
+    const fullName = getFullName(controllerName, target.targetName)
     total += getLoadCount(fullName)
   })
 

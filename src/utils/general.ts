@@ -53,8 +53,7 @@ export const isMatchingPaths = (
   let currentBits: string[]
   if (current === "/") {
     currentBits = ["/"]
-  }
-  else {
+  } else {
     currentBits = current.split("/")
   }
   currentBits = currentBits.filter(bit => bit.length > 0)
@@ -67,8 +66,8 @@ export const isMatchingPaths = (
       if (skippedBit === "*") {
         return true
       }
-      const isMatching
-        = currentBits.length && currentBits[i] && currentBits[i] === skippedBit
+      const isMatching =
+        currentBits.length && currentBits[i] && currentBits[i] === skippedBit
       return isMatching === true
     })
     .every(isTrue)
@@ -82,7 +81,7 @@ export const getMasterName = (
   masterName = masterName.replace("/", "_")
 
   targets.forEach(obj => {
-    masterName = `${masterName}__${obj.name}`
+    masterName = `${masterName}__${obj.targetName}`
   })
 
   return masterName
