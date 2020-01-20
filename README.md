@@ -10,7 +10,7 @@ yarn add @alexseitsinger/react-render-controller
 
 ## Props
 
-1. __name__ - The name of the controller
+1. __controllerName__ - The name of the controller
 2. __targets__ - An array of objects with the Target shape (shown below).
 3. __lastPathname__ - The last pathname used by the router.
 4. __currentPathname__ - The current pathname used by the router.
