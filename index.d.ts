@@ -11,7 +11,7 @@ export interface AddUnloaderArgs {
   currentPathname: string;
   skippedPathnames: SkippedPathname[];
   handler: () => void;
-  name: string;
+  targetName: string;
 }
 
 export interface LoadTargetData {
@@ -19,7 +19,7 @@ export interface LoadTargetData {
 }
 
 export interface LoadTarget {
-  name: string;
+  targetName: string;
   data: LoadTargetData;
   getter: (...args: any) => void;
   setter: (o: {} | []) => void;
@@ -40,7 +40,7 @@ export interface Props {
   lastPathname: string;
   currentPathname: string;
   skippedPathnames: SkippedPathname[];
-  name: string;
+  controllerName: string;
 }
 
 export interface State {
