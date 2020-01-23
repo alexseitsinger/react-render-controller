@@ -1,3 +1,12 @@
+<a name="v7.3.0"></a>
+## [v7.3.0](https://github.com/alexseitsinger/react-render-controller/compare/v7.2.0...v7.3.0) (2020-01-23)
+
+### Code Refactoring
+- Moves internal types. ([9cf6c87](https://github.com/alexseitsinger/react-render-controller/commit/9cf6c872dad971321274761ea4ac094d19c936a0))
+- Updates local types. ([9b525df](https://github.com/alexseitsinger/react-render-controller/commit/9b525df70a62e3780262964ff30240638b8424d6))
+- Updates. ([73fc714](https://github.com/alexseitsinger/react-render-controller/commit/73fc71407a3f379891b50c6d5d0a4ef602f5b57c))
+
+
 <a name="v7.2.0"></a>
 ## [v7.2.0](https://github.com/alexseitsinger/react-render-controller/compare/v7.1.0...v7.2.0) (2020-01-20)
 
