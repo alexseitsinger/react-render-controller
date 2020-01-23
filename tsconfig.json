@@ -13,6 +13,9 @@
     "strictNullChecks": true,
     "sourceMap": true,
 
+    "outDir": "dist",
+    "declaration": true,
+
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
 
@@ -26,9 +29,15 @@
     "baseUrl": ".",
     "paths": {
       "src/*": ["src/*"],
-      "types": ["index.d.ts"]
+      "types": ["index.d.ts"],
+      "tests/*": ["tests/*"]
     }
   },
+  "include": [
+    "src",
+    "tests",
+    "**/*.d.ts"
+  ],
   "exclude": [
     "node_modules",
     ".yalc",
