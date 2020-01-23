@@ -10,7 +10,7 @@ import {
   FirstRender,
   SuccessfulRender,
 } from "tests/setup/components"
-import { SkippedPathname } from "types"
+import { SkippedPathname } from "src/types"
 
 const skipped: SkippedPathname[] = []
 

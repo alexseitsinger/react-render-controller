@@ -8,7 +8,6 @@ export interface PageDispatchProps {
 
 export default (dispatch: ThunkDispatch): PageDispatchProps => ({
   getData: (): void => {
-    console.log("getdata")
     dispatch(getData())
   },
   setData: (data: { name: string }): void => {
