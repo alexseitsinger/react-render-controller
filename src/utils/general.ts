@@ -19,7 +19,7 @@ export const removeLeadingAndTrailingSlashes = (url: string): string => {
 
 export const prepareSkippedPathnames = (
   skippedPathnames: SkippedPathname[]
-) => {
+): SkippedPathname[] => {
   const prepared: SkippedPathname[] = []
 
   skippedPathnames.forEach(obj => {
@@ -28,7 +28,7 @@ export const prepareSkippedPathnames = (
       to: obj.to,
     })
 
-    if (obj.reverse && obj.reverse === true) {
+    if (obj.reverse !== undefined && obj.reverse === true) {
       prepared.push({
         from: obj.to,
         to: obj.from,
@@ -58,7 +58,7 @@ export const isMatchingPaths = (
   }
   currentBits = currentBits.filter(bit => bit.length > 0)
 
-  const isTrue = (result: boolean) => result === true
+  const isTrue = (result: boolean): boolean => result === true
 
   return skipped
     .split("/")
@@ -67,7 +67,9 @@ export const isMatchingPaths = (
         return true
       }
       const isMatching =
-        currentBits.length && currentBits[i] && currentBits[i] === skippedBit
+        currentBits.length > 0 &&
+        currentBits[i] !== undefined &&
+        currentBits[i] === skippedBit
       return isMatching === true
     })
     .every(isTrue)
@@ -76,7 +78,7 @@ export const isMatchingPaths = (
 export const getMasterName = (
   currentPathname: string,
   targets: LoadTarget[]
-) => {
+): string => {
   var masterName = removeLeadingAndTrailingSlashes(currentPathname)
   masterName = masterName.replace("/", "_")
 
@@ -90,7 +92,7 @@ export const getMasterName = (
 export const createCancellableMethod = (
   delay: number,
   callback: () => void
-) => {
+): ({ canceller: () => void, method: () => void }) => {
   var isCancelled = false
 
   const method = debounce(() => {
@@ -101,7 +103,7 @@ export const createCancellableMethod = (
     callback()
   }, delay)
 
-  const canceller = () => {
+  const canceller = (): void => {
     isCancelled = true
   }
 

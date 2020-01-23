@@ -1,6 +1,8 @@
-import React, { ReactElement, ReactNode } from "react"
-import PropTypes from "prop-types"
+import React, { ReactNode } from "react"
+//import PropTypes from "prop-types"
 import { debounce, isEqual, isFunction } from "underscore"
+
+import { RenderControllerProps, RenderControllerState } from ".."
 
 import { checkForFirstLoad } from "./utils/counting"
 import { createCancellableMethod } from "./utils/general"
@@ -8,73 +10,34 @@ import { checkTargetsLoaded, startLoading } from "./utils/loading"
 import { addMounted, hasBeenMounted, removeMounted } from "./utils/mounted"
 import { hasControllerBeenSeen, removeControllerSeen } from "./utils/seen"
 import { startUnloading } from "./utils/unloading"
-
-import { Props, State } from ".."
-import { resetAttempted } from "src/utils/attempted"
+//import { resetAttempted } from "src/utils/attempted"
 
 const defaultContext = {
-  onRenderFirst: () => <></>,
-  onRenderWithout: () => <></>,
+  onRenderFirst: (): ReactNode => <></>,
+  onRenderWithout: (): ReactNode => <></>,
 }
 
 export const Context = React.createContext(defaultContext)
 
-const targetShape = PropTypes.shape({
-  controllerName: PropTypes.string.isRequired,
-  data: PropTypes.oneOfType([PropTypes.array, PropTypes.object]),
-  empty: PropTypes.oneOfType([PropTypes.array, PropTypes.object]),
-  cached: PropTypes.bool.isRequired,
-  //expiration: PropTypes.number.isRequired,
-  setter: PropTypes.func.isRequired,
-  getter: PropTypes.func.isRequired,
-})
-
-const skippedPathnameShape = PropTypes.shape({
-  from: PropTypes.string.isRequired,
-  to: PropTypes.string.isRequired,
-  reverse: PropTypes.bool,
-})
-
-interface DefaultProps {
-  children: null;
-  skippedPathnames: [];
-  renderFirst?: () => void;
-  renderWith?: () => void;
-  renderWithout?: () => void;
-}
-
-const defaultProps: DefaultProps = {
-  children: null,
-  skippedPathnames: [],
-  renderFirst: undefined,
-  renderWith: undefined,
-  renderWithout: undefined,
-}
-
-type PropsWithDefaults = Props & DefaultProps
-
 export class RenderController extends React.Component<
-  PropsWithDefaults,
-  State
+  RenderControllerProps,
+  RenderControllerState
 > {
-  static propTypes = {
-    children: PropTypes.oneOfType([
-      PropTypes.arrayOf(PropTypes.node),
-      PropTypes.node,
-    ]),
-    targets: PropTypes.arrayOf(targetShape).isRequired,
-    renderFirst: PropTypes.func,
-    renderWith: PropTypes.func,
-    renderWithout: PropTypes.func,
-    lastPathname: PropTypes.string.isRequired,
-    currentPathname: PropTypes.string.isRequired,
-    skippedPathnames: PropTypes.arrayOf(skippedPathnameShape),
-    controllerName: PropTypes.string.isRequired,
-  }
+  // Control our setState method with a variable to prevent memroy leaking
+  // from our debounced methods running after the components are removed.
+  _isMounted = false
 
-  static defaultProps = defaultProps
+  // Store a set of canceller functions to run when our debounced load
+  // functions should not continue due to unmounting, etc.
+  cancellers: (() => void)[] = []
 
-  constructor(props: PropsWithDefaults) {
+  setControllerSeen: null | (() => void) = null
+
+  cancelUnsetControllerSeen: null | (() => void) = null
+
+  unsetControllerSeen: null | (() => void) = null
+
+  constructor(props: RenderControllerProps) {
     super(props)
 
     const { controllerName, targets } = props
@@ -84,7 +47,7 @@ export class RenderController extends React.Component<
     const failDelay = Math.max(1100, Math.min(4400, targets.length * 1100))
 
     const realSetState = this.setState.bind(this)
-    this.setState = (...args) => {
+    this.setState = (...args): void => {
       if (this._isMounted === false) {
         return
       }
@@ -154,27 +117,29 @@ export class RenderController extends React.Component<
       targets,
       setCanceller: this.setCanceller,
       setControllerSeen: () => {
-        if (this.setControllerSeen) {
-          this.setControllerSeen()
+        const f = this.setControllerSeen
+        if (f !== null && isFunction(f) === true) {
+          f()
         }
       },
-      currentPathname,
     })
 
     // Add this controller to the list of mounted controllers.
     addMounted(controllerName)
 
     // Cancel any previous calls to unsetControllerSeen for this controller.
-    if (this.cancelUnsetControllerSeen) {
-      this.cancelUnsetControllerSeen()
+    const f = this.cancelUnsetControllerSeen
+    if (f !== null && isFunction(f) === true) {
+      f()
     }
   }
 
-  componentDidUpdate(prevProps: Props): void {
+  componentDidUpdate(prevProps: RenderControllerProps): void {
     const { targets } = this.props
 
-    if (this.setControllerSeen) {
-      this.setControllerSeen()
+    const f = this.setControllerSeen
+    if (f !== null && isFunction(f)) {
+      f()
     }
 
     // If we have pending loads, and then we navigate away from that controller
@@ -201,30 +166,19 @@ export class RenderController extends React.Component<
 
     // Remove this controllers name from the seen controllers list to allow for
     // renderFirst() methods to work again.
-    if (this.unsetControllerSeen) {
-      this.unsetControllerSeen()
+    const f = this.unsetControllerSeen
+    if (f !== null && isFunction(f)) {
+      f()
     }
   }
 
-  // Control our setState method with a variable to prevent memroy leaking
-  // from our debounced methods running after the components are removed.
-  _isMounted = false
-
-  // Store a set of canceller functions to run when our debounced load
-  // functions should not continue due to unmounting, etc.
-  cancellers: (() => void)[] = []
-
-  setControllerSeen: null | (() => void) = null
-
-  cancelUnsetControllerSeen: null | (() => void) = null
-
-  unsetControllerSeen: null | (() => void) = null
-
-  setCanceller = (controllerName: string, fn: () => void): void => {
-    this.cancellers.push(fn)
+  setCanceller = (f?: () => void): void => {
+    if (f !== undefined && isFunction(f)) {
+      this.cancellers.push(f)
+    }
   }
 
-  runCancellers = () => {
+  runCancellers = (): void => {
     this.cancellers.forEach((f: () => void) => {
       if (isFunction(f)) {
         f()
@@ -232,46 +186,50 @@ export class RenderController extends React.Component<
     })
   }
 
-  render(): ReactElement | ReactNode {
-    const {
-      controllerName,
-      targets,
-      children,
-      renderWithout,
-      renderWith,
-      renderFirst,
-    } = this.props
+  handleRenderFirst = (onRenderFirst: () => ReactNode): ReactNode => {
+    const { renderFirst } = this.props
 
+    if (isFunction(renderFirst)) {
+      return renderFirst()
+    }
+    return onRenderFirst()
+  }
+
+  handleRenderWithout = (onRenderWithout: () => ReactNode): ReactNode => {
+    const { renderWithout } = this.props
+
+    if (isFunction(renderWithout)) {
+      return renderWithout()
+    }
+    return onRenderWithout()
+  }
+
+  handleRenderWith = (): ReactNode => {
+    const { renderWith, children } = this.props
+    if (isFunction(renderWith)) {
+      return renderWith()
+    }
+    return children
+  }
+
+  render(): ReactNode {
+    const { controllerName, targets } = this.props
     const { isControllerSeen } = this.state
 
     if (checkTargetsLoaded(targets) === true) {
-      if (isFunction(renderWith)) {
-        return renderWith()
-      }
-      return children
+      return this.handleRenderWith()
     }
 
     return (
       <Context.Consumer>
-        {({ onRenderFirst, onRenderWithout }): ReactNode | ReactElement => {
-          // If the controller is already seen, use renderWithout since the data
-          // is empty and a load was attempted, but failed to produce non-empty
-          // data.
-          if (isControllerSeen === true) {
-            if (isFunction(renderWithout)) {
-              return renderWithout()
-            }
-            return onRenderWithout()
+        {({ onRenderFirst, onRenderWithout }): ReactNode => {
+          if (
+            checkForFirstLoad(controllerName, targets) === true &&
+            isControllerSeen === false
+          ) {
+            return this.handleRenderFirst(onRenderFirst)
           }
-
-          // Otherwise, use renderFirst() to generate the output, until the data
-          // is finally loaded and changed to non-empty.
-          if (checkForFirstLoad(controllerName, targets) === true) {
-            if (isFunction(renderFirst)) {
-              return renderFirst()
-            }
-            return onRenderFirst()
-          }
+          return this.handleRenderWithout(onRenderWithout)
         }}
       </Context.Consumer>
     )

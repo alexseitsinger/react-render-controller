@@ -6,14 +6,20 @@ interface Attempted {
 
 const attempted: Attempted = {}
 
-export const setAttempted = (controllerName: string, targetName: string) => {
+export const setAttempted = (
+  controllerName: string,
+  targetName: string
+): void => {
   if (!(controllerName in attempted)) {
     attempted[controllerName] = []
   }
   attempted[controllerName] = [...attempted[controllerName], targetName]
 }
 
-export const areAttempted = (controllerName: string, targets: LoadTarget[]) => {
+export const areAttempted = (
+  controllerName: string,
+  targets: LoadTarget[]
+): boolean => {
   if (!(controllerName in attempted)) {
     attempted[controllerName] = []
   }
@@ -21,6 +27,6 @@ export const areAttempted = (controllerName: string, targets: LoadTarget[]) => {
   return names.length === targets.length
 }
 
-export const resetAttempted = (controllerName: string) => {
+export const resetAttempted = (controllerName: string): void => {
   attempted[controllerName] = []
 }

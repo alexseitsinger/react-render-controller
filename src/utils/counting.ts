@@ -1,6 +1,6 @@
-import { getFullName } from "./general"
-
 import { LoadTarget } from "../.."
+
+import { getFullName } from "./general"
 
 interface LoadCounts {
   [key: string]: number;

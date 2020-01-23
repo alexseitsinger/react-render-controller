@@ -1,9 +1,9 @@
-import { isEmpty } from "underscore"
-
-import { getFullName } from "./general"
-import { resetAttempted, areAttempted, setAttempted } from "./attempted"
+import { isEmpty, isString } from "underscore"
 
 import { LoadTarget } from "../.."
+
+import { areAttempted, resetAttempted, setAttempted } from "./attempted"
+import { getFullName } from "./general"
 
 interface Loaders {
   [key: string]: () => void;
@@ -11,32 +11,27 @@ interface Loaders {
 
 const loaders: Loaders = {}
 
-interface TargetData {
-  [key: string]: any;
-}
-
 const targetHasData = (target: LoadTarget): boolean => {
-  const targetData: TargetData = {}
   const { data } = target
-
-  Object.keys(data).forEach(key => {
-    if (target.excluded && target.excluded.includes(key)) {
-      return
-    }
-    targetData[key] = data[key]
-  })
-
-  return isEmpty(targetData) === false
+  return Object.keys(data)
+    .map(key => {
+      if (isString(data[key])) {
+        return data[key].length > 0
+      }
+      return isEmpty(data[key]) === false
+    })
+    .every((r: boolean) => r === true)
 }
 
-export const checkTargetsLoaded = (targets: LoadTarget[]) =>
+export const checkTargetsLoaded = (targets: LoadTarget[]): boolean =>
   targets.map(targetHasData).every(b => b === true)
 
-const clearLoaders = () => {
+const clearLoaders = (): void => {
   const keys = Object.keys(loaders)
-  while (keys.length) {
-    const k = keys.shift()
-    if (k) {
+  let k
+  while (keys.length > 0) {
+    k = keys.shift()
+    if (k !== undefined) {
       delete loaders[k]
     }
   }
@@ -46,14 +41,14 @@ const addLoader = (
   targetName: string,
   handler: () => void,
   callback: () => void
-) => {
+): (() => void) | undefined => {
   var isLoadCancelled = false
 
   if (targetName in loaders) {
     return
   }
 
-  loaders[targetName] = () => {
+  loaders[targetName] = (): void => {
     delete loaders[targetName]
     if (isLoadCancelled === true) {
       return
@@ -62,27 +57,25 @@ const addLoader = (
     callback()
   }
 
-  return () => {
+  return (): void => {
     isLoadCancelled = true
   }
 }
 
-const startRunningLoaders = () => {
+const startRunningLoaders = (): void => {
   const keys = Object.keys(loaders)
-  while (keys.length) {
+  while (keys.length > 0) {
     const key = keys.shift()
-    if (key) {
+    if (key !== undefined) {
       loaders[key]()
     }
   }
 }
 
-const loadTarget = (controllerName: string, target: LoadTarget) => {
-  //const fullName = getFullName(controllerName, target.name)
-
+const loadTarget = (target: LoadTarget): void => {
   if (targetHasData(target) === true) {
-    if (target.forced && target.forced === true) {
-      if (!target.attempted) {
+    if (target.forced !== undefined && target.forced === true) {
+      if (target.attempted !== undefined) {
         target.attempted = true
         target.getter()
         return
@@ -118,9 +111,8 @@ const loadTarget = (controllerName: string, target: LoadTarget) => {
 interface StartLoadingArgs {
   controllerName: string;
   targets: LoadTarget[];
-  setCanceller: (name: string, f?: () => void) => void;
+  setCanceller: (f: () => void) => void;
   setControllerSeen: () => void;
-  currentPathname: string;
 }
 
 export const startLoading = ({
@@ -128,15 +120,15 @@ export const startLoading = ({
   targets,
   setCanceller,
   setControllerSeen,
-  currentPathname,
-}: StartLoadingArgs) => {
+}: StartLoadingArgs): void => {
   clearLoaders()
 
-  const prepareTarget = (target: LoadTarget) => {
+  const prepareTarget = (target: LoadTarget): void => {
     const fullName = getFullName(controllerName, target.name)
-    const loadHandler = () => loadTarget(controllerName, target)
-    const loadHandlerCallback = () => {
-      setCanceller(fullName, undefined)
+    const loadHandler = (): void => {
+      loadTarget(target)
+    }
+    const loadHandlerCallback = (): void => {
       setAttempted(controllerName, target.name)
       const result = areAttempted(controllerName, targets)
       if (result) {
@@ -145,16 +137,18 @@ export const startLoading = ({
       }
     }
     const canceller = addLoader(fullName, loadHandler, loadHandlerCallback)
-    setCanceller(fullName, canceller)
+    if (canceller !== undefined) {
+      setCanceller(canceller)
+    }
   }
 
   /**
    * Start adding each target loader to the list.
    */
   const arr = [...targets]
-  while (arr.length) {
+  while (arr.length > 0) {
     const target = arr.shift()
-    if (target) {
+    if (target !== undefined) {
       prepareTarget(target)
     }
   }

@@ -1,13 +1,13 @@
 import { isArray, isFunction, isObject } from "underscore"
 
+import { LoadTarget, SkippedPathname } from "../.."
+
 import { resetLoadCount } from "./counting"
 import {
   getFullName,
   isMatchingPaths,
   prepareSkippedPathnames,
 } from "./general"
-
-import { LoadTarget, SkippedPathname } from "../.."
 
 const pathnames = {
   last: "/",
@@ -51,12 +51,12 @@ const addUnloader = (
   skippedPathnames: SkippedPathname[],
   handler: () => void,
   targetName: string
-) => {
+): void => {
   if (targetName in unloaders) {
     return
   }
 
-  unloaders[targetName] = (from: string, to: string) => {
+  unloaders[targetName] = (from: string, to: string): void => {
     const should = shouldUnload(from, to, skippedPathnames)
     if (should) {
       handler()
@@ -66,7 +66,7 @@ const addUnloader = (
   }
 }
 
-const runUnloaders = (from: string, to: string) => {
+const runUnloaders = (from: string, to: string): void => {
   // If we use multiple renderControllers on the same page, each one will invoke
   // the others unloaders unless we have this call to prevent unnecessary
   // repeated loading/unloading.
@@ -75,9 +75,9 @@ const runUnloaders = (from: string, to: string) => {
   }
 
   const keys = Object.keys(unloaders)
-  while (keys.length) {
+  while (keys.length > 0) {
     const k = keys.shift()
-    if (k) {
+    if (k !== undefined) {
       unloaders[k](from, to)
     }
   }
@@ -94,12 +94,12 @@ export const startUnloading = (
   lastPathname: string,
   currentPathname: string,
   skippedPathnames: SkippedPathname[]
-) => {
+): void => {
   runUnloaders(lastPathname, currentPathname)
 
-  const prepareTarget = (target: LoadTarget) => {
+  const prepareTarget = (target: LoadTarget): void => {
     const fullControllerName = getFullName(controllerName, target.name)
-    const handler = () => {
+    const handler = (): void => {
       if (
         isFunction(target.setter) &&
         (isObject(target.empty) || isArray(target.empty))
