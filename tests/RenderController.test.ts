@@ -1,8 +1,9 @@
-//import { RenderController } from "src"
 import waitForExpect from "wait-for-expect"
 
 import { FailedRender, FirstRender, SuccessfulRender } from "./setup/components"
 import setup from "./setup"
+
+jest.setTimeout(20000)
 
 // test:
 // 1) data is unloaded on when navigated away, then data is re-loaded when
@@ -10,52 +11,23 @@ import setup from "./setup"
 // 2) doesnt use cached data if the cached is empty.
 
 describe("RenderController", () => {
-  it("should load data, then after success, use renderWith", async () => {
-    const { wrapper } = setup()
+  it.only("should load data, then after success, use renderWith", async () => {
+    const { wrapper, store } = setup("/page-one")
 
-    // FirstRender wont show because the mounting process is too fast.
-    //expect(wrapper.find(FirstRender)).toHaveLength(1)
     await waitForExpect(() => {
       wrapper.update()
-
+      expect(store.getState().pageOne.data).toStrictEqual({ name: "one" })
       expect(wrapper.find(SuccessfulRender)).toHaveLength(1)
     })
   })
 
-  it("should attempt to load data, then after failure, use renderWithout", async () => {
-    const { wrapper } = setup("/page-b")
+  it.only("should attempt to load data, then after failure, use renderWithout", async () => {
+    const { wrapper, store } = setup("/page-two")
 
     expect(wrapper.find(FirstRender)).toHaveLength(1)
-
     await waitForExpect(() => {
       wrapper.update()
-
-      expect(wrapper.find(FailedRender)).toHaveLength(1)
-    })
-  })
-
-  it("should unload first then load data for each target", async () => {
-    const getOneDataMock = jest.fn()
-    const setOneDataMock = jest.fn()
-    const getTwoDataMock = jest.fn()
-    const setTwoDataMock = jest.fn()
-
-    const { wrapper } = setup("/page-c", {
-      getOneData: getOneDataMock,
-      setOneData: setOneDataMock,
-      getTwoData: getTwoDataMock,
-      setTwoData: setTwoDataMock,
-    })
-
-    expect(wrapper.find(FirstRender)).toHaveLength(1)
-
-    await waitForExpect(() => {
-      wrapper.update()
-
-      expect(getOneDataMock).toHaveBeenCalledTimes(1)
-      expect(setOneDataMock).toHaveBeenCalledTimes(1)
-      expect(getTwoDataMock).toHaveBeenCalledTimes(1)
-      expect(setTwoDataMock).toHaveBeenCalledTimes(1)
+      expect(store.getState().pageTwo.data).toStrictEqual({ name: "" })
       expect(wrapper.find(FailedRender)).toHaveLength(1)
     })
   })

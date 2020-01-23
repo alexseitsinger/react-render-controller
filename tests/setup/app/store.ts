@@ -1,4 +1,3 @@
-// @ts-ignore
 import { createLocationsMiddleware } from "@alexseitsinger/redux-locations"
 import {
   applyMiddleware,
@@ -12,10 +11,10 @@ import createRootReducer, { ReducerState } from "./reducer"
 
 export type StoreType = Store<ReducerState>
 
-export default (initialState = {}): StoreType => {
+export default (preloadedState = {}): StoreType => {
   const rootReducer = createRootReducer()
   const middleware = [thunk, createLocationsMiddleware()]
   const storeEnhancers = compose(applyMiddleware(...middleware))
-  const store = createReduxStore(rootReducer, initialState, storeEnhancers)
+  const store = createReduxStore(rootReducer, preloadedState, storeEnhancers)
   return store
 }

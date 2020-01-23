@@ -23,7 +23,7 @@ export const setData = (data: { name: string }): FirstAction => ({
 export const getData = (): ThunkAction => (dispatch: ThunkDispatch) => {
   dispatch(
     setData({
-      name: "one",
+      name: "",
     })
   )
 }

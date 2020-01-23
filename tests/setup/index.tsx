@@ -5,18 +5,18 @@ import { createMemoryHistory } from "history"
 import createStore from "./app/store"
 import App from "./app"
 
-export default (url = "/page-a", mockedMethods?: object) => {
-  const memoryHistory = createMemoryHistory({
+export default (url = "/page-one", mocked = {}) => {
+  const serverHistory = createMemoryHistory({
     initialEntries: [url],
     initialIndex: 0,
   })
-  const store = createStore(memoryHistory)
+  const store = createStore()
   const wrapper = mount(
-    <App memoryHistory={memoryHistory} store={store} mocked={mockedMethods} />
+    <App routerHistory={serverHistory} store={store} mockedMethods={mocked} />
   )
   return {
     wrapper,
     store,
-    memoryHistory,
+    serverHistory,
   }
 }

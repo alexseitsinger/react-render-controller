@@ -21,7 +21,7 @@ export type PageProps = PageStateProps &
     },
   }
 
-export default function PageOne({
+export default function PageTwo({
   data,
   getData,
   setData,
@@ -29,7 +29,7 @@ export default function PageOne({
 }: PageProps) {
   return (
     <RenderController
-      controllerName={"pageA"}
+      controllerName={"pageTwo"}
       targets={[
         {
           name: "data",
