@@ -1,4 +1,4 @@
-import { LoadTarget } from "types"
+import { LoadTarget } from "../types"
 
 interface Attempted {
   [key: string]: string[];

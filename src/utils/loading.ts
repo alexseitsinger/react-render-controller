@@ -1,13 +1,9 @@
 import { isEmpty, isString } from "underscore"
 
-import { LoadTarget } from "../.."
+import { Loaders, LoadTarget } from "../types"
 
 import { areAttempted, resetAttempted, setAttempted } from "./attempted"
 import { getFullName } from "./general"
-
-interface Loaders {
-  [key: string]: () => void;
-}
 
 const loaders: Loaders = {}
 
@@ -28,9 +24,8 @@ export const checkTargetsLoaded = (targets: LoadTarget[]): boolean =>
 
 const clearLoaders = (): void => {
   const keys = Object.keys(loaders)
-  let k
   while (keys.length > 0) {
-    k = keys.shift()
+    const k = keys.shift()
     if (k !== undefined) {
       delete loaders[k]
     }

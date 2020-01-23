@@ -1,6 +1,6 @@
 import { debounce } from "underscore"
 
-import { LoadTarget, SkippedPathname } from "../.."
+import { LoadTarget, SkippedPathname } from "../types"
 
 export const getFullName = (
   controllerName: string,

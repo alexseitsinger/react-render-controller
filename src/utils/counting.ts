@@ -1,4 +1,4 @@
-import { LoadTarget } from "../.."
+import { LoadTarget } from "../types"
 
 import { getFullName } from "./general"
 

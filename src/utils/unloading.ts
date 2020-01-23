@@ -1,6 +1,6 @@
 import { isArray, isFunction, isObject } from "underscore"
 
-import { LoadTarget, SkippedPathname } from "../.."
+import { LoadTarget, SkippedPathname } from "../types"
 
 import { resetLoadCount } from "./counting"
 import {

@@ -2,8 +2,7 @@ import React, { ReactNode } from "react"
 //import PropTypes from "prop-types"
 import { debounce, isEqual, isFunction } from "underscore"
 
-import { RenderControllerProps, RenderControllerState } from ".."
-
+import { LoadTarget, SkippedPathname } from "./types"
 import { checkForFirstLoad } from "./utils/counting"
 import { createCancellableMethod } from "./utils/general"
 import { checkTargetsLoaded, startLoading } from "./utils/loading"
@@ -18,6 +17,22 @@ const defaultContext = {
 }
 
 export const Context = React.createContext(defaultContext)
+
+export interface RenderControllerProps {
+  children?: React.ReactNode | React.ReactNode[];
+  targets: LoadTarget[];
+  renderFirst?: () => React.ReactElement;
+  renderWith?: () => React.ReactElement;
+  renderWithout?: () => React.ReactElement;
+  lastPathname: string;
+  currentPathname: string;
+  skippedPathnames: SkippedPathname[];
+  controllerName: string;
+}
+
+export interface RenderControllerState {
+  isControllerSeen: boolean;
+}
 
 export class RenderController extends React.Component<
   RenderControllerProps,
