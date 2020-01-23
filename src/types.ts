@@ -18,8 +18,8 @@ export interface Loaders {
 
 export interface LoadTarget {
   name: string;
-  data: object;
-  getter: (...args) => void;
+  data: { [key: string]: any };
+  getter: (...args: any[]) => void;
   setter: (o: {} | []) => void;
   empty: {} | [];
   excluded?: string[];
