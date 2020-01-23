@@ -2,14 +2,14 @@
 # yarn lockfile v1
 
 
-"@alexseitsinger/eslint-config@^2.7.0":
-  version "2.7.0"
-  resolved "https://registry.yarnpkg.com/@alexseitsinger/eslint-config/-/eslint-config-2.7.0.tgz#aa72efb3f5f46d3b79b2901d1a042c5471fc9c3f"
-  integrity sha512-0Q5pnxOKEGCwkmGS10Eg+5LW0JMyKgLjkIdxoCn1y/Wgc9BDeqbwy+JEe7QMod6vqZyoJKJQrUjXekf6gkW/iA==
+"@alexseitsinger/eslint-config@^2.8.0":
+  version "2.8.0"
+  resolved "https://registry.yarnpkg.com/@alexseitsinger/eslint-config/-/eslint-config-2.8.0.tgz#dfe3d8f31bd995f0f36c87fce4904e1d634db7f3"
+  integrity sha512-8V7WOvs+/RPdjYz9yuq/GsW9AWNOOFT3crRTdOXLR0Nfw6IlpINA7ErsGsXtQwOesdC6ZMopvn6I6B0OaRp1tg==
   dependencies:
     confusing-browser-globals "^1.0.7"
   optionalDependencies:
-    "@emotion/eslint-plugin" "*"
+    "@emotion/eslint-plugin" "^11.0.0-next.10"
     "@getify/eslint-plugin-proper-ternary" "^3"
     eslint-config-prettier "^6"
     eslint-import-resolver-jest "^3"
@@ -955,7 +955,7 @@
     exec-sh "^0.3.2"
     minimist "^1.2.0"
 
-"@emotion/eslint-plugin@*":
+"@emotion/eslint-plugin@^11.0.0-next.10":
   version "11.0.0-next.10"
   resolved "https://registry.yarnpkg.com/@emotion/eslint-plugin/-/eslint-plugin-11.0.0-next.10.tgz#0cb387c44d0ba9354c564c25bbafcabee2b29d2e"
   integrity sha512-5jr5Aw3ucv2aUopIJnGnwki30RooBGZzCB3M9vE8lAvFdC+HqJ35DE4Pmy35LI/r0W6sABh0pJNbTsA9bmEG4A==
