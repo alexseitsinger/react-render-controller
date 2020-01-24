@@ -10,18 +10,15 @@ yarn add @alexseitsinger/react-render-controller
 
 ## Props
 
-1. __controllerName__ - The name of the controller
-2. __targets__ - An array of objects with the Target shape (shown below).
-3. __lastPathname__ - The last pathname used by the router.
-4. __currentPathname__ - The current pathname used by the router.
-5. __skippedPathnames__ - An array of pathname objects used to determine when
-   unloading data should be skipped. (See shape below)
-6. __renderFirst__ - The function used to render output before data loading is
-attempted.
-7. __renderWith__ - The function used to render the output once the data has
-been loaded.
-8. __renderWithout__ - The function used to render the output when data loading
-failed to produce non-empty result.
+__Name__        | __Purpose__                                                                                 | __Required__ | __Default__
+---             | ---                                                                                         | ---          | ---
+controllerName  | The name of the controller                                                                  | Yes          | null
+targets         | An array of target objects                                                                  | Yes          | null
+lastPathname    | The last pathname used by the router                                                        | Yes          | null
+currentPathname | The current pathname used by the router                                                     | Yes          | null
+renderFirst     | The function used to render output before the data loading is attempted                     | No           | null
+renderWith      | The function used to render the output once the data has been loaded                        | No           | null
+renderWithout   | The function used to render the output when data loading failed to produce non-empty result | No           | null
 
 #### Shapes
 
