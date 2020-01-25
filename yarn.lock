@@ -2,10 +2,10 @@
 # yarn lockfile v1
 
 
-"@alexseitsinger/eslint-config@^2.9.0":
-  version "2.9.0"
-  resolved "https://registry.yarnpkg.com/@alexseitsinger/eslint-config/-/eslint-config-2.9.0.tgz#c9ae16fe334452eeddad75dbda0ee2fa3a30ae5c"
-  integrity sha512-E11PycdehfsQ1MTL+G5C2bSAcllL6LIevb6LdEXy2HWWEYt3nyDQEjBNo6q5IDbq7CQnr+98gMI+blNy3RBrrQ==
+"@alexseitsinger/eslint-config@^2.11.0":
+  version "2.11.0"
+  resolved "https://registry.yarnpkg.com/@alexseitsinger/eslint-config/-/eslint-config-2.11.0.tgz#fb4b8fb1dc12c25de4833791ce90fad3d8b88da0"
+  integrity sha512-qSKCHC/V1L18uNnNGDzRXbOznn0awI4BTPrLzm1YOsMMnF4BA5As8kmDaoccq8U7238s+Zgo4jaLmh6wNWdIAw==
   dependencies:
     confusing-browser-globals "^1.0.7"
   optionalDependencies:
@@ -20,7 +20,7 @@
     eslint-plugin-jest "*"
     eslint-plugin-jest-formatting "*"
     eslint-plugin-jsdoc "*"
-    eslint-plugin-markdown "^1"
+    eslint-plugin-markdown "^1.0.1"
     eslint-plugin-node "^10"
     eslint-plugin-react "*"
     eslint-plugin-react-hooks "*"
@@ -3236,7 +3236,7 @@ eslint-plugin-jsdoc@*:
     semver "^6.3.0"
     spdx-expression-parse "^3.0.0"
 
-eslint-plugin-markdown@^1:
+eslint-plugin-markdown@^1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/eslint-plugin-markdown/-/eslint-plugin-markdown-1.0.1.tgz#9705786310f84dad9cf800bea1eb5c4acafcc13a"
   integrity sha512-nAUURNHJGPooBMZMP23FmTbh3LTdgoSqeFBv9FA3fYrJ+vDUJxrp6nKiQF4iDNAmnWQnmnrDvV61BmIF4X9QAQ==
