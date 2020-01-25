@@ -24,8 +24,8 @@ module.exports = {
     },
   },
   plugins: [
-    "import",
     "node",
+    "import",
     "react",
     "jest",
     "jest-formatting",
@@ -33,14 +33,11 @@ module.exports = {
   ],
   extends: [
     "@alexseitsinger/eslint-config/eslint",
-    "@alexseitsinger/eslint-config/import",
     "@alexseitsinger/eslint-config/node",
+    "@alexseitsinger/eslint-config/import",
     "@alexseitsinger/eslint-config/react",
     "@alexseitsinger/eslint-config/jest",
     "@alexseitsinger/eslint-config/jest-formatting",
     "@alexseitsinger/eslint-config/typescript-eslint",
-    "prettier",
-    "prettier/react",
-    "prettier/@typescript-eslint",
   ],
 }
