@@ -82,11 +82,9 @@ function App({
       renderFirst={() => <LoadingScreen />}
       renderWith={() => (
         <div>
-          {Object.keys(dates).map(key => {
-            return (
-                  <div>{key}</div>
-            )
-          })}
+          {Object.keys(dates).map(key => (
+            <div key={"fdsfsd"}>{key}</div>
+          ))}
         </div>
       )}
       renderWithout={() => <FailedScreen />}
