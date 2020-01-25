@@ -1,3 +1,7 @@
+<a name="v7.3.1"></a>
+## [v7.3.1](https://github.com/alexseitsinger/react-render-controller/compare/v7.3.0...v7.3.1) (2020-01-25)
+
+
 <a name="v7.3.0"></a>
 ## [v7.3.0](https://github.com/alexseitsinger/react-render-controller/compare/v7.2.0...v7.3.0) (2020-01-23)
 
