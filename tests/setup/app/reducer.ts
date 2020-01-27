@@ -18,7 +18,22 @@ import objectWithNonEmptyStringPageReducer, {
   ReducerState as ObjectWithNonEmptyStringPageReducerState,
 } from "./pages/object-with-non-empty-string/reducer"
 
+import objectWithMixedStringsPageReducer, {
+  ReducerState as ObjectWithMixedStringsPageReducerState,
+} from "./pages/object-with-mixed-strings/reducer"
+
+import arrayWithMixedStringsPageReducer, {
+  ReducerState as ArrayWithMixedStringsPageReducerState,
+} from "./pages/array-with-mixed-strings/reducer"
+
+import arrayWithMultipleEmptyStringsPageReducer, {
+  ReducerState as ArrayWithMultipleEmptyStringsReducerState,
+} from "./pages/array-with-multiple-empty-strings/reducer"
+
 export interface ReducerState {
+  arrayWithMultipleEmptyStringsPage: ArrayWithMultipleEmptyStringsReducerState;
+  arrayWithMixedStringsPage: ArrayWithMixedStringsPageReducerState;
+  objectWithMixedStringsPage: ObjectWithMixedStringsPageReducerState;
   objectWithEmptyStringPage: ObjectWithEmptyStringReducerState;
   emptyArrayPage: EmptyArrayPageReducerState;
   nonEmptyArrayPage: NonEmptyArrayPageReducerState;
@@ -28,6 +43,9 @@ export interface ReducerState {
 
 export default () =>
   combineReducers({
+    arrayWithMultipleEmptyStringsPage: arrayWithMultipleEmptyStringsPageReducer,
+    arrayWithMixedStringsPage: arrayWithMixedStringsPageReducer,
+    objectWithMixedStringsPage: objectWithMixedStringsPageReducer,
     objectWithEmptyStringPage: objectWithEmptyStringPageReducer,
     emptyArrayPage: emptyArrayPageReducer,
     nonEmptyArrayPage: nonEmptyArrayPageReducer,

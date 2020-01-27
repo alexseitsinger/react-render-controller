@@ -3,10 +3,13 @@ import { Provider } from "react-redux"
 import { Route, Router } from "react-router"
 import { MemoryHistory } from "history"
 
+import ArrayWithMultipleEmptyStringsPage from "./pages/array-with-multiple-empty-strings"
+import ArrayWithMixedStringsPage from "./pages/array-with-mixed-strings"
 import EmptyArrayPage from "./pages/empty-array"
 import NonEmptyArrayPage from "./pages/non-empty-array"
 import ObjectWithNonEmptyStringPage from "./pages/object-with-non-empty-string"
 import ObjectWithEmptyStringPage from "./pages/object-with-empty-string"
+import ObjectWithMixedStringsPage from "./pages/object-with-mixed-strings"
 import { StoreType } from "./store"
 import { RenderControllerProvider } from "src"
 import { FirstRender, FailedRender } from "../components"
@@ -28,6 +31,26 @@ export default ({ store, routerHistory, mockedMethods }: Props) => (
   <RenderControllerProvider context={renderControllerContext}>
     <Provider store={store}>
       <Router history={routerHistory}>
+        <Route
+          path={"/array-with-mixed-strings"}
+          exact
+          render={routeProps => (
+            <ArrayWithMixedStringsPage
+              {...routeProps}
+              mockedMethods={mockedMethods}
+            />
+          )}
+        />
+        <Route
+          path={"/array-with-multiple-empty-strings"}
+          exact
+          render={routeProps => (
+            <ArrayWithMultipleEmptyStringsPage
+              {...routeProps}
+              mockedMethods={mockedMethods}
+            />
+          )}
+        />
         <Route
           path={"/empty-array"}
           exact
@@ -57,6 +80,16 @@ export default ({ store, routerHistory, mockedMethods }: Props) => (
           exact
           render={routeProps => (
             <ObjectWithEmptyStringPage
+              {...routeProps}
+              mockedMethods={mockedMethods}
+            />
+          )}
+        />
+        <Route
+          path={"/object-with-mixed-strings"}
+          exact
+          render={routeProps => (
+            <ObjectWithMixedStringsPage
               {...routeProps}
               mockedMethods={mockedMethods}
             />

@@ -1,6 +1,6 @@
 import waitForExpect from "wait-for-expect"
 
-import { FailedRender, FirstRender, SuccessfulRender } from "./setup/components"
+import { FirstRender, FailedRender, SuccessfulRender } from "./setup/components"
 import setup from "./setup"
 
 jest.setTimeout(20000)
@@ -11,20 +11,47 @@ jest.setTimeout(20000)
 // 2) doesnt use cached data if the cached is empty.
 
 describe("RenderController", () => {
-  it("should use renderWith for an object with an empty string", async () => {
+  it("should use renderWithout after getData returns an object with only empty strings", async () => {
     const { wrapper, store } = setup("/object-with-empty-string")
 
-    //expect(wrapper.find(FirstRender)).toHaveLength(1)
+    expect(wrapper.find(FirstRender)).toHaveLength(1)
     await waitForExpect(() => {
       wrapper.update()
       expect(store.getState().objectWithEmptyStringPage.data).toStrictEqual({
         name: "",
       })
+      expect(wrapper.find(FailedRender)).toHaveLength(1)
+    })
+  })
+
+  it("should use RenderWithout after getData returns an array multiple empty strings.", async () => {
+    const { wrapper, store } = setup("/array-with-multiple-empty-strings")
+
+    expect(wrapper.find(FirstRender)).toHaveLength(1)
+    await waitForExpect(() => {
+      wrapper.update()
+      expect(
+        store.getState().arrayWithMultipleEmptyStringsPage.data
+      ).toStrictEqual(["", ""])
+      expect(wrapper.find(FailedRender)).toHaveLength(1)
+    })
+  })
+
+  it("should use RenderWith after getData returns an array with mixed strings.", async () => {
+    const { wrapper, store } = setup("/array-with-mixed-strings")
+
+    expect(wrapper.find(FirstRender)).toHaveLength(1)
+    await waitForExpect(() => {
+      wrapper.update()
+      expect(store.getState().arrayWithMixedStringsPage.data).toStrictEqual([
+        "Alex",
+        "",
+      ])
       expect(wrapper.find(SuccessfulRender)).toHaveLength(1)
     })
   })
 
-  it("should use RenderWithout for an empty array.", async () => {
+  it("should use RenderWithout after getData returns an empty array.", async () => {
     const { wrapper, store } = setup("/empty-array")
 
     expect(wrapper.find(FirstRender)).toHaveLength(1)
@@ -35,7 +62,7 @@ describe("RenderController", () => {
     })
   })
 
-  it("should use RenderWith for a non-empty array.", async () => {
+  it("should use RenderWith after getData returns a non-empty array.", async () => {
     const { wrapper, store } = setup("/non-empty-array")
 
     expect(wrapper.find(FirstRender)).toHaveLength(1)
@@ -46,7 +73,7 @@ describe("RenderController", () => {
     })
   })
 
-  it("should use RenderWith for an object with a non-empty string.", async () => {
+  it("should use RenderWith after getData returns an object with a non-empty string.", async () => {
     const { wrapper, store } = setup("/object-with-non-empty-string")
 
     expect(wrapper.find(FirstRender)).toHaveLength(1)
@@ -54,6 +81,20 @@ describe("RenderController", () => {
       wrapper.update()
       expect(store.getState().objectWithNonEmptyStringPage.data).toStrictEqual({
         name: "Alex",
+      })
+      expect(wrapper.find(SuccessfulRender)).toHaveLength(1)
+    })
+  })
+
+  it("should use RenderWith after getData returns an object with mixed strings.", async () => {
+    const { wrapper, store } = setup("/object-with-mixed-strings")
+
+    //expect(wrapper.find(FirstRender)).toHaveLength(1)
+    await waitForExpect(() => {
+      wrapper.update()
+      expect(store.getState().objectWithMixedStringsPage.data).toStrictEqual({
+        firstName: "Alex",
+        lastName: "",
       })
       expect(wrapper.find(SuccessfulRender)).toHaveLength(1)
     })
