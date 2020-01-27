@@ -1,4 +1,4 @@
-import { isEmpty } from "underscore"
+import { isArray, isEmpty, isObject, isString } from "underscore"
 
 import { Loaders, LoadTarget } from "../types"
 
@@ -7,10 +7,42 @@ import { getFullName } from "./general"
 
 const loaders: Loaders = {}
 
-const targetHasData = (target: LoadTarget): boolean => {
-  const { data } = target
-  return isEmpty(data) === false
+const hasValue = (o?: any): boolean => {
+  if (o === undefined || o === null) {
+    return false
+  }
+  if (isString(o) === true) {
+    return o.length > 0
+  }
+  if (isArray(o) === true) {
+    if (o.length === 0) {
+      return false
+    }
+    const results = o.map((e: any): boolean => hasValue(e))
+    const includes = results.includes(true)
+    const every = results.every((r: boolean): boolean => r === true)
+    if (includes === true || every === true) {
+      return true
+    }
+    return false
+  }
+  if (isObject(o) === true) {
+    const keys = Object.keys(o)
+    if (keys.length === 0) {
+      return false
+    }
+    const results = keys.map((k: any): boolean => hasValue(o[k]))
+    const includes = results.includes(true)
+    const every = results.every((r: boolean): boolean => r === true)
+    if (includes === true || every === true) {
+      return true
+    }
+    return false
+  }
+  return isEmpty(o) === false
 }
+
+const targetHasData = (target: LoadTarget): boolean => hasValue(target.data)
 
 export const checkTargetsLoaded = (targets: LoadTarget[]): boolean =>
   targets.map(targetHasData).every(b => b === true)
