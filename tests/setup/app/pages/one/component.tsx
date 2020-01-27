@@ -5,11 +5,7 @@ import { RenderController } from "src"
 import { PageDispatchProps } from "./mapDispatchToProps"
 import { PageStateProps } from "./mapStateToProps"
 
-import {
-  FailedRender,
-  FirstRender,
-  SuccessfulRender,
-} from "tests/setup/components"
+import { SuccessfulRender } from "tests/setup/components"
 import { SkippedPathname } from "src/types"
 
 const skipped: SkippedPathname[] = []
@@ -48,8 +44,6 @@ export default function PageOne({
       lastPathname={last.pathname}
       skippedPathnames={skipped}
       renderWith={() => <SuccessfulRender />}
-      renderWithout={() => <FailedRender />}
-      renderFirst={() => <FirstRender />}
     />
   )
 }
