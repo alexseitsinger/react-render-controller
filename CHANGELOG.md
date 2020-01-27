@@ -1,3 +1,10 @@
+<a name="v7.3.4"></a>
+## [v7.3.4](https://github.com/alexseitsinger/react-render-controller/compare/v7.3.3...v7.3.4) (2020-01-27)
+
+### Bug Fixes
+- Updates data check. ([b3aa19e](https://github.com/alexseitsinger/react-render-controller/commit/b3aa19e32efc7c61277f6baae04df43df994e082))
+
+
 <a name="v7.3.3"></a>
 ## [v7.3.3](https://github.com/alexseitsinger/react-render-controller/compare/v7.3.2...v7.3.3) (2020-01-27)
 
