@@ -1,4 +1,4 @@
-import { isEmpty, isString } from "underscore"
+import { isEmpty } from "underscore"
 
 import { Loaders, LoadTarget } from "../types"
 
@@ -9,17 +9,11 @@ const loaders: Loaders = {}
 
 const targetHasData = (target: LoadTarget): boolean => {
   const { data } = target
-  return Object.keys(data)
-    .map(key => {
-      if (isString(data[key])) {
-        return data[key].length > 0
-      }
-      return isEmpty(data[key]) === false
-    })
-    .every((r: boolean) => r === true)
+  return isEmpty(data) === false
 }
 
-export const checkTargetsLoaded = (targets: LoadTarget[]): boolean => targets.map(targetHasData).every(b => b === true)
+export const checkTargetsLoaded = (targets: LoadTarget[]): boolean =>
+  targets.map(targetHasData).every(b => b === true)
 
 const clearLoaders = (): void => {
   const keys = Object.keys(loaders)
@@ -35,8 +29,7 @@ const addLoader = (
   targetName: string,
   handler: () => void,
   callback: () => void
-): (() => void
-  ) | undefined => {
+): (() => void) | undefined => {
   var isLoadCancelled = false
 
   if (targetName in loaders) {
