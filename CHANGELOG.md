@@ -1,3 +1,10 @@
+<a name="v7.3.2"></a>
+## [v7.3.2](https://github.com/alexseitsinger/react-render-controller/compare/v7.3.1...v7.3.2) (2020-01-27)
+
+### Bug Fixes
+- Fixes context provider. ([d88f3e0](https://github.com/alexseitsinger/react-render-controller/commit/d88f3e0556e93a77178671bb09030e2dd9d0d5c2))
+
+
 <a name="v7.3.1"></a>
 ## [v7.3.1](https://github.com/alexseitsinger/react-render-controller/compare/v7.3.0...v7.3.1) (2020-01-25)
 
