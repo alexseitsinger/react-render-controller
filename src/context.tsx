@@ -1,8 +1,8 @@
 import React, { ReactElement, ReactNode } from "react"
 
 export interface ContextProps {
-  onRenderFirst?: () => ReactNode;
-  onRenderWithout?: () => ReactNode;
+  onRenderFirst?: () => ReactElement;
+  onRenderWithout?: () => ReactElement;
 }
 
 const defaultContext: ContextProps = {
