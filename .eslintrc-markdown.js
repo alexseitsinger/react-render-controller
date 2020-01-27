@@ -10,5 +10,7 @@ module.exports = {
     "@alexseitsinger/eslint-config/react",
     "@alexseitsinger/eslint-config/import",
     "@alexseitsinger/eslint-config/markdown",
+    "prettier",
+    "prettier/react",
   ],
 }

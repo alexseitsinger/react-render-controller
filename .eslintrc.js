@@ -33,6 +33,7 @@ module.exports = {
     "@alexseitsinger/eslint-config/jest",
     "@alexseitsinger/eslint-config/jest-formatting",
     "prettier",
+    "prettier/babel",
     "prettier/react",
   ],
   overrides: [
