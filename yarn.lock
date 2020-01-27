@@ -2,10 +2,10 @@
 # yarn lockfile v1
 
 
-"@alexseitsinger/eslint-config@^2.11.0":
-  version "2.11.0"
-  resolved "https://registry.yarnpkg.com/@alexseitsinger/eslint-config/-/eslint-config-2.11.0.tgz#fb4b8fb1dc12c25de4833791ce90fad3d8b88da0"
-  integrity sha512-qSKCHC/V1L18uNnNGDzRXbOznn0awI4BTPrLzm1YOsMMnF4BA5As8kmDaoccq8U7238s+Zgo4jaLmh6wNWdIAw==
+"@alexseitsinger/eslint-config@^2.12.0":
+  version "2.12.0"
+  resolved "https://registry.yarnpkg.com/@alexseitsinger/eslint-config/-/eslint-config-2.12.0.tgz#e9d587519fdda39605d165fabcd5348c3088b7c9"
+  integrity sha512-XQlgX/hl2z5kwg9bLISyiJ1wcHVd/WVQvnaBE2jYiGGryg3+KUsSjlaDJoyX5FOVQTLhNxv3dD2BsNqYsIpoTA==
   dependencies:
     confusing-browser-globals "^1.0.7"
   optionalDependencies:
