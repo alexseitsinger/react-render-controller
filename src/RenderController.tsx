@@ -1,7 +1,9 @@
-import React, { ReactNode } from "react"
+import React, { ReactElement, ReactNode } from "react"
 //import PropTypes from "prop-types"
 import { debounce, isEqual, isFunction } from "underscore"
 
+//import { resetAttempted } from "src/utils/attempted"
+import { Context, ContextProps } from "./context"
 import { LoadTarget, SkippedPathname } from "./types"
 import { checkForFirstLoad } from "./utils/counting"
 import { createCancellableMethod } from "./utils/general"
@@ -9,16 +11,8 @@ import { checkTargetsLoaded, startLoading } from "./utils/loading"
 import { addMounted, hasBeenMounted, removeMounted } from "./utils/mounted"
 import { hasControllerBeenSeen, removeControllerSeen } from "./utils/seen"
 import { startUnloading } from "./utils/unloading"
-//import { resetAttempted } from "src/utils/attempted"
 
-const defaultContext = {
-  onRenderFirst: (): ReactNode => <></>,
-  onRenderWithout: (): ReactNode => <></>,
-}
-
-export const Context = React.createContext(defaultContext)
-
-export interface RenderControllerProps {
+export interface RenderControllerWrapperProps {
   children?: React.ReactNode | React.ReactNode[];
   targets: LoadTarget[];
   renderFirst?: () => React.ReactElement;
@@ -29,6 +23,8 @@ export interface RenderControllerProps {
   skippedPathnames: SkippedPathname[];
   controllerName: string;
 }
+
+export type RenderControllerProps = RenderControllerWrapperProps & ContextProps
 
 export interface RenderControllerState {
   isControllerSeen: boolean;
@@ -201,25 +197,35 @@ export class RenderController extends React.Component<
     })
   }
 
-  handleRenderFirst = (onRenderFirst: () => ReactNode): ReactNode => {
-    const { renderFirst } = this.props
+  renderFirst = (): ReactNode | null => {
+    const { renderFirst, onRenderFirst } = this.props
 
     if (isFunction(renderFirst)) {
       return renderFirst()
     }
-    return onRenderFirst()
+
+    if (onRenderFirst !== undefined && isFunction(onRenderFirst)) {
+      return onRenderFirst()
+    }
+
+    return null
   }
 
-  handleRenderWithout = (onRenderWithout: () => ReactNode): ReactNode => {
-    const { renderWithout } = this.props
+  renderWithout = (): ReactNode | null => {
+    const { renderWithout, onRenderWithout } = this.props
 
     if (isFunction(renderWithout)) {
       return renderWithout()
     }
-    return onRenderWithout()
+
+    if (onRenderWithout !== undefined && isFunction(onRenderWithout)) {
+      return onRenderWithout()
+    }
+
+    return null
   }
 
-  handleRenderWith = (): ReactNode => {
+  renderWith = (): ReactNode => {
     const { renderWith, children } = this.props
     if (isFunction(renderWith)) {
       return renderWith()
@@ -227,26 +233,37 @@ export class RenderController extends React.Component<
     return children
   }
 
-  render(): ReactNode {
+  render(): ReactNode | null {
     const { controllerName, targets } = this.props
     const { isControllerSeen } = this.state
 
     if (checkTargetsLoaded(targets) === true) {
-      return this.handleRenderWith()
+      return this.renderWith()
     }
 
-    return (
-      <Context.Consumer>
-        {({ onRenderFirst, onRenderWithout }): ReactNode => {
-          if (
-            checkForFirstLoad(controllerName, targets) === true &&
-            isControllerSeen === false
-          ) {
-            return this.handleRenderFirst(onRenderFirst)
-          }
-          return this.handleRenderWithout(onRenderWithout)
-        }}
-      </Context.Consumer>
-    )
+    if (
+      checkForFirstLoad(controllerName, targets) === true &&
+      isControllerSeen === false
+    ) {
+      return this.renderFirst()
+    }
+
+    return this.renderWithout()
   }
+}
+
+export function RenderControllerWrapper(
+  props: RenderControllerWrapperProps
+): ReactElement {
+  return (
+    <Context.Consumer>
+      {({ onRenderFirst, onRenderWithout }): ReactNode => (
+        <RenderController
+          {...props}
+          onRenderFirst={onRenderFirst}
+          onRenderWithout={onRenderWithout}
+        />
+      )}
+    </Context.Consumer>
+  )
 }

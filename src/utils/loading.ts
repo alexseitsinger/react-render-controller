@@ -19,8 +19,7 @@ const targetHasData = (target: LoadTarget): boolean => {
     .every((r: boolean) => r === true)
 }
 
-export const checkTargetsLoaded = (targets: LoadTarget[]): boolean =>
-  targets.map(targetHasData).every(b => b === true)
+export const checkTargetsLoaded = (targets: LoadTarget[]): boolean => targets.map(targetHasData).every(b => b === true)
 
 const clearLoaders = (): void => {
   const keys = Object.keys(loaders)
@@ -36,7 +35,8 @@ const addLoader = (
   targetName: string,
   handler: () => void,
   callback: () => void
-): (() => void) | undefined => {
+): (() => void
+  ) | undefined => {
   var isLoadCancelled = false
 
   if (targetName in loaders) {

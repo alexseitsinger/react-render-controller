@@ -101,8 +101,8 @@ export const startUnloading = (
     const fullControllerName = getFullName(controllerName, target.name)
     const handler = (): void => {
       if (
-        isFunction(target.setter) &&
-        (isObject(target.empty) || isArray(target.empty))
+        isFunction(target.setter)
+        && (isObject(target.empty) || isArray(target.empty))
       ) {
         target.setter(target.empty)
         resetLoadCount(fullControllerName)
