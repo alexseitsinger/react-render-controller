@@ -11,24 +11,51 @@ jest.setTimeout(20000)
 // 2) doesnt use cached data if the cached is empty.
 
 describe("RenderController", () => {
-  it.only("should load data, then after success, use renderWith", async () => {
-    const { wrapper, store } = setup("/page-one")
+  it("should use renderWith for an object with an empty string", async () => {
+    const { wrapper, store } = setup("/object-with-empty-string")
 
+    //expect(wrapper.find(FirstRender)).toHaveLength(1)
     await waitForExpect(() => {
       wrapper.update()
-      expect(store.getState().pageOne.data).toStrictEqual({ name: "one" })
+      expect(store.getState().objectWithEmptyStringPage.data).toStrictEqual({
+        name: "",
+      })
       expect(wrapper.find(SuccessfulRender)).toHaveLength(1)
     })
   })
 
-  it.only("should attempt to load data, then after failure, use renderWithout", async () => {
-    const { wrapper, store } = setup("/page-two")
+  it("should use RenderWithout for an empty array.", async () => {
+    const { wrapper, store } = setup("/empty-array")
 
     expect(wrapper.find(FirstRender)).toHaveLength(1)
     await waitForExpect(() => {
       wrapper.update()
-      expect(store.getState().pageTwo.data).toStrictEqual({ name: "" })
+      expect(store.getState().emptyArrayPage.data).toStrictEqual([])
       expect(wrapper.find(FailedRender)).toHaveLength(1)
+    })
+  })
+
+  it("should use RenderWith for a non-empty array.", async () => {
+    const { wrapper, store } = setup("/non-empty-array")
+
+    expect(wrapper.find(FirstRender)).toHaveLength(1)
+    await waitForExpect(() => {
+      wrapper.update()
+      expect(store.getState().nonEmptyArrayPage.data).toStrictEqual(["Alex"])
+      expect(wrapper.find(SuccessfulRender)).toHaveLength(1)
+    })
+  })
+
+  it("should use RenderWith for an object with a non-empty string.", async () => {
+    const { wrapper, store } = setup("/object-with-non-empty-string")
+
+    expect(wrapper.find(FirstRender)).toHaveLength(1)
+    await waitForExpect(() => {
+      wrapper.update()
+      expect(store.getState().objectWithNonEmptyStringPage.data).toStrictEqual({
+        name: "Alex",
+      })
+      expect(wrapper.find(SuccessfulRender)).toHaveLength(1)
     })
   })
 

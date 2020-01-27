@@ -8,22 +8,20 @@ import { ReducerState as RootReducerState } from "../../reducer"
 type ThunkAction = RealThunkAction<void, RootReducerState, undefined, AnyAction>
 type ThunkDispatch = RealThunkDispatch<RootReducerState, undefined, AnyAction>
 
-import { FIRST } from "./constants"
+import { SET_DATA } from "./constants"
 
-export interface FirstAction {
-  type: typeof FIRST;
-  data: { name: string };
+export interface SetDataAction {
+  type: typeof SET_DATA;
+  data: {} | { name: string };
 }
 
-export const setData = (data: { name: string }): FirstAction => ({
-  type: FIRST,
-  data,
+export const setData = (): SetDataAction => ({
+  type: SET_DATA,
+  data: { name: "Alex" },
 })
 
 export const getData = (): ThunkAction => (dispatch: ThunkDispatch) => {
-  dispatch(
-    setData({
-      name: "",
-    })
-  )
+  setTimeout(() => {
+    dispatch(setData())
+  }, 1000)
 }

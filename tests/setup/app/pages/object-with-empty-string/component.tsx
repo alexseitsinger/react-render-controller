@@ -17,27 +17,24 @@ export type PageProps = PageStateProps &
     },
   }
 
-export default function PageOne({
+export default ({
   data,
   getData,
   setData,
   locations: { current, last },
-}: PageProps) {
+}: PageProps) => {
   return (
     <RenderController
-      controllerName={"pageA"}
+      controllerName={"object-with-empty-string"}
       targets={[
         {
           name: "data",
           data: data,
           empty: {},
-          cached: true,
           getter: (): void => {
             getData()
           },
-          setter: (obj: { name: string }): void => {
-            setData(obj)
-          },
+          setter: setData,
         },
       ]}
       currentPathname={current.pathname}

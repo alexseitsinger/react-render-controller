@@ -3,8 +3,10 @@ import { Provider } from "react-redux"
 import { Route, Router } from "react-router"
 import { MemoryHistory } from "history"
 
-import PageTwo from "./pages/two"
-import PageOne from "./pages/one"
+import EmptyArrayPage from "./pages/empty-array"
+import NonEmptyArrayPage from "./pages/non-empty-array"
+import ObjectWithNonEmptyStringPage from "./pages/object-with-non-empty-string"
+import ObjectWithEmptyStringPage from "./pages/object-with-empty-string"
 import { StoreType } from "./store"
 import { RenderControllerProvider } from "src"
 import { FirstRender, FailedRender } from "../components"
@@ -27,17 +29,37 @@ export default ({ store, routerHistory, mockedMethods }: Props) => (
     <Provider store={store}>
       <Router history={routerHistory}>
         <Route
-          path={"/page-one"}
+          path={"/empty-array"}
           exact
           render={routeProps => (
-            <PageOne {...routeProps} mockedMethods={mockedMethods} />
+            <EmptyArrayPage {...routeProps} mockedMethods={mockedMethods} />
           )}
         />
         <Route
-          path={"/page-two"}
+          path={"/non-empty-array"}
           exact
           render={routeProps => (
-            <PageTwo {...routeProps} mockedMethods={mockedMethods} />
+            <NonEmptyArrayPage {...routeProps} mockedMethods={mockedMethods} />
+          )}
+        />
+        <Route
+          path={"/object-with-non-empty-string"}
+          exact
+          render={routeProps => (
+            <ObjectWithNonEmptyStringPage
+              {...routeProps}
+              mockedMethods={mockedMethods}
+            />
+          )}
+        />
+        <Route
+          path={"/object-with-empty-string"}
+          exact
+          render={routeProps => (
+            <ObjectWithEmptyStringPage
+              {...routeProps}
+              mockedMethods={mockedMethods}
+            />
           )}
         />
       </Router>

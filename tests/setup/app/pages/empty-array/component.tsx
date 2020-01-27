@@ -5,8 +5,8 @@ import { RenderController } from "src"
 import { PageDispatchProps } from "./mapDispatchToProps"
 import { PageStateProps } from "./mapStateToProps"
 
-import { SuccessfulRender } from "tests/setup/components"
 import { SkippedPathname } from "src/types"
+import { SuccessfulRender } from "../../../components"
 
 const skipped: SkippedPathname[] = []
 
@@ -17,27 +17,24 @@ export type PageProps = PageStateProps &
     },
   }
 
-export default function PageTwo({
+export default ({
   data,
-  getData,
-  setData,
+  getEmptyArray,
+  setEmptyArray,
   locations: { current, last },
-}: PageProps) {
+}: PageProps) => {
   return (
     <RenderController
-      controllerName={"pageTwo"}
+      controllerName={"emptyArrayPage"}
       targets={[
         {
-          name: "data",
+          name: "emptyArray",
           data: data,
-          empty: {},
-          cached: true,
+          empty: [],
           getter: (): void => {
-            getData()
+            getEmptyArray()
           },
-          setter: (obj: { name: string }): void => {
-            setData(obj)
-          },
+          setter: setEmptyArray,
         },
       ]}
       currentPathname={current.pathname}

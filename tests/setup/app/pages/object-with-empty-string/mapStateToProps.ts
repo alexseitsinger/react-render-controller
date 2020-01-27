@@ -8,6 +8,6 @@ export type PageStateProps = PageReducerState & {
 }
 
 export default (state: RootReducerState): PageStateProps => ({
-  data: state.pageOne.data,
+  data: state.objectWithEmptyStringPage.data,
   locations: state.locations,
 })

@@ -1,23 +1,36 @@
 import { locationsReducer } from "@alexseitsinger/redux-locations"
+import { LocationsReducerState } from "@alexseitsinger/redux-locations/dist/locations/reducer"
 import { combineReducers } from "redux"
 
-import pageOneReducer, {
-  ReducerState as PageOneReducerState,
-} from "./pages/one/reducer"
-import pageTwoReducer, {
-  ReducerState as PageTwoReducerState,
-} from "./pages/two/reducer"
-import { LocationsReducerState } from "@alexseitsinger/redux-locations/dist/locations/reducer"
+import objectWithEmptyStringPageReducer, {
+  ReducerState as ObjectWithEmptyStringReducerState,
+} from "./pages/object-with-empty-string/reducer"
+
+import emptyArrayPageReducer, {
+  ReducerState as EmptyArrayPageReducerState,
+} from "./pages/empty-array/reducer"
+
+import nonEmptyArrayPageReducer, {
+  ReducerState as NonEmptyArrayPageReducerState,
+} from "./pages/non-empty-array/reducer"
+
+import objectWithNonEmptyStringPageReducer, {
+  ReducerState as ObjectWithNonEmptyStringPageReducerState,
+} from "./pages/object-with-non-empty-string/reducer"
 
 export interface ReducerState {
-  pageOne: PageOneReducerState;
-  pageTwo: PageTwoReducerState;
+  objectWithEmptyStringPage: ObjectWithEmptyStringReducerState;
+  emptyArrayPage: EmptyArrayPageReducerState;
+  nonEmptyArrayPage: NonEmptyArrayPageReducerState;
+  objectWithNonEmptyStringPage: ObjectWithNonEmptyStringPageReducerState;
   locations: LocationsReducerState;
 }
 
 export default () =>
   combineReducers({
-    pageOne: pageOneReducer,
-    pageTwo: pageTwoReducer,
+    objectWithEmptyStringPage: objectWithEmptyStringPageReducer,
+    emptyArrayPage: emptyArrayPageReducer,
+    nonEmptyArrayPage: nonEmptyArrayPageReducer,
+    objectWithNonEmptyStringPage: objectWithNonEmptyStringPageReducer,
     locations: locationsReducer,
   })
