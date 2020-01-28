@@ -47,6 +47,33 @@ skippedPathnames | An array of objects that unloading should be skipped for.    
 
 ## Example
 
+In app root
+
+```javascript
+import { RenderControllerProvider } from "@alexseitsinger/react-render-controller"
+
+function App({ store, routerHistory }) {
+	return (
+		<RenderControllerProvider
+			context={{
+				onRenderFirst: () => <LoadingScreen />,
+				onRenderWithout: () => <FailedScreen />,
+				store,
+			}}>
+			<Provider store={store}>
+				<ConnectedRouter history={routerHistory}>
+					<Route path={"/"} exact component={IndexPage} />
+				</ConnectedRouter>
+			</Provider>
+		</RenderControllerProvider>
+	)
+}
+
+export default App
+```
+
+Within a page component
+
 ```javascript
 import { RenderController } from "@alexseitsinger/react-render-controler"
 
@@ -74,17 +101,13 @@ function App({
           to: "/about",
           reverse: true,
         },
-      ]}
-      renderFirst={() => <LoadingScreen />}
-      renderWith={() => (
-        <div>
-          {Object.keys(dates).map(key => (
-            <div key={"fdsfsd"}>{key}</div>
-          ))}
-        </div>
-      )}
-      renderWithout={() => <FailedScreen />}
-    />
+      ]}>
+			<div>
+				{Object.keys(dates).map(key => (
+					<div key={"fdsfsd"}>{key}</div>
+				))}
+			</div>
+		</RenderController>
   )
 }
 ```
