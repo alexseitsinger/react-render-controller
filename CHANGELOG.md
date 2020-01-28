@@ -1,3 +1,10 @@
+<a name="v8.0.0"></a>
+## [v8.0.0](https://github.com/alexseitsinger/react-render-controller/compare/v7.4.1...v8.0.0) (2020-01-28)
+
+### Features
+- Adds pathnames internally. ([03f391c](https://github.com/alexseitsinger/react-render-controller/commit/03f391c3e0e450186893ce28ad54cc21f8baeaa1))
+
+
 <a name="v7.4.1"></a>
 ## [v7.4.1](https://github.com/alexseitsinger/react-render-controller/compare/v7.4.0...v7.4.1) (2020-01-28)
 
