@@ -5,10 +5,12 @@ import setup from "./setup"
 
 jest.setTimeout(20000)
 
-// test:
-// 1) data is unloaded on when navigated away, then data is re-loaded when
-// navigated back.
-// 2) doesnt use cached data if the cached is empty.
+// Add tests for:
+// - Assert that isControllerSeen is checked and only changed once via
+// constructor-created setControllerSeen method.
+// - Data is unloaded when currentPathname changes, and then re-loaded when
+// currentPathname changes back.
+// - Doesnt use cached data is the cache is empty.
 
 describe("RenderController", () => {
   it("should use renderWithout after returning empty object from an object with excluded fields.", async () => {

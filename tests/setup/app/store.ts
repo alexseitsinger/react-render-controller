@@ -6,14 +6,22 @@ import {
   Store,
 } from "redux"
 import thunk from "redux-thunk"
+import { routerMiddleware } from "connected-react-router"
 
 import createRootReducer, { ReducerState } from "./reducer"
+import { MemoryHistory, History as BrowserHistory } from "history"
 
 export type StoreType = Store<ReducerState>
 
-export default (preloadedState = {}): StoreType => {
-  const rootReducer = createRootReducer()
-  const middleware = [thunk, createLocationsMiddleware()]
+type HistoryType = MemoryHistory | BrowserHistory
+
+export default (routerHistory: HistoryType, preloadedState = {}): StoreType => {
+  const rootReducer = createRootReducer(routerHistory)
+  const middleware = [
+    thunk,
+    createLocationsMiddleware(),
+    routerMiddleware(routerHistory),
+  ]
   const storeEnhancers = compose(applyMiddleware(...middleware))
   const store = createReduxStore(rootReducer, preloadedState, storeEnhancers)
   return store

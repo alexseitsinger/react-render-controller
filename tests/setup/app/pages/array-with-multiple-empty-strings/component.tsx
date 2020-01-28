@@ -17,12 +17,7 @@ export type PageProps = PageStateProps &
     },
   }
 
-export default ({
-  data,
-  getData,
-  setData,
-  locations: { current, last },
-}: PageProps) => {
+export default ({ data, getData, setData }: PageProps) => {
   return (
     <RenderController
       controllerName={"array-with-multiple-empty-strings"}
@@ -37,8 +32,6 @@ export default ({
           setter: setData,
         },
       ]}
-      currentPathname={current.pathname}
-      lastPathname={last.pathname}
       skippedPathnames={skipped}
       renderWith={() => <SuccessfulRender />}
     />

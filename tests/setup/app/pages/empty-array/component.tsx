@@ -17,12 +17,7 @@ export type PageProps = PageStateProps &
     },
   }
 
-export default ({
-  data,
-  getEmptyArray,
-  setEmptyArray,
-  locations: { current, last },
-}: PageProps) => {
+export default ({ data, getEmptyArray, setEmptyArray }: PageProps) => {
   return (
     <RenderController
       controllerName={"emptyArrayPage"}
@@ -37,8 +32,6 @@ export default ({
           setter: setEmptyArray,
         },
       ]}
-      currentPathname={current.pathname}
-      lastPathname={last.pathname}
       skippedPathnames={skipped}
       renderWith={() => <SuccessfulRender />}
     />

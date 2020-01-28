@@ -1,7 +1,8 @@
 import React from "react"
 import { Provider } from "react-redux"
-import { Route, Router } from "react-router"
+import { Route } from "react-router"
 import { MemoryHistory } from "history"
+import { ConnectedRouter } from "connected-react-router"
 
 import ArrayWithMultipleEmptyStringsPage from "./pages/array-with-multiple-empty-strings"
 import ArrayWithMixedStringsPage from "./pages/array-with-mixed-strings"
@@ -23,15 +24,18 @@ export interface Props {
   };
 }
 
-const renderControllerContext = {
-  onRenderFirst: () => <FirstRender />,
-  onRenderWithout: () => <FailedRender />,
-}
+const onRenderWithout = () => <FailedRender />
+const onRenderFirst = () => <FirstRender />
 
 export default ({ store, routerHistory, mockedMethods }: Props) => (
-  <RenderControllerProvider context={renderControllerContext}>
+  <RenderControllerProvider
+    context={{
+      onRenderWithout,
+      onRenderFirst,
+      store,
+    }}>
     <Provider store={store}>
-      <Router history={routerHistory}>
+      <ConnectedRouter history={routerHistory}>
         <Route
           path={"/object-with-excluded-fields"}
           exact
@@ -106,7 +110,7 @@ export default ({ store, routerHistory, mockedMethods }: Props) => (
             />
           )}
         />
-      </Router>
+      </ConnectedRouter>
     </Provider>
   </RenderControllerProvider>
 )

@@ -10,7 +10,7 @@ export default (url = "/page-one", mocked = {}) => {
     initialEntries: [url],
     initialIndex: 0,
   })
-  const store = createStore()
+  const store = createStore(serverHistory)
   const wrapper = mount(
     <App routerHistory={serverHistory} store={store} mockedMethods={mocked} />
   )

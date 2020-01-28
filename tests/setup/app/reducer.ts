@@ -1,6 +1,8 @@
 import { locationsReducer } from "@alexseitsinger/redux-locations"
 import { LocationsReducerState } from "@alexseitsinger/redux-locations/dist/locations/reducer"
 import { combineReducers } from "redux"
+import { connectRouter } from "connected-react-router"
+import { MemoryHistory, History as BrowserHistory } from "history"
 
 import objectWithExcludedFieldsPageReducer, {
   ReducerState as ObjectWithExcludedFieldsPageReducerState,
@@ -46,8 +48,11 @@ export interface ReducerState {
   locations: LocationsReducerState;
 }
 
-export default () =>
+type HistoryType = MemoryHistory | BrowserHistory
+
+export default (routerHistory: HistoryType) =>
   combineReducers({
+    router: connectRouter(routerHistory),
     emptyArrayPage: emptyArrayPageReducer,
     nonEmptyArrayPage: nonEmptyArrayPageReducer,
     arrayWithMultipleEmptyStringsPage: arrayWithMultipleEmptyStringsPageReducer,
