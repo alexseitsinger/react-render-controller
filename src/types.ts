@@ -16,9 +16,17 @@ export interface Loaders {
   [key: string]: () => void;
 }
 
+interface DataObject {
+  [key: string]: any;
+}
+
+type DataArray = string[] | []
+
+export type DataType = DataObject | DataArray
+
 export interface LoadTarget {
   name: string;
-  data: { [key: string]: any };
+  data: DataType;
   getter: (...args: any[]) => void;
   setter: (o: {} | []) => void;
   empty: {} | [];

@@ -42,7 +42,29 @@ const hasValue = (o?: any): boolean => {
   return isEmpty(o) === false
 }
 
-const targetHasData = (target: LoadTarget): boolean => hasValue(target.data)
+const targetHasData = (target: LoadTarget): boolean => {
+  const excluded = isArray(target.excluded) ? target.excluded : []
+  const { data } = target
+
+  if (isArray(data)) {
+    return hasValue(data.filter(s => excluded.includes(s) === false))
+  }
+  if (isObject(data)) {
+    const newData = {
+      ...data,
+    }
+
+    Object.keys(data).forEach(key => {
+      if (excluded.includes(key)) {
+        delete newData[key]
+      }
+    })
+
+    return hasValue(newData)
+  }
+
+  return hasValue(data)
+}
 
 export const checkTargetsLoaded = (targets: LoadTarget[]): boolean =>
   targets.map(targetHasData).every(b => b === true)
