@@ -1,3 +1,10 @@
+<a name="v7.4.0"></a>
+## [v7.4.0](https://github.com/alexseitsinger/react-render-controller/compare/v7.3.4...v7.4.0) (2020-01-28)
+
+### Features
+- Adds excluded fields check. ([948a0d9](https://github.com/alexseitsinger/react-render-controller/commit/948a0d9a8243d3a60683eadca14b5f2d263c6eac))
+
+
 <a name="v7.3.4"></a>
 ## [v7.3.4](https://github.com/alexseitsinger/react-render-controller/compare/v7.3.3...v7.3.4) (2020-01-27)
 
