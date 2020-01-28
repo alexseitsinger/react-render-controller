@@ -54,8 +54,6 @@ function App({
   dates,
   getDates,
   setDates,
-  lastPathname,
-  currentPathname,
 }) {
   return (
     <RenderController
@@ -70,8 +68,6 @@ function App({
           cached: true,
         },
       ]}
-      lastPathname={lastPathname}
-      currentPathname={currentPathname}
       skippedPathnames={[
         {
           from: "/",
