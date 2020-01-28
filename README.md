@@ -1,6 +1,7 @@
 # RenderController
 
-Renders a component after its data has been loaded.
+Renders a component after its data has been loaded. Requres the use of
+[@alexseitsinger/redux-locations](https://github.com/alexseitsinger/redux-locations).
 
 ## Installation
 
