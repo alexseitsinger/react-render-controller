@@ -10,15 +10,14 @@ yarn add @alexseitsinger/react-render-controller
 
 ## Props
 
-__Name__        | __Purpose__                                                                                 | __Required__ | __Default__
----             | ---                                                                                         | ---          | ---
-controllerName  | The name of the controller                                                                  | Yes          | null
-targets         | An array of target objects                                                                  | Yes          | null
-lastPathname    | The last pathname used by the router                                                        | Yes          | null
-currentPathname | The current pathname used by the router                                                     | Yes          | null
-renderFirst     | The function used to render output before the data loading is attempted                     | No           | null
-renderWith      | The function used to render the output once the data has been loaded                        | No           | null
-renderWithout   | The function used to render the output when data loading failed to produce non-empty result | No           | null
+__Name__         | __Purpose__                                                                                 | __Required__ | __Default__
+---              | ---                                                                                         | ---          | ---
+controllerName   | The name of the controller                                                                  | Yes          | null
+targets          | An array of target objects                                                                  | Yes          | null
+renderFirst      | The function used to render output before the data loading is attempted                     | No           | null
+renderWith       | The function used to render the output once the data has been loaded                        | No           | null
+renderWithout    | The function used to render the output when data loading failed to produce non-empty result | No           | null
+skippedPathnames | An array of objects that unloading should be skipped for.                                   | No           | []
 
 #### Shapes
 
