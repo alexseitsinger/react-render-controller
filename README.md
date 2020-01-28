@@ -53,20 +53,20 @@ In app root
 import { RenderControllerProvider } from "@alexseitsinger/react-render-controller"
 
 function App({ store, routerHistory }) {
-	return (
-		<RenderControllerProvider
-			context={{
-				onRenderFirst: () => <LoadingScreen />,
-				onRenderWithout: () => <FailedScreen />,
-				store,
-			}}>
-			<Provider store={store}>
-				<ConnectedRouter history={routerHistory}>
-					<Route path={"/"} exact component={IndexPage} />
-				</ConnectedRouter>
-			</Provider>
-		</RenderControllerProvider>
-	)
+  return (
+    <RenderControllerProvider
+      context={{
+        onRenderFirst: () => <LoadingScreen />,
+        onRenderWithout: () => <FailedScreen />,
+        store,
+      }}>
+      <Provider store={store}>
+        <ConnectedRouter history={routerHistory}>
+          <Route path={"/"} exact component={IndexPage} />
+        </ConnectedRouter>
+      </Provider>
+    </RenderControllerProvider>
+  )
 }
 
 export default App
@@ -102,12 +102,12 @@ function App({
           reverse: true,
         },
       ]}>
-			<div>
-				{Object.keys(dates).map(key => (
-					<div key={"fdsfsd"}>{key}</div>
-				))}
-			</div>
-		</RenderController>
+      <div>
+        {Object.keys(dates).map(key => (
+          <div key={"fdsfsd"}>{key}</div>
+        ))}
+      </div>
+    </RenderController>
   )
 }
 ```
