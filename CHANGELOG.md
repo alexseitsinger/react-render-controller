@@ -1,3 +1,10 @@
+<a name="v7.4.1"></a>
+## [v7.4.1](https://github.com/alexseitsinger/react-render-controller/compare/v7.4.0...v7.4.1) (2020-01-28)
+
+### Bug Fixes
+- Fixes state check loop. ([44e66f4](https://github.com/alexseitsinger/react-render-controller/commit/44e66f424b73604dd229462b93eced02ae277e0a))
+
+
 <a name="v7.4.0"></a>
 ## [v7.4.0](https://github.com/alexseitsinger/react-render-controller/compare/v7.3.4...v7.4.0) (2020-01-28)
 
