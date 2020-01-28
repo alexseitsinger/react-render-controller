@@ -2,9 +2,14 @@ import React, { ReactElement, ReactNode } from "react"
 //import PropTypes from "prop-types"
 import { debounce, isEqual, isFunction } from "underscore"
 
+import { RenderControllerContext } from "./RenderControllerContext"
 //import { resetAttempted } from "src/utils/attempted"
-import { Context, ContextProps } from "./context"
-import { LoadTarget, SkippedPathname } from "./types"
+import {
+  FunctionType,
+  RenderControllerProps,
+  RenderControllerState,
+  RenderControllerWithContextProps,
+} from "./types"
 import { checkForFirstLoad } from "./utils/counting"
 import { createCancellableMethod } from "./utils/general"
 import { checkTargetsLoaded, startLoading } from "./utils/loading"
@@ -12,25 +17,7 @@ import { addMounted, hasBeenMounted, removeMounted } from "./utils/mounted"
 import { hasControllerBeenSeen, removeControllerSeen } from "./utils/seen"
 import { startUnloading } from "./utils/unloading"
 
-export interface RenderControllerWrapperProps {
-  children?: React.ReactNode | React.ReactNode[];
-  targets: LoadTarget[];
-  renderFirst?: () => React.ReactElement;
-  renderWith?: () => React.ReactElement;
-  renderWithout?: () => React.ReactElement;
-  lastPathname: string;
-  currentPathname: string;
-  skippedPathnames: SkippedPathname[];
-  controllerName: string;
-}
-
-export type RenderControllerProps = RenderControllerWrapperProps & ContextProps
-
-export interface RenderControllerState {
-  isControllerSeen: boolean;
-}
-
-export class RenderController extends React.Component<
+class RenderController extends React.Component<
   RenderControllerProps,
   RenderControllerState
 > {
@@ -40,13 +27,13 @@ export class RenderController extends React.Component<
 
   // Store a set of canceller functions to run when our debounced load
   // functions should not continue due to unmounting, etc.
-  cancellers: (() => void)[] = []
+  cancellers: FunctionType[] = []
 
-  setControllerSeen: undefined | (() => void) = undefined
+  setControllerSeen: undefined | FunctionType = undefined
 
-  cancelUnsetControllerSeen: null | (() => void) = null
+  cancelUnsetControllerSeen: undefined | FunctionType = undefined
 
-  unsetControllerSeen: undefined | (() => void) = undefined
+  unsetControllerSeen: undefined | FunctionType = undefined
 
   constructor(props: RenderControllerProps) {
     super(props)
@@ -78,10 +65,7 @@ export class RenderController extends React.Component<
     // cancel this removal. Otherwise, following a delay from unmounting, this
     // controllers name will be removed. This allows the renderFirst() method to
     // be shown again. Save these methods to the instance for use elsewhere.
-    const {
-      method: unsetControllerSeen,
-      canceller: cancelUnsetControllerSeen,
-    } = createCancellableMethod(failDelay, () => {
+    const [method, cancelMethod] = createCancellableMethod(failDelay, () => {
       const isMounted = this._isMounted
       const isBeenMounted = hasBeenMounted(controllerName)
       if (isMounted && isBeenMounted) {
@@ -89,8 +73,8 @@ export class RenderController extends React.Component<
       }
       removeControllerSeen(controllerName)
     })
-    this.cancelUnsetControllerSeen = cancelUnsetControllerSeen
-    this.unsetControllerSeen = unsetControllerSeen
+    this.unsetControllerSeen = method
+    this.cancelUnsetControllerSeen = cancelMethod
 
     // Save an instance method that adds this controllers name to a list of
     // controllers seen. This prevents the renderFirst() method from displaying
@@ -126,6 +110,7 @@ export class RenderController extends React.Component<
       currentPathname,
       skippedPathnames
     )
+
     startLoading({
       controllerName,
       targets,
@@ -143,7 +128,7 @@ export class RenderController extends React.Component<
 
     // Cancel any previous calls to unsetControllerSeen for this controller.
     const f = this.cancelUnsetControllerSeen
-    if (f !== null && isFunction(f) === true) {
+    if (f !== undefined && isFunction(f) === true) {
       f()
     }
   }
@@ -186,14 +171,14 @@ export class RenderController extends React.Component<
     }
   }
 
-  setCanceller = (f?: () => void): void => {
+  setCanceller = (f?: FunctionType): void => {
     if (f !== undefined && isFunction(f)) {
       this.cancellers.push(f)
     }
   }
 
   runCancellers = (): void => {
-    this.cancellers.forEach((f: () => void) => {
+    this.cancellers.forEach((f: FunctionType) => {
       if (isFunction(f)) {
         f()
       }
@@ -230,9 +215,11 @@ export class RenderController extends React.Component<
 
   renderWith = (): ReactNode => {
     const { renderWith, children } = this.props
+
     if (isFunction(renderWith)) {
       return renderWith()
     }
+
     return children
   }
 
@@ -254,18 +241,29 @@ export class RenderController extends React.Component<
   }
 }
 
-export function RenderControllerWrapper(
-  props: RenderControllerWrapperProps
+export function RenderControllerWithContext(
+  props: RenderControllerWithContextProps
 ): ReactElement {
   return (
-    <Context.Consumer>
-      {({ onRenderFirst, onRenderWithout }): ReactNode => (
-        <RenderController
-          {...props}
-          onRenderFirst={onRenderFirst}
-          onRenderWithout={onRenderWithout}
-        />
-      )}
-    </Context.Consumer>
+    <RenderControllerContext.Consumer>
+      {({ onRenderFirst, onRenderWithout, store }): ReactElement => {
+        let lastPathname = "/"
+        let currentPathname = "/"
+        if (store !== undefined) {
+          const { locations } = store.getState()
+          lastPathname = locations.last.pathname
+          currentPathname = locations.current.pathname
+        }
+        return (
+          <RenderController
+            {...props}
+            onRenderFirst={onRenderFirst}
+            onRenderWithout={onRenderWithout}
+            lastPathname={lastPathname}
+            currentPathname={currentPathname}
+          />
+        )
+      }}
+    </RenderControllerContext.Consumer>
   )
 }

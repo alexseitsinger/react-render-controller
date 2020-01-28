@@ -66,10 +66,10 @@ export const isMatchingPaths = (
       if (skippedBit === "*") {
         return true
       }
-      const isMatching
-        = currentBits.length > 0
-        && currentBits[i] !== undefined
-        && currentBits[i] === skippedBit
+      const isMatching =
+        currentBits.length > 0 &&
+        currentBits[i] !== undefined &&
+        currentBits[i] === skippedBit
       return isMatching === true
     })
     .every(isTrue)
@@ -89,11 +89,12 @@ export const getMasterName = (
   return masterName
 }
 
+export type CreateCancellableMethodReturnType = (() => void)[]
+
 export const createCancellableMethod = (
   delay: number,
   callback: () => void
-): ({ canceller: () => void, method: () => void, }
-  ) => {
+): CreateCancellableMethodReturnType => {
   var isCancelled = false
 
   const method = debounce(() => {
@@ -108,8 +109,5 @@ export const createCancellableMethod = (
     isCancelled = true
   }
 
-  return {
-    method,
-    canceller,
-  }
+  return [method, canceller]
 }
