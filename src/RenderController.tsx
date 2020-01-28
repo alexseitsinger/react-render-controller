@@ -42,11 +42,11 @@ export class RenderController extends React.Component<
   // functions should not continue due to unmounting, etc.
   cancellers: (() => void)[] = []
 
-  setControllerSeen: null | (() => void) = null
+  setControllerSeen: undefined | (() => void) = undefined
 
   cancelUnsetControllerSeen: null | (() => void) = null
 
-  unsetControllerSeen: null | (() => void) = null
+  unsetControllerSeen: undefined | (() => void) = undefined
 
   constructor(props: RenderControllerProps) {
     super(props)
@@ -69,9 +69,8 @@ export class RenderController extends React.Component<
     // default state for isControllerSeen will be false, so the loading screen
     // will shopw. To avoid this, we track each mounted component and reset the
     // default state if its already been mounted once.
-    const isControllerSeen = hasControllerBeenSeen(controllerName)
     this.state = {
-      isControllerSeen,
+      isControllerSeen: hasControllerBeenSeen(controllerName),
     }
 
     // Create a set of methods to remove this controller name from a list of
@@ -83,7 +82,9 @@ export class RenderController extends React.Component<
       method: unsetControllerSeen,
       canceller: cancelUnsetControllerSeen,
     } = createCancellableMethod(failDelay, () => {
-      if (this._isMounted === true && hasBeenMounted(controllerName) === true) {
+      const isMounted = this._isMounted
+      const isBeenMounted = hasBeenMounted(controllerName)
+      if (isMounted && isBeenMounted) {
         return
       }
       removeControllerSeen(controllerName)
@@ -96,11 +97,13 @@ export class RenderController extends React.Component<
     // again, after the data has already been loaded, but this cmponent gets
     // re-rendered.
     this.setControllerSeen = debounce(() => {
-      if (isControllerSeen === false) {
-        // Toggle the components state to True so our renderFirst() method
-        // finished, and is replaced with either renderWith() or renderWithout().
-        this.setState({ isControllerSeen: true })
+      const { isControllerSeen } = this.state
+      if (isControllerSeen) {
+        return
       }
+      // Toggle the components state to True so our renderFirst() method
+      // finished, and is replaced with either renderWith() or renderWithout().
+      this.setState({ isControllerSeen: true })
     }, failDelay)
   }
 
@@ -129,7 +132,7 @@ export class RenderController extends React.Component<
       setCanceller: this.setCanceller,
       setControllerSeen: () => {
         const f = this.setControllerSeen
-        if (f !== null && isFunction(f) === true) {
+        if (f !== undefined && isFunction(f) === true) {
           f()
         }
       },
@@ -149,7 +152,7 @@ export class RenderController extends React.Component<
     const { targets } = this.props
 
     const f = this.setControllerSeen
-    if (f !== null && isFunction(f)) {
+    if (f !== undefined && isFunction(f)) {
       f()
     }
 
@@ -178,7 +181,7 @@ export class RenderController extends React.Component<
     // Remove this controllers name from the seen controllers list to allow for
     // renderFirst() methods to work again.
     const f = this.unsetControllerSeen
-    if (f !== null && isFunction(f)) {
+    if (f !== undefined && isFunction(f)) {
       f()
     }
   }
@@ -236,15 +239,14 @@ export class RenderController extends React.Component<
   render(): ReactNode | null {
     const { controllerName, targets } = this.props
     const { isControllerSeen } = this.state
+    const isFirstLoad = checkForFirstLoad(controllerName, targets)
+    const isTargetsLoaded = checkTargetsLoaded(targets)
 
-    if (checkTargetsLoaded(targets) === true) {
+    if (isTargetsLoaded) {
       return this.renderWith()
     }
 
-    if (
-      checkForFirstLoad(controllerName, targets) === true &&
-      isControllerSeen === false
-    ) {
+    if (isFirstLoad && isControllerSeen === false) {
       return this.renderFirst()
     }
 
