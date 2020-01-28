@@ -2,8 +2,12 @@ import { locationsReducer } from "@alexseitsinger/redux-locations"
 import { LocationsReducerState } from "@alexseitsinger/redux-locations/dist/locations/reducer"
 import { combineReducers } from "redux"
 
+import objectWithExcludedFieldsPageReducer, {
+  ReducerState as ObjectWithExcludedFieldsPageReducerState,
+} from "./pages/object-with-excluded-fields/reducer"
+
 import objectWithEmptyStringPageReducer, {
-  ReducerState as ObjectWithEmptyStringReducerState,
+  ReducerState as ObjectWithEmptyStringPageReducerState,
 } from "./pages/object-with-empty-string/reducer"
 
 import emptyArrayPageReducer, {
@@ -27,28 +31,30 @@ import arrayWithMixedStringsPageReducer, {
 } from "./pages/array-with-mixed-strings/reducer"
 
 import arrayWithMultipleEmptyStringsPageReducer, {
-  ReducerState as ArrayWithMultipleEmptyStringsReducerState,
+  ReducerState as ArrayWithMultipleEmptyStringsPageReducerState,
 } from "./pages/array-with-multiple-empty-strings/reducer"
 
 export interface ReducerState {
-  arrayWithMultipleEmptyStringsPage: ArrayWithMultipleEmptyStringsReducerState;
-  arrayWithMixedStringsPage: ArrayWithMixedStringsPageReducerState;
-  objectWithMixedStringsPage: ObjectWithMixedStringsPageReducerState;
-  objectWithEmptyStringPage: ObjectWithEmptyStringReducerState;
   emptyArrayPage: EmptyArrayPageReducerState;
   nonEmptyArrayPage: NonEmptyArrayPageReducerState;
+  arrayWithMultipleEmptyStringsPage: ArrayWithMultipleEmptyStringsPageReducerState;
+  arrayWithMixedStringsPage: ArrayWithMixedStringsPageReducerState;
+  objectWithMixedStringsPage: ObjectWithMixedStringsPageReducerState;
+  objectWithEmptyStringPage: ObjectWithEmptyStringPageReducerState;
   objectWithNonEmptyStringPage: ObjectWithNonEmptyStringPageReducerState;
+  objectWithExcludedFieldsPage: ObjectWithExcludedFieldsPageReducerState;
   locations: LocationsReducerState;
 }
 
 export default () =>
   combineReducers({
+    emptyArrayPage: emptyArrayPageReducer,
+    nonEmptyArrayPage: nonEmptyArrayPageReducer,
     arrayWithMultipleEmptyStringsPage: arrayWithMultipleEmptyStringsPageReducer,
     arrayWithMixedStringsPage: arrayWithMixedStringsPageReducer,
     objectWithMixedStringsPage: objectWithMixedStringsPageReducer,
     objectWithEmptyStringPage: objectWithEmptyStringPageReducer,
-    emptyArrayPage: emptyArrayPageReducer,
-    nonEmptyArrayPage: nonEmptyArrayPageReducer,
     objectWithNonEmptyStringPage: objectWithNonEmptyStringPageReducer,
+    objectWithExcludedFieldsPage: objectWithExcludedFieldsPageReducer,
     locations: locationsReducer,
   })

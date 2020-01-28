@@ -10,6 +10,7 @@ import NonEmptyArrayPage from "./pages/non-empty-array"
 import ObjectWithNonEmptyStringPage from "./pages/object-with-non-empty-string"
 import ObjectWithEmptyStringPage from "./pages/object-with-empty-string"
 import ObjectWithMixedStringsPage from "./pages/object-with-mixed-strings"
+import ObjectWithExcludedFieldsPage from "./pages/object-with-excluded-fields"
 import { StoreType } from "./store"
 import { RenderControllerProvider } from "src"
 import { FirstRender, FailedRender } from "../components"
@@ -31,6 +32,16 @@ export default ({ store, routerHistory, mockedMethods }: Props) => (
   <RenderControllerProvider context={renderControllerContext}>
     <Provider store={store}>
       <Router history={routerHistory}>
+        <Route
+          path={"/object-with-excluded-fields"}
+          exact
+          render={routeProps => (
+            <ObjectWithExcludedFieldsPage
+              {...routeProps}
+              mockedMethods={mockedMethods}
+            />
+          )}
+        />
         <Route
           path={"/array-with-mixed-strings"}
           exact

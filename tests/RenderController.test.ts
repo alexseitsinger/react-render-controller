@@ -11,6 +11,24 @@ jest.setTimeout(20000)
 // 2) doesnt use cached data if the cached is empty.
 
 describe("RenderController", () => {
+  it("should use renderWithout after returning empty object from an object with excluded fields.", async () => {
+    const { wrapper, store } = setup("/object-with-excluded-fields")
+
+    expect(wrapper.find(FirstRender)).toHaveLength(1)
+    expect(store.getState().objectWithExcludedFieldsPage.data).toStrictEqual({
+      firstName: "Alex",
+      lastName: "Last",
+    })
+    await waitForExpect(() => {
+      wrapper.update()
+      expect(store.getState().objectWithExcludedFieldsPage.data).toStrictEqual({
+        firstName: "",
+        lastName: "",
+      })
+      expect(wrapper.find(FailedRender)).toHaveLength(1)
+    })
+  })
+
   it("should use renderWithout after getData returns an object with only empty strings", async () => {
     const { wrapper, store } = setup("/object-with-empty-string")
 
