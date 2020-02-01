@@ -5,10 +5,7 @@ import { RenderController } from "src"
 import { PageDispatchProps } from "./mapDispatchToProps"
 import { PageStateProps } from "./mapStateToProps"
 
-import { SkippedPathname } from "src/types"
 import { SuccessfulRender } from "../../../components"
-
-const skipped: SkippedPathname[] = []
 
 export type PageProps = PageStateProps &
   PageDispatchProps & {
@@ -31,7 +28,6 @@ export default ({ data, getData, setData }: PageProps) => {
           setter: setData,
         },
       ]}
-      skippedPathnames={skipped}
       renderWith={() => <SuccessfulRender />}
     />
   )

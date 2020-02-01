@@ -11,6 +11,9 @@ jest.setTimeout(20000)
 // - Data is unloaded when currentPathname changes, and then re-loaded when
 // currentPathname changes back.
 // - Doesnt use cached data is the cache is empty.
+// - Uses skippedPathnames from parent controllers + passed.
+// - Re-uses skippedpathnames that are saved, when they are identical, insead of replacing.
+// - Clears skippedPathnames when unmounted perm.
 
 describe("RenderController", () => {
   it("should use renderWithout after returning empty object from an object with excluded fields.", async () => {
