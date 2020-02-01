@@ -77,7 +77,6 @@ class RenderController extends React.Component<
     // Get the unique controller name so we can track this component and its
     // data's status outside of the component's lifecycle.
     const controllerName = this.getControllerName()
-    console.log(controllerName)
 
     // If this component gets re-mounted and it already has empty data, the
     // default state for isControllerSeen will be false, so the loading screen
