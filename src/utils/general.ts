@@ -38,7 +38,7 @@ export interface GetControllerNamePrefixArgs {
   currentPathname: string;
 }
 
-const getControllerNamePrefix = ({
+export const getControllerNamePrefix = ({
   lastPathname,
   currentPathname,
 }: GetControllerNamePrefixArgs): string => {
