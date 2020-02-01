@@ -2,6 +2,90 @@ import { debounce } from "underscore"
 
 import { LoadTarget, SkippedPathname } from "../types"
 
+export const isNullish = (o?: any): boolean => {
+  if (o === undefined || o === null) {
+    return true
+  }
+  return false
+}
+
+export const isDefined = (o?: any): boolean => {
+  if (isNullish(o)) {
+    return false
+  }
+  return true
+}
+
+const normalizePathname = (pn: string): string => {
+  return pn.replace(/\/\/+/, "/")
+}
+
+const convertPathname = (pathname: string): string => {
+  const normalized = normalizePathname(pathname)
+  if (normalized === "/") {
+    return "root"
+  }
+  const bits = normalized.split("/")
+  const joined = bits.join(":")
+  if (joined.startsWith(":")) {
+    return joined.slice(1)
+  }
+  return joined
+}
+
+export interface GetControllerNamePrefixArgs {
+  lastPathname: string;
+  currentPathname: string;
+}
+
+const getControllerNamePrefix = ({
+  lastPathname,
+  currentPathname,
+}: GetControllerNamePrefixArgs): string => {
+  const convertedLast = convertPathname(lastPathname)
+  const convertedCurrent = convertPathname(currentPathname)
+  return `[${convertedLast}]___[${convertedCurrent}]`
+}
+
+export interface GetControllerNameSuffixArgs {
+  targets: LoadTarget[];
+}
+
+const getControllerNameSuffix = ({
+  targets,
+}: GetControllerNameSuffixArgs): string => {
+  return `[${targets
+    .map((target: LoadTarget): string => target.name)
+    .join(",")}]`
+}
+
+export interface GetControllerNameArgs {
+  lastPathname: string;
+  currentPathname: string;
+  targets: LoadTarget[];
+}
+
+export const getControllerName = ({
+  lastPathname,
+  currentPathname,
+  targets,
+}: GetControllerNameArgs): string => {
+  const prefix = getControllerNamePrefix({
+    lastPathname,
+    currentPathname,
+  })
+  const suffix = getControllerNameSuffix({
+    targets,
+  })
+  return `${prefix}___${suffix}`
+}
+
+export interface GetTargetNameArgs {
+  lastPathname: string;
+  currentPathname: string;
+  target: LoadTarget;
+}
+
 export const getFullName = (
   controllerName: string,
   targetName: string
