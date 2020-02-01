@@ -20,7 +20,6 @@ export type PageProps = PageStateProps &
 export default ({ data, getEmptyArray, setEmptyArray }: PageProps) => {
   return (
     <RenderController
-      controllerName={"emptyArrayPage"}
       targets={[
         {
           name: "emptyArray",

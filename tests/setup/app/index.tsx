@@ -29,10 +29,15 @@ const onRenderFirst = () => <FirstRender />
 
 export default ({ store, routerHistory, mockedMethods }: Props) => (
   <RenderControllerProvider
-    context={{
-      onRenderWithout,
-      onRenderFirst,
-      store,
+    onRenderWithout={onRenderWithout}
+    onRenderFirst={onRenderFirst}
+    getPathnames={() => {
+      const state = store.getState()
+      const { current, last } = state.locations
+      return {
+        lastPathname: last.pathname,
+        currentPathname: current.pathname,
+      }
     }}>
     <Provider store={store}>
       <ConnectedRouter history={routerHistory}>

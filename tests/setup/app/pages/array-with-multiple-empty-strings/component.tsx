@@ -20,7 +20,6 @@ export type PageProps = PageStateProps &
 export default ({ data, getData, setData }: PageProps) => {
   return (
     <RenderController
-      controllerName={"array-with-multiple-empty-strings"}
       targets={[
         {
           name: "data",
