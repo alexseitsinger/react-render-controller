@@ -1,3 +1,10 @@
+<a name="v9.0.1"></a>
+## [v9.0.1](https://github.com/alexseitsinger/react-render-controller/compare/v9.0.0...v9.0.1) (2020-02-01)
+
+### Code Refactoring
+- Removes console.log statement. ([28d6e59](https://github.com/alexseitsinger/react-render-controller/commit/28d6e59456c90db85be625ebaefc08311b20eb3d))
+
+
 <a name="v9.0.0"></a>
 ## [v9.0.0](https://github.com/alexseitsinger/react-render-controller/compare/v8.0.0...v9.0.0) (2020-02-01)
 
