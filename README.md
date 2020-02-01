@@ -1,6 +1,6 @@
 # RenderController
 
-Renders a component after its data has been loaded. Requres the use of
+Renders a component after its data has been loaded. Expects the use of
 [@alexseitsinger/redux-locations](https://github.com/alexseitsinger/redux-locations).
 
 ## Installation
@@ -13,7 +13,6 @@ yarn add @alexseitsinger/react-render-controller
 
 __Name__         | __Purpose__                                                                                 | __Required__ | __Default__
 ---              | ---                                                                                         | ---          | ---
-controllerName   | The name of the controller                                                                  | Yes          | null
 targets          | An array of target objects                                                                  | Yes          | null
 renderFirst      | The function used to render output before the data loading is attempted                     | No           | null
 renderWith       | The function used to render the output once the data has been loaded                        | No           | null
@@ -52,24 +51,25 @@ In app root
 ```javascript
 import { RenderControllerProvider } from "@alexseitsinger/react-render-controller"
 
-function App({ store, routerHistory }) {
-  return (
-    <RenderControllerProvider
-      context={{
-        onRenderFirst: () => <LoadingScreen />,
-        onRenderWithout: () => <FailedScreen />,
-        store,
-      }}>
-      <Provider store={store}>
-        <ConnectedRouter history={routerHistory}>
-          <Route path={"/"} exact component={IndexPage} />
-        </ConnectedRouter>
-      </Provider>
-    </RenderControllerProvider>
-  )
-}
-
-export default App
+const App = ({ store, routerHistory }) => (
+  <RenderControllerProvider
+    onRenderFirst={() => <LoadingScreen />}
+    onRenderWithout={() => <FailedScreen />}
+    getPathnames={() => {
+      const state = store.getState()
+      const { current, last } = state.locations
+      return {
+        lastPathname: last.pathname,
+        currentPathname: currentPathname,
+      }
+    }}>
+    <Provider store={store}>
+      <ConnectedRouter history={routerHistory}>
+        <Route path={"/"} exact component={IndexPage} />
+      </ConnectedRouter>
+    </Provider>
+  </RenderControllerProvider>
+)
 ```
 
 Within a page component
@@ -77,37 +77,36 @@ Within a page component
 ```javascript
 import { RenderController } from "@alexseitsinger/react-render-controler"
 
-function App({
+const HomePage = ({
   dates,
   getDates,
   setDates,
-}) {
-  return (
-    <RenderController
-      controllerName={"app"}
-      targets={[
-        {
-          name: "dates",
-          data: dates,
-          getter: getDates,
-          setter: setDates,
-          empty: {},
-          cached: true,
-        },
-      ]}
-      skippedPathnames={[
-        {
-          from: "/",
-          to: "/about",
-          reverse: true,
-        },
-      ]}>
+}) => (
+  <RenderController
+    targets={[
+      {
+        name: "dates",
+        data: dates,
+        getter: getDates,
+        setter: setDates,
+        empty: {},
+        cached: true,
+      },
+    ]}
+    skippedPathnames={[
+      {
+        from: "/",
+        to: "/about",
+        reverse: true,
+      },
+    ]}
+    renderWith={() => (
       <div>
         {Object.keys(dates).map(key => (
           <div key={"fdsfsd"}>{key}</div>
         ))}
       </div>
-    </RenderController>
-  )
-}
+    )}
+  />
+)
 ```
