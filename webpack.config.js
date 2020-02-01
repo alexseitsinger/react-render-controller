@@ -1,6 +1,7 @@
 const path = require("path")
 const nodeExternals = require("webpack-node-externals")
 const TerserPlugin = require("terser-webpack-plugin")
+const { CleanWebpackPlugin } = require("clean-webpack-plugin")
 
 module.exports = {
   entry: "./src/index.ts",
@@ -21,6 +22,17 @@ module.exports = {
       },
     ],
   },
+  plugins: [
+    /**
+     * Clean the contents of output.path before saving new files.
+     *
+     * NOTE: This should only be used on the config that runs first, since the
+     * following configs will re-clear the previously built files.
+     */
+    new CleanWebpackPlugin({
+      dry: false,
+    }),
+  ],
   externals: [
     nodeExternals({
       modulesFromFile: {
