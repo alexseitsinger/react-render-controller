@@ -1,3 +1,10 @@
+<a name="v9.0.0"></a>
+## [v9.0.0](https://github.com/alexseitsinger/react-render-controller/compare/v8.0.0...v9.0.0) (2020-02-01)
+
+### Features
+- Removes explicit controllerName prop. ([f10ba08](https://github.com/alexseitsinger/react-render-controller/commit/f10ba084dfa6cc78c77bc887cd099999a270780e))
+
+
 <a name="v8.0.0"></a>
 ## [v8.0.0](https://github.com/alexseitsinger/react-render-controller/compare/v7.4.1...v8.0.0) (2020-01-28)
 
