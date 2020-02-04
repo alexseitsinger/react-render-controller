@@ -1,11 +1,11 @@
-import React from "react"
+import React, { ReactElement } from "react"
 
 import { RenderController } from "src"
 
+import { SuccessfulRender } from "../../../components"
+
 import { PageDispatchProps } from "./mapDispatchToProps"
 import { PageStateProps } from "./mapStateToProps"
-
-import { SuccessfulRender } from "../../../components"
 
 export type PageProps = PageStateProps &
   PageDispatchProps & {
@@ -14,7 +14,7 @@ export type PageProps = PageStateProps &
     },
   }
 
-export default ({ data, getData, setData }: PageProps) => {
+export default ({ data, getData, setData }: PageProps): ReactElement => {
   return (
     <RenderController
       targets={[
@@ -28,7 +28,7 @@ export default ({ data, getData, setData }: PageProps) => {
           setter: setData,
         },
       ]}
-      renderWith={() => <SuccessfulRender />}
+      renderWith={(): ReactElement => <SuccessfulRender />}
     />
   )
 }

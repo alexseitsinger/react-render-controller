@@ -1,4 +1,4 @@
-import { SetDataAction, DataType } from "./actions"
+import { DataType,SetDataAction } from "./actions"
 import { SET_DATA } from "./constants"
 
 export interface ReducerState {

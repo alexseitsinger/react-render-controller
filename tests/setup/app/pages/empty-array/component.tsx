@@ -1,14 +1,14 @@
-import React from "react"
+import React, { ReactElement } from "react"
 
 import { RenderController } from "src"
+import { RenderControllerSkippedPathname } from "src/RenderController"
+
+import { SuccessfulRender } from "../../../components"
 
 import { PageDispatchProps } from "./mapDispatchToProps"
 import { PageStateProps } from "./mapStateToProps"
 
-import { SkippedPathname } from "src/types"
-import { SuccessfulRender } from "../../../components"
-
-const skipped: SkippedPathname[] = []
+const skipped: RenderControllerSkippedPathname[] = []
 
 export type PageProps = PageStateProps &
   PageDispatchProps & {
@@ -17,7 +17,11 @@ export type PageProps = PageStateProps &
     },
   }
 
-export default ({ data, getEmptyArray, setEmptyArray }: PageProps) => {
+export default ({
+  data,
+  getEmptyArray,
+  setEmptyArray,
+}: PageProps): ReactElement => {
   return (
     <RenderController
       targets={[
@@ -32,7 +36,7 @@ export default ({ data, getEmptyArray, setEmptyArray }: PageProps) => {
         },
       ]}
       skippedPathnames={skipped}
-      renderWith={() => <SuccessfulRender />}
+      renderWith={(): ReactElement => <SuccessfulRender />}
     />
   )
 }

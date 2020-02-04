@@ -1,4 +1,5 @@
 import { ThunkDispatch } from "../../types"
+
 import { getData, setData } from "./actions"
 
 export interface PageDispatchProps {

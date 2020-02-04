@@ -1,10 +1,10 @@
+import { AnyAction } from "redux"
 import {
   ThunkAction as RealThunkAction,
   ThunkDispatch as RealThunkDispatch,
 } from "redux-thunk"
 
 import { ReducerState as RootReducerState } from "./reducer"
-import { AnyAction } from "redux"
 
 export type ThunkAction = RealThunkAction<
   void,

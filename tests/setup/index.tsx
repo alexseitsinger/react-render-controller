@@ -1,11 +1,18 @@
 import React from "react"
-import { mount } from "enzyme"
-import { createMemoryHistory } from "history"
+import { mount, ReactWrapper } from "enzyme"
+import { createMemoryHistory, MemoryHistory } from "history"
+import { Store } from "redux"
 
-import createStore from "./app/store"
 import App from "./app"
+import createStore from "./app/store"
 
-export default (url = "/page-one", mocked = {}) => {
+interface SetupReturnType {
+  wrapper: ReactWrapper;
+  store: Store;
+  serverHistory: MemoryHistory;
+}
+
+export default (url = "/page-one", mocked = {}): SetupReturnType => {
   const serverHistory = createMemoryHistory({
     initialEntries: [url],
     initialIndex: 0,

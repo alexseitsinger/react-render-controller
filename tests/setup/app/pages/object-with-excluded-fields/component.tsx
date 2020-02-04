@@ -1,14 +1,14 @@
-import React from "react"
+import React, { ReactElement } from "react"
 
 import { RenderController } from "src"
+import { RenderControllerSkippedPathname } from "src/RenderController"
+
+import { FailedRender, SuccessfulRender } from "../../../components"
 
 import { PageDispatchProps } from "./mapDispatchToProps"
 import { PageStateProps } from "./mapStateToProps"
 
-import { SkippedPathname } from "src/types"
-import { SuccessfulRender, FailedRender } from "../../../components"
-
-const skipped: SkippedPathname[] = []
+const skipped: RenderControllerSkippedPathname[] = []
 
 export type PageProps = PageStateProps &
   PageDispatchProps & {
@@ -17,7 +17,7 @@ export type PageProps = PageStateProps &
     },
   }
 
-export default ({ data, getData, setData }: PageProps) => {
+export default ({ data, getData, setData }: PageProps): ReactElement => {
   return (
     <RenderController
       targets={[
@@ -33,8 +33,8 @@ export default ({ data, getData, setData }: PageProps) => {
         },
       ]}
       skippedPathnames={skipped}
-      renderWith={() => <SuccessfulRender />}
-      renderWithout={() => <FailedRender />}
+      renderWith={(): ReactElement => <SuccessfulRender />}
+      renderWithout={(): ReactElement => <FailedRender />}
     />
   )
 }

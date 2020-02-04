@@ -1,8 +1,9 @@
+import { AnyAction } from "redux"
 import {
   ThunkAction as RealThunkAction,
   ThunkDispatch as RealThunkDispatch,
 } from "redux-thunk"
-import { AnyAction } from "redux"
+
 import { ReducerState as RootReducerState } from "../../reducer"
 
 type ThunkAction = RealThunkAction<void, RootReducerState, undefined, AnyAction>
@@ -22,6 +23,6 @@ export const setData = (): SetDataAction => ({
   },
 })
 
-export const getData = (): ThunkAction => (dispatch: ThunkDispatch) => {
+export const getData = (): ThunkAction => (dispatch: ThunkDispatch): void => {
   dispatch(setData())
 }

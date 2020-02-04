@@ -1,4 +1,5 @@
 import { ThunkDispatch } from "../../types"
+
 import { getEmptyArray, setEmptyArray } from "./actions"
 
 export interface PageDispatchProps {

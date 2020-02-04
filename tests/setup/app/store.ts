@@ -1,4 +1,6 @@
 import { createLocationsMiddleware } from "@alexseitsinger/redux-locations"
+import { routerMiddleware } from "connected-react-router"
+import { History as BrowserHistory, MemoryHistory } from "history"
 import {
   applyMiddleware,
   compose,
@@ -6,16 +8,14 @@ import {
   Store,
 } from "redux"
 import thunk from "redux-thunk"
-import { routerMiddleware } from "connected-react-router"
 
 import createRootReducer, { ReducerState } from "./reducer"
-import { MemoryHistory, History as BrowserHistory } from "history"
 
 export type StoreType = Store<ReducerState>
 
 type HistoryType = MemoryHistory | BrowserHistory
 
-export default (routerHistory: HistoryType, preloadedState = {}): StoreType => {
+export default (routerHistory: HistoryType, preloadedState = {}): Store => {
   const rootReducer = createRootReducer(routerHistory)
   const middleware = [
     thunk,
