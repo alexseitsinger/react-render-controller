@@ -1,5 +1,6 @@
 import React from "react"
 
+import { RenderControllerPathnames } from "./RenderController"
 import { RenderFunctionType } from "./types"
 
 export interface RenderControllerContextRenderMethods {
@@ -8,7 +9,7 @@ export interface RenderControllerContextRenderMethods {
 }
 
 export type RenderControllerContextProps = RenderControllerContextRenderMethods & {
-  getPathnames: () => { lastPathname: string, currentPathname: string },
+  getPathnames: () => RenderControllerPathnames,
 }
 
 const defaultContext: RenderControllerContextProps = {

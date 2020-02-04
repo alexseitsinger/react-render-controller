@@ -1,42 +1,54 @@
-import { LoadTarget } from "../types"
+import { RenderControllerTarget } from "src/RenderController"
 
-import { getFullName } from "./general"
+import { getControllerTargetName } from "./general"
 
 interface LoadCounts {
   [key: string]: number;
 }
 
-export const loadCounts: LoadCounts = {}
+const loadCounts: LoadCounts = {}
 
-export const getLoadCount = (controllerName: string): number => {
-  if (!(controllerName in loadCounts)) {
-    loadCounts[controllerName] = -1
+export const getLoadCount = (targetName: string): number => {
+  if (!(targetName in loadCounts)) {
+    loadCounts[targetName] = -1
   }
-  return loadCounts[controllerName]
+  return loadCounts[targetName]
 }
 
-export const resetLoadCount = (controllerName: string): number => {
-  loadCounts[controllerName] = -1
+export const resetLoadCount = (targetName: string): number => {
+  loadCounts[targetName] = -1
   return -1
 }
 
-export const updateLoadCount = (controllerName: string): number => {
-  if (!(controllerName in loadCounts)) {
-    loadCounts[controllerName] = -1
+export const updateLoadCount = (targetName: string): number => {
+  if (!(targetName in loadCounts)) {
+    loadCounts[targetName] = -1
   }
-  loadCounts[controllerName] += 1
-  return loadCounts[controllerName]
+  loadCounts[targetName] += 1
+  return loadCounts[targetName]
 }
 
-export const checkForFirstLoad = (
-  controllerName: string,
-  targets: LoadTarget[]
-): boolean => {
-  var total = 0
+interface CheckForFirstLoadArgs {
+  lastPathname: string;
+  currentPathname: string;
+  targets: RenderControllerTarget[];
+}
 
-  targets.forEach((target: LoadTarget) => {
-    const fullName = getFullName(controllerName, target.name)
-    total += getLoadCount(fullName)
+export const checkForFirstLoad = ({
+  lastPathname,
+  currentPathname,
+  targets,
+}: CheckForFirstLoadArgs): boolean => {
+  let total = 0
+
+  targets.forEach((target: RenderControllerTarget): void => {
+    const targetName = getControllerTargetName({
+      lastPathname,
+      currentPathname,
+      target,
+    })
+
+    total += getLoadCount(targetName)
   })
 
   if (total <= 0) {
@@ -45,8 +57,8 @@ export const checkForFirstLoad = (
   return false
 }
 
-export const hasTargetAttemptedLoad = (fullName: string): boolean => {
-  if (getLoadCount(fullName) < 0) {
+export const hasTargetAttemptedLoad = (targetName: string): boolean => {
+  if (getLoadCount(targetName) < 0) {
     return false
   }
   return true

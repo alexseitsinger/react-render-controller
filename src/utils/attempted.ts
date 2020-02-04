@@ -1,4 +1,4 @@
-import { LoadTarget } from "../types"
+import { RenderControllerTarget } from "src/RenderController"
 
 interface Attempted {
   [key: string]: string[];
@@ -18,7 +18,7 @@ export const setAttempted = (
 
 export const areAttempted = (
   controllerName: string,
-  targets: LoadTarget[]
+  targets: RenderControllerTarget[]
 ): boolean => {
   if (!(controllerName in attempted)) {
     attempted[controllerName] = []

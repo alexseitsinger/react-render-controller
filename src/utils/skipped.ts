@@ -1,21 +1,44 @@
-import { isArray, isEqual, uniq } from "underscore"
+import { isArray, isEqual } from "underscore"
 
-import { SkippedPathname } from "src/types"
+import { RenderControllerSkippedPathname } from "src/RenderController"
+import { debugMessage } from "src/utils/debug"
 
-export interface MappedPathnames {
-  [key: string]: SkippedPathname[];
+interface MappedRenderControllerSkippedPathnames {
+  [key: string]: RenderControllerSkippedPathname[];
 }
 
-const mapped: MappedPathnames = {}
+const mapped: MappedRenderControllerSkippedPathnames = {}
+
+const uniquePathnames = (
+  arr: RenderControllerSkippedPathname[]
+): RenderControllerSkippedPathname[] => {
+  let seen: RenderControllerSkippedPathname[] = []
+
+  arr.forEach((arrObj: RenderControllerSkippedPathname) => {
+    if (
+      !seen
+        .map((seenObj: RenderControllerSkippedPathname): boolean => {
+          const fromMatch = seenObj.from === arrObj.from
+          const toMatch = seenObj.to === arrObj.to
+          return fromMatch && toMatch
+        })
+        .includes(true)
+    ) {
+      seen = [...seen, arrObj]
+    }
+  })
+
+  return seen
+}
 
 export const getSkippedPathnames = (
   prefix: string,
-  passed: SkippedPathname[]
-): SkippedPathname[] => {
+  passed: RenderControllerSkippedPathname[]
+): RenderControllerSkippedPathname[] => {
   /**
    * Create a new array to use.
    */
-  let final: SkippedPathname[] = []
+  let final: RenderControllerSkippedPathname[] = []
   if (prefix in mapped) {
     final = [...mapped[prefix]]
   }
@@ -26,7 +49,7 @@ export const getSkippedPathnames = (
   /**
    * Remove duplicates.
    */
-  final = uniq(final)
+  final = uniquePathnames(final)
 
   /**
    * If we already have the same values saved already, just re-use that array
@@ -35,6 +58,9 @@ export const getSkippedPathnames = (
   if (prefix in mapped) {
     const current = mapped[prefix]
     if (isEqual(current, final)) {
+      debugMessage(`  -> Cached skippedPathnames match the newly created one, so
+                   returning the cached one to prevent redundant references.
+                     (${prefix})`)
       return current
     }
   }
@@ -44,6 +70,8 @@ export const getSkippedPathnames = (
    * again by child controllers.
    */
   mapped[prefix] = final
+  debugMessage(`  -> Saving a copy of the skippedPathnames for re-use by child
+               controllers. (${prefix})`)
 
   /**
    * Return it for use in the current controller.

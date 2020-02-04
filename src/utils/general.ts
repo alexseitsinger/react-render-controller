@@ -1,27 +1,13 @@
 import { debounce } from "underscore"
 
-import { LoadTarget, SkippedPathname } from "../types"
+import {
+  RenderControllerPathnames,
+  RenderControllerSkippedPathname,
+  RenderControllerTarget,
+} from "src/RenderController"
 
-export const isNullish = (o?: any): boolean => {
-  if (o === undefined || o === null) {
-    return true
-  }
-  return false
-}
-
-export const isDefined = (o?: any): boolean => {
-  if (isNullish(o)) {
-    return false
-  }
-  return true
-}
-
-const normalizePathname = (pn: string): string => {
-  return pn.replace(/\/\/+/, "/")
-}
-
-const convertPathname = (pathname: string): string => {
-  const normalized = normalizePathname(pathname)
+const convertPathname = (pn: string): string => {
+  const normalized = pn.replace(/\/\/+/, "/")
   if (normalized === "/") {
     return "root"
   }
@@ -33,36 +19,17 @@ const convertPathname = (pathname: string): string => {
   return joined
 }
 
-export interface GetControllerNamePrefixArgs {
-  lastPathname: string;
-  currentPathname: string;
-}
-
 export const getControllerNamePrefix = ({
   lastPathname,
   currentPathname,
-}: GetControllerNamePrefixArgs): string => {
+}: RenderControllerPathnames): string => {
   const convertedLast = convertPathname(lastPathname)
   const convertedCurrent = convertPathname(currentPathname)
   return `[${convertedLast}]___[${convertedCurrent}]`
 }
 
-export interface GetControllerNameSuffixArgs {
-  targets: LoadTarget[];
-}
-
-const getControllerNameSuffix = ({
-  targets,
-}: GetControllerNameSuffixArgs): string => {
-  return `[${targets
-    .map((target: LoadTarget): string => target.name)
-    .join(",")}]`
-}
-
-export interface GetControllerNameArgs {
-  lastPathname: string;
-  currentPathname: string;
-  targets: LoadTarget[];
+type GetControllerNameArgs = RenderControllerPathnames & {
+  targets: RenderControllerTarget[],
 }
 
 export const getControllerName = ({
@@ -74,22 +41,27 @@ export const getControllerName = ({
     lastPathname,
     currentPathname,
   })
-  const suffix = getControllerNameSuffix({
-    targets,
-  })
+  const suffix = `[${targets
+    .map((target: RenderControllerTarget): string => target.name)
+    .join(",")}]`
   return `${prefix}___${suffix}`
 }
 
-export interface GetTargetNameArgs {
-  lastPathname: string;
-  currentPathname: string;
-  target: LoadTarget;
+type GetControllerTargetNameArgs = RenderControllerPathnames & {
+  target: RenderControllerTarget,
 }
 
-export const getFullName = (
-  controllerName: string,
-  targetName: string
-): string => `${controllerName}__${targetName}`
+export const getControllerTargetName = ({
+  lastPathname,
+  currentPathname,
+  target,
+}: GetControllerTargetNameArgs): string => {
+  return getControllerName({
+    lastPathname,
+    currentPathname,
+    targets: [target],
+  })
+}
 
 export const removeLeadingAndTrailingSlashes = (url: string): string => {
   var updated = url
@@ -102,9 +74,9 @@ export const removeLeadingAndTrailingSlashes = (url: string): string => {
 }
 
 export const prepareSkippedPathnames = (
-  skippedPathnames: SkippedPathname[]
-): SkippedPathname[] => {
-  const prepared: SkippedPathname[] = []
+  skippedPathnames: RenderControllerSkippedPathname[]
+): RenderControllerSkippedPathname[] => {
+  const prepared: RenderControllerSkippedPathname[] = []
 
   skippedPathnames.forEach(obj => {
     prepared.push({
@@ -159,21 +131,7 @@ export const isMatchingPaths = (
     .every(isTrue)
 }
 
-export const getMasterName = (
-  currentPathname: string,
-  targets: LoadTarget[]
-): string => {
-  var masterName = removeLeadingAndTrailingSlashes(currentPathname)
-  masterName = masterName.replace("/", "_")
-
-  targets.forEach(obj => {
-    masterName = `${masterName}__${obj.name}`
-  })
-
-  return masterName
-}
-
-export type CreateCancellableMethodReturnType = (() => void)[]
+type CreateCancellableMethodReturnType = (() => void)[]
 
 export const createCancellableMethod = (
   delay: number,

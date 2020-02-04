@@ -2,6 +2,7 @@ import React, { ReactElement, ReactNode } from "react"
 //import PropTypes from "prop-types"
 import { debounce, isArray, isEqual, isFunction } from "underscore"
 
+import { debugMessage } from "src/utils/debug"
 import { clearSkippedPathnames, getSkippedPathnames } from "src/utils/skipped"
 
 import {
@@ -9,14 +10,7 @@ import {
   RenderControllerContextRenderMethods,
 } from "./RenderControllerContext"
 //import { resetAttempted } from "src/utils/attempted"
-import {
-  ChildrenType,
-  FunctionType,
-  LoadTarget,
-  LocationProps,
-  RenderFunctionType,
-  SkippedPathname,
-} from "./types"
+import { ChildrenType, FunctionType, RenderFunctionType } from "./types"
 import { checkForFirstLoad } from "./utils/counting"
 import {
   createCancellableMethod,
@@ -25,22 +19,51 @@ import {
 } from "./utils/general"
 import { checkTargetsLoaded, startLoading } from "./utils/loading"
 import { addMounted, hasBeenMounted, removeMounted } from "./utils/mounted"
-import { hasControllerBeenSeen, removeControllerSeen } from "./utils/seen"
+import {
+  addControllerSeen,
+  hasControllerBeenSeen,
+  removeControllerSeen,
+} from "./utils/seen"
 import { startUnloading } from "./utils/unloading"
+
+export interface RenderControllerSkippedPathname {
+  from: string;
+  to: string;
+  reverse?: boolean;
+}
+
+export type RenderControllerTargetData = any[] | { [key: string]: any }
+
+export interface RenderControllerTarget {
+  name: string;
+  data: RenderControllerTargetData;
+  getter: FunctionType;
+  setter: FunctionType;
+  empty: {} | [];
+  excluded?: string[];
+  forced?: boolean;
+  cached?: boolean;
+  attempted?: boolean;
+}
+
+export interface RenderControllerPathnames {
+  lastPathname: string;
+  currentPathname: string;
+}
 
 export interface RenderControllerWithContextProps {
   children?: ChildrenType;
-  targets: LoadTarget[];
+  targets: RenderControllerTarget[];
   renderWith?: RenderFunctionType;
   renderWithout?: RenderFunctionType;
   renderFirst?: RenderFunctionType;
-  skippedPathnames?: SkippedPathname[];
+  skippedPathnames?: RenderControllerSkippedPathname[];
 }
 
 export type RenderControllerProps = RenderControllerWithContextProps &
-  LocationProps &
+  RenderControllerPathnames &
   RenderControllerContextRenderMethods & {
-    skippedPathnames: SkippedPathname[],
+    skippedPathnames: RenderControllerSkippedPathname[],
     controllerName: string,
     controllerNamePrefix: string,
   }
@@ -79,7 +102,13 @@ class RenderController extends React.Component<
   constructor(props: RenderControllerProps) {
     super(props)
 
-    const { controllerName, controllerNamePrefix, targets } = props
+    const {
+      lastPathname,
+      currentPathname,
+      controllerName,
+      controllerNamePrefix,
+      targets,
+    } = props
 
     // Require the delay to be at least 1100ms.
     // Limit the delay to 4400ms
@@ -101,7 +130,7 @@ class RenderController extends React.Component<
       isControllerSeen: hasControllerBeenSeen(controllerName),
     }
 
-    const cancelDelay = failDelay * 2
+    const cancelDelay = failDelay * 1.5
 
     // Create a set of methods to remove this controller name from a list of
     // mounted controllers. When this controller is mounted again, it will
@@ -111,19 +140,24 @@ class RenderController extends React.Component<
     const [handleUnmount, cancelHandleUnmount] = createCancellableMethod(
       cancelDelay,
       () => {
+        debugMessage(`Handing unmount (${controllerName})`)
+        // When its determined that this pathname combination isnt being used,
+        // run some functions to clear our our local caches.
+        const isPrefixMounted = hasBeenMounted(controllerNamePrefix)
+        if (isPrefixMounted === false) {
+          clearSkippedPathnames(controllerNamePrefix)
+        }
+
         // If this component instance is currently mounted and has been mounted
         // previously, don't run the rest of this function. This prevents our
         // handler from removing itself while its about to be
         // re-used/re-rendered again.
         const { isMountedNow } = this
-        const isMountedPreviously = hasBeenMounted(controllerName)
-        if (isMountedNow && isMountedPreviously) {
-          return
+        //const isMountedPreviously = hasBeenMounted(controllerName)
+        if (!isMountedNow) {
+          debugMessage(`Removing controllerSeen (${controllerName})`)
+          removeControllerSeen(controllerName)
         }
-        // When its determined that this controller isn't going to be
-        // re-mounted, run some functions to clear our our local caches.
-        clearSkippedPathnames(controllerNamePrefix)
-        removeControllerSeen(controllerName)
       }
     )
     this.handleUnmount = handleUnmount
@@ -138,6 +172,8 @@ class RenderController extends React.Component<
       if (isControllerSeen) {
         return
       }
+      debugMessage(`-> Setting isControllerSeen to true. (${controllerName})`)
+      addControllerSeen(controllerName)
       // Toggle the components state to True so our renderFirst() method
       // finished, and is replaced with either renderWith() or renderWithout().
       this.setState({ isControllerSeen: true })
@@ -151,6 +187,7 @@ class RenderController extends React.Component<
       currentPathname,
       skippedPathnames,
       controllerName,
+      controllerNamePrefix,
     } = this.props
 
     /**
@@ -162,19 +199,19 @@ class RenderController extends React.Component<
      * First, unload any previous data from prior render controllers before we
      * attempt to load data for this currently mounted render controller.
      */
-    startUnloading(
-      controllerName,
+    startUnloading({
       targets,
       lastPathname,
       currentPathname,
-      skippedPathnames
-    )
+      skippedPathnames,
+    })
 
     /**
      * Then, start the loading process for this render controllers targets.
      */
     startLoading({
-      controllerName,
+      lastPathname,
+      currentPathname,
       targets,
       setCanceller: this.setCanceller,
       setControllerSeen: () => {
@@ -186,6 +223,7 @@ class RenderController extends React.Component<
     })
 
     // Add this controller to the list of mounted controllers.
+    addMounted(controllerNamePrefix)
     addMounted(controllerName)
 
     // Cancel any previous calls to unsetControllerSeen for this controller.
@@ -213,7 +251,7 @@ class RenderController extends React.Component<
   }
 
   componentWillUnmount(): void {
-    const { controllerName } = this.props
+    const { controllerName, controllerNamePrefix } = this.props
 
     // Set our flag to false so setState doesn't work after this.
     this.isMountedNow = false
@@ -224,6 +262,7 @@ class RenderController extends React.Component<
     // Remove this controllers name from the list of mounbted controllers so
     // unsetLoadingComplete() can run for this controller.
     removeMounted(controllerName)
+    removeMounted(controllerNamePrefix)
 
     // Remove this controllers name from the seen controllers list to allow for
     // renderFirst() methods to work again.
@@ -231,15 +270,6 @@ class RenderController extends React.Component<
     if (f !== undefined && isFunction(f)) {
       f()
     }
-  }
-
-  getControllerName = (): string => {
-    const { targets, lastPathname, currentPathname } = this.props
-    return getControllerName({
-      lastPathname,
-      currentPathname,
-      targets,
-    })
   }
 
   setCanceller = (f?: FunctionType): void => {
@@ -295,9 +325,13 @@ class RenderController extends React.Component<
   }
 
   render(): ReactNode | null {
-    const { targets, controllerName } = this.props
+    const { targets, lastPathname, currentPathname } = this.props
     const { isControllerSeen } = this.state
-    const isFirstLoad = checkForFirstLoad(controllerName, targets)
+    const isFirstLoad = checkForFirstLoad({
+      lastPathname,
+      currentPathname,
+      targets,
+    })
     const isTargetsLoaded = checkTargetsLoaded(targets)
 
     if (isTargetsLoaded) {
@@ -320,7 +354,7 @@ export function RenderControllerWithContext(
    * Ensure we always pass an array, empty or not, for the passed
    * skippedPathnames.
    */
-  let passedSkippedPathnames: SkippedPathname[] = []
+  let passedSkippedPathnames: RenderControllerSkippedPathname[] = []
   if (skippedPathnames !== undefined && isArray(skippedPathnames) === true) {
     passedSkippedPathnames = [...skippedPathnames]
   }
@@ -345,6 +379,7 @@ export function RenderControllerWithContext(
           controllerNamePrefix,
           passedSkippedPathnames
         )
+
         /**
          * Add any skippedPathnames explicitly passed in props after, so they
          * override anything we inherit from parent controllers.
