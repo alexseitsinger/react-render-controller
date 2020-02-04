@@ -1,3 +1,13 @@
+<a name="v9.1.0"></a>
+## [v9.1.0](https://github.com/alexseitsinger/react-render-controller/compare/v9.0.1...v9.1.0) (2020-02-04)
+
+### Code Refactoring
+- Misc adjustments. ([37b5cc6](https://github.com/alexseitsinger/react-render-controller/commit/37b5cc62ebe7aaa5b7e2a71777742fcbd3de6cc6))
+
+### Features
+- Adds inherit skippedPathnames. ([b1ca6bb](https://github.com/alexseitsinger/react-render-controller/commit/b1ca6bb4208ec82b727f0e76f9a8c31fcab1b272))
+
+
 <a name="v9.0.1"></a>
 ## [v9.0.1](https://github.com/alexseitsinger/react-render-controller/compare/v9.0.0...v9.0.1) (2020-02-01)
 
