@@ -1,3 +1,10 @@
+<a name="v9.2.0"></a>
+## [v9.2.0](https://github.com/alexseitsinger/react-render-controller/compare/v9.1.0...v9.2.0) (2020-02-04)
+
+### Code Refactoring
+- Removes unused variables. ([c0ea602](https://github.com/alexseitsinger/react-render-controller/commit/c0ea602fc6b465d3160cce2db0996dbf3eab950b))
+
+
 <a name="v9.1.0"></a>
 ## [v9.1.0](https://github.com/alexseitsinger/react-render-controller/compare/v9.0.1...v9.1.0) (2020-02-04)
 
