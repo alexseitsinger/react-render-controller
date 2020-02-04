@@ -20,6 +20,7 @@ export type PageProps = PageStateProps &
 export default ({ data, getData, setData }: PageProps): ReactElement => {
   return (
     <RenderController
+      controllerName={"non-empty-array"}
       targets={[
         {
           name: "non-empty-array",

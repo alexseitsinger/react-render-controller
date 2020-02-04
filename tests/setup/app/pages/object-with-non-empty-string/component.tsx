@@ -1,16 +1,13 @@
 import React, { ReactElement } from "react"
 
 import { RenderController } from "src"
-import { RenderControllerSkippedPathname } from "src/RenderController"
 
 import { SuccessfulRender } from "../../../components"
 
 import { PageDispatchProps } from "./mapDispatchToProps"
 import { PageStateProps } from "./mapStateToProps"
 
-const skipped: RenderControllerSkippedPathname[] = []
-
-export type PageProps = PageStateProps &
+type PageProps = PageStateProps &
   PageDispatchProps & {
     mockedMethods?: {
       [key: string]: () => void,
@@ -20,6 +17,7 @@ export type PageProps = PageStateProps &
 export default ({ data, getData, setData }: PageProps): ReactElement => {
   return (
     <RenderController
+      controllerName={"object-with-non-empty-string"}
       targets={[
         {
           name: "data",
@@ -31,7 +29,6 @@ export default ({ data, getData, setData }: PageProps): ReactElement => {
           setter: setData,
         },
       ]}
-      skippedPathnames={skipped}
       renderWith={(): ReactElement => <SuccessfulRender />}
     />
   )

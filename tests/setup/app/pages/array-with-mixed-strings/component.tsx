@@ -17,6 +17,7 @@ export type PageProps = PageStateProps &
 export default ({ data, getData, setData }: PageProps): ReactElement => {
   return (
     <RenderController
+      controllerName={"array-with-empty-strings-controller"}
       targets={[
         {
           name: "data",

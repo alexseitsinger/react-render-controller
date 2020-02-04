@@ -24,6 +24,7 @@ export default ({
 }: PageProps): ReactElement => {
   return (
     <RenderController
+      controllerName={"empty-array"}
       targets={[
         {
           name: "emptyArray",

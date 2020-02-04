@@ -19,6 +19,7 @@ export type PageProps = PageStateProps &
 export default ({ data, getData, setData }: PageProps): ReactElement => {
   return (
     <RenderController
+      controllerName={"object-with-empty-string"}
       targets={[
         {
           name: "data",

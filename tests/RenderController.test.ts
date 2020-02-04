@@ -1,7 +1,7 @@
 import waitForExpect from "wait-for-expect"
 
-import { FirstRender, FailedRender, SuccessfulRender } from "./setup/components"
 import setup from "./setup"
+import { FailedRender, FirstRender, SuccessfulRender } from "./setup/components"
 
 jest.setTimeout(20000)
 
@@ -26,8 +26,10 @@ describe("RenderController", () => {
       firstName: "Alex",
       lastName: "Last",
     })
+
     await waitForExpect(() => {
       wrapper.update()
+
       expect(store.getState().objectWithExcludedFieldsPage.data).toStrictEqual({
         firstName: "",
         lastName: "",
@@ -40,8 +42,10 @@ describe("RenderController", () => {
     const { wrapper, store } = setup("/object-with-empty-string")
 
     expect(wrapper.find(FirstRender)).toHaveLength(1)
+
     await waitForExpect(() => {
       wrapper.update()
+
       expect(store.getState().objectWithEmptyStringPage.data).toStrictEqual({
         name: "",
       })
@@ -53,8 +57,10 @@ describe("RenderController", () => {
     const { wrapper, store } = setup("/array-with-multiple-empty-strings")
 
     expect(wrapper.find(FirstRender)).toHaveLength(1)
+
     await waitForExpect(() => {
       wrapper.update()
+
       expect(
         store.getState().arrayWithMultipleEmptyStringsPage.data
       ).toStrictEqual(["", ""])
@@ -66,8 +72,10 @@ describe("RenderController", () => {
     const { wrapper, store } = setup("/array-with-mixed-strings")
 
     expect(wrapper.find(FirstRender)).toHaveLength(1)
+
     await waitForExpect(() => {
       wrapper.update()
+
       expect(store.getState().arrayWithMixedStringsPage.data).toStrictEqual([
         "Alex",
         "",
@@ -80,8 +88,10 @@ describe("RenderController", () => {
     const { wrapper, store } = setup("/empty-array")
 
     expect(wrapper.find(FirstRender)).toHaveLength(1)
+
     await waitForExpect(() => {
       wrapper.update()
+
       expect(store.getState().emptyArrayPage.data).toStrictEqual([])
       expect(wrapper.find(FailedRender)).toHaveLength(1)
     })
@@ -91,8 +101,10 @@ describe("RenderController", () => {
     const { wrapper, store } = setup("/non-empty-array")
 
     expect(wrapper.find(FirstRender)).toHaveLength(1)
+
     await waitForExpect(() => {
       wrapper.update()
+
       expect(store.getState().nonEmptyArrayPage.data).toStrictEqual(["Alex"])
       expect(wrapper.find(SuccessfulRender)).toHaveLength(1)
     })
@@ -102,8 +114,10 @@ describe("RenderController", () => {
     const { wrapper, store } = setup("/object-with-non-empty-string")
 
     expect(wrapper.find(FirstRender)).toHaveLength(1)
+
     await waitForExpect(() => {
       wrapper.update()
+
       expect(store.getState().objectWithNonEmptyStringPage.data).toStrictEqual({
         name: "Alex",
       })
@@ -117,6 +131,7 @@ describe("RenderController", () => {
     //expect(wrapper.find(FirstRender)).toHaveLength(1)
     await waitForExpect(() => {
       wrapper.update()
+
       expect(store.getState().objectWithMixedStringsPage.data).toStrictEqual({
         firstName: "Alex",
         lastName: "",
