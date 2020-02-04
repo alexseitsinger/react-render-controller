@@ -1,12 +1,12 @@
 import React, { ReactElement } from "react"
 
 import {
-  RenderControllerContext,
+  Context,
   RenderControllerContextProps,
 } from "./RenderControllerContext"
 import { ChildrenType } from "./types"
 
-export type RenderControllerProviderProps = RenderControllerContextProps & {
+type RenderControllerProviderProps = RenderControllerContextProps & {
   children: ChildrenType,
 }
 
@@ -15,13 +15,13 @@ export function RenderControllerProvider(
 ): ReactElement {
   const { onRenderFirst, onRenderWithout, getPathnames, children } = props
   return (
-    <RenderControllerContext.Provider
+    <Context.Provider
       value={{
         onRenderWithout,
         onRenderFirst,
         getPathnames,
       }}>
       {children}
-    </RenderControllerContext.Provider>
+    </Context.Provider>
   )
 }

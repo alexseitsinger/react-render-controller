@@ -29,22 +29,19 @@ export const updateLoadCount = (targetName: string): number => {
 }
 
 interface CheckForFirstLoadArgs {
-  lastPathname: string;
-  currentPathname: string;
+  controllerName: string;
   targets: RenderControllerTarget[];
 }
 
 export const checkForFirstLoad = ({
-  lastPathname,
-  currentPathname,
+  controllerName,
   targets,
 }: CheckForFirstLoadArgs): boolean => {
   let total = 0
 
   targets.forEach((target: RenderControllerTarget): void => {
     const targetName = getControllerTargetName({
-      lastPathname,
-      currentPathname,
+      controllerName,
       target,
     })
 

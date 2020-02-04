@@ -1,10 +1,7 @@
 import { isArray, isEmpty, isObject, isString } from "underscore"
 
-import {
-  RenderControllerPathnames,
-  RenderControllerTarget,
-} from "src/RenderController"
-import { getControllerName, getControllerTargetName } from "src/utils/general"
+import { RenderControllerTarget } from "src/RenderController"
+import { getControllerTargetName } from "src/utils/general"
 
 import { FunctionType } from "../types"
 
@@ -166,31 +163,24 @@ const loadTarget = (target: RenderControllerTarget): void => {
   target.getter()
 }
 
-type StartLoadingArgs = RenderControllerPathnames & {
-  targets: RenderControllerTarget[],
-  setCanceller: (f: () => void) => void,
-  setControllerSeen: () => void,
+interface StartLoadingArgs {
+  targets: RenderControllerTarget[];
+  controllerName: string;
+  setCanceller: (f: () => void) => void;
+  setControllerSeen: () => void;
 }
 
 export const startLoading = ({
-  lastPathname,
-  currentPathname,
+  controllerName,
   targets,
   setCanceller,
   setControllerSeen,
 }: StartLoadingArgs): void => {
   clearLoaders()
 
-  const controllerName = getControllerName({
-    lastPathname,
-    currentPathname,
-    targets,
-  })
-
   const prepareTarget = (target: RenderControllerTarget): void => {
     const targetName = getControllerTargetName({
-      lastPathname,
-      currentPathname,
+      controllerName,
       target,
     })
     const loadHandler = (): void => {

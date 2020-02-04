@@ -1,25 +1,18 @@
-import { debounce } from "underscore"
+//import { debounce } from "underscore"
 
-const mounted: string[] = []
-
-export const addMounted = debounce((controllerName: string) => {
-  const i = mounted.indexOf(controllerName)
-  if (i === -1) {
-    mounted.push(controllerName)
-  }
-}, 1000)
-
-export const removeMounted = debounce((controllerName: string) => {
-  const i = mounted.indexOf(controllerName)
-  if (i > -1) {
-    mounted.splice(i, 1)
-  }
-}, 1000)
+let mounted: string[] = []
 
 export const hasBeenMounted = (controllerName: string): boolean => {
-  const i = mounted.indexOf(controllerName)
-  if (i > -1) {
-    return true
+  return mounted.includes(controllerName)
+}
+
+export const addMounted = (controllerName: string): void => {
+  if (hasBeenMounted(controllerName)) {
+    return
   }
-  return false
+  mounted = [...mounted, controllerName]
+}
+
+export const removeMounted = (controllerName: string): void => {
+  mounted = mounted.filter(n => n !== controllerName)
 }

@@ -5,7 +5,6 @@ import {
   RenderControllerSkippedPathname,
   RenderControllerTarget,
 } from "src/RenderController"
-import { debugMessage } from "src/utils/debug"
 
 import { resetLoadCount } from "./counting"
 import {
@@ -75,8 +74,6 @@ const addUnloader = ({
     lastPathname,
     currentPathname,
   }: RenderControllerPathnames): void => {
-    debugMessage(`unload() (${targetName})`)
-
     const should = shouldUnload({
       lastPathname,
       currentPathname,
@@ -84,15 +81,9 @@ const addUnloader = ({
     })
 
     if (should) {
-      debugMessage(`  -> No skipped pathnames found, so unloading ${targetName}`)
       handler()
-      debugMessage(`  -> No skipped patnames found, so resetting load count for ${targetName}`)
       resetLoadCount(targetName)
-      debugMessage(`  -> No skipped pathnames found, so deleting unloaders for ${targetName}`)
       delete unloaders[targetName]
-    }
-    else {
-      debugMessage(`  -> Skipped pathname was found, so unloading was prevented for ${targetName} when navigating from ${lastPathname} to ${currentPathname}`)
     }
   }
 }
@@ -110,7 +101,6 @@ const runUnloaders = ({
   // the others unloaders unless we have this call to prevent unnecessary
   // repeated loading/unloading.
   if (pathnames.current === currentPathname) {
-    debugMessage(`  -> Unloading prevented because pathname saved matches current`)
     return
   }
 
@@ -130,24 +120,25 @@ const runUnloaders = ({
 }
 
 interface StartUnloadingArgs {
-  lastPathname: string;
-  currentPathname: string;
   targets: RenderControllerTarget[];
   skippedPathnames: RenderControllerSkippedPathname[];
+  controllerName: string;
+  lastPathname: string;
+  currentPathname: string;
 }
 
 export const startUnloading = ({
   targets,
+  controllerName,
+  skippedPathnames,
   lastPathname,
   currentPathname,
-  skippedPathnames,
 }: StartUnloadingArgs): void => {
   runUnloaders({ lastPathname, currentPathname })
 
   const prepareTarget = (target: RenderControllerTarget): void => {
     const targetName = getControllerTargetName({
-      lastPathname,
-      currentPathname,
+      controllerName,
       target,
     })
 
@@ -156,9 +147,7 @@ export const startUnloading = ({
         isFunction(target.setter) &&
         (isObject(target.empty) || isArray(target.empty))
       ) {
-        debugMessage(`  -> Target has setter & an empty value, so emptying data for ${targetName}`)
         target.setter(target.empty)
-        debugMessage(`  -> Target has a setter & an empty value, so resetting load count for ${targetName}`)
         resetLoadCount(targetName)
       }
     }

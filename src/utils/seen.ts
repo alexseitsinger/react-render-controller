@@ -1,23 +1,16 @@
-export const controllersSeen: string[] = []
+let seen: string[] = []
 
-export const addControllerSeen = (controllerName: string): void => {
-  const i = controllersSeen.indexOf(controllerName)
-  if (i === -1) {
-    controllersSeen.push(controllerName)
-  }
+export const hasBeenSeen = (controllerName: string): boolean => {
+  return seen.includes(controllerName)
 }
 
 export const removeControllerSeen = (controllerName: string): void => {
-  const i = controllersSeen.indexOf(controllerName)
-  if (i > -1) {
-    controllersSeen.splice(i, 1)
-  }
+  seen = seen.filter(n => n !== controllerName)
 }
 
-export const hasControllerBeenSeen = (controllerName: string): boolean => {
-  const i = controllersSeen.indexOf(controllerName)
-  if (i > -1) {
-    return true
+export const addControllerSeen = (controllerName: string): void => {
+  if (hasBeenSeen(controllerName)) {
+    return
   }
-  return false
+  seen = [...seen, controllerName]
 }

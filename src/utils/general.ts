@@ -1,66 +1,20 @@
 import { debounce } from "underscore"
 
 import {
-  RenderControllerPathnames,
   RenderControllerSkippedPathname,
   RenderControllerTarget,
 } from "src/RenderController"
 
-const convertPathname = (pn: string): string => {
-  const normalized = pn.replace(/\/\/+/, "/")
-  if (normalized === "/") {
-    return "root"
-  }
-  const bits = normalized.split("/")
-  const joined = bits.join(":")
-  if (joined.startsWith(":")) {
-    return joined.slice(1)
-  }
-  return joined
-}
-
-export const getControllerNamePrefix = ({
-  lastPathname,
-  currentPathname,
-}: RenderControllerPathnames): string => {
-  const convertedLast = convertPathname(lastPathname)
-  const convertedCurrent = convertPathname(currentPathname)
-  return `[${convertedLast}]___[${convertedCurrent}]`
-}
-
-type GetControllerNameArgs = RenderControllerPathnames & {
-  targets: RenderControllerTarget[],
-}
-
-export const getControllerName = ({
-  lastPathname,
-  currentPathname,
-  targets,
-}: GetControllerNameArgs): string => {
-  const prefix = getControllerNamePrefix({
-    lastPathname,
-    currentPathname,
-  })
-  const suffix = `[${targets
-    .map((target: RenderControllerTarget): string => target.name)
-    .join(",")}]`
-  return `${prefix}___${suffix}`
-}
-
-type GetControllerTargetNameArgs = RenderControllerPathnames & {
-  target: RenderControllerTarget,
+interface GetControllerTargetNameArgs {
+  target: RenderControllerTarget;
+  controllerName: string;
 }
 
 export const getControllerTargetName = ({
-  lastPathname,
-  currentPathname,
+  controllerName,
   target,
 }: GetControllerTargetNameArgs): string => {
-  return getControllerName({
-    lastPathname,
-    currentPathname,
-    targets: [target],
-  })
+  return `[${controllerName}]__[${target.name}]`
 }
 
 export const removeLeadingAndTrailingSlashes = (url: string): string => {
@@ -131,25 +85,84 @@ export const isMatchingPaths = (
     .every(isTrue)
 }
 
-type CreateCancellableMethodReturnType = (() => void)[]
+type Function = () => void
 
-export const createCancellableMethod = (
-  delay: number,
-  callback: () => void
-): CreateCancellableMethodReturnType => {
-  var isCancelled = false
+interface CreateCancellableArgs {
+  controllerName: string;
+  delay: number;
+  handler: Function;
+}
 
-  const method = debounce(() => {
-    if (isCancelled === true) {
-      return
+interface CancellableCache {
+  [key: string]: Function[];
+}
+
+const cancellableCache: CancellableCache = {}
+
+export const createCancellable = ({
+  controllerName,
+  delay,
+  handler,
+}: CreateCancellableArgs): Function[] => {
+  const create = (): Function[] => {
+    let isCancelled = false
+
+    const method = debounce(() => {
+      if (isCancelled) {
+        return
+      }
+
+      handler()
+    }, delay)
+
+    const cancel = (): void => {
+      isCancelled = true
     }
 
-    callback()
-  }, delay)
+    const reset = (): void => {
+      isCancelled = false
+    }
 
-  const canceller = (): void => {
-    isCancelled = true
+    return [method, cancel, reset]
   }
 
-  return [method, canceller]
+  if (!(controllerName in cancellableCache)) {
+    cancellableCache[controllerName] = create()
+  }
+
+  return cancellableCache[controllerName]
+}
+
+interface CheckerCache {
+  [key: string]: Function;
+}
+
+const checkerCache: CheckerCache = {}
+
+interface CreateCheckerArgs {
+  controllerName: string;
+  delay: number;
+  check: () => boolean;
+  complete: Function;
+}
+
+export const createChecker = ({
+  controllerName,
+  delay,
+  check,
+  complete,
+}: CreateCheckerArgs): Function => {
+  const create = (): Function => {
+    return debounce(() => {
+      if (check()) {
+        complete()
+      }
+    }, delay)
+  }
+
+  if (!(controllerName in checkerCache)) {
+    checkerCache[controllerName] = create()
+  }
+
+  return checkerCache[controllerName]
 }
