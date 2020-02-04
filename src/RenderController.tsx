@@ -102,13 +102,7 @@ class RenderController extends React.Component<
   constructor(props: RenderControllerProps) {
     super(props)
 
-    const {
-      lastPathname,
-      currentPathname,
-      controllerName,
-      controllerNamePrefix,
-      targets,
-    } = props
+    const { controllerName, controllerNamePrefix, targets } = props
 
     // Require the delay to be at least 1100ms.
     // Limit the delay to 4400ms
