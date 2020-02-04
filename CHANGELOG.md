@@ -1,3 +1,10 @@
+<a name="v9.2.1"></a>
+## [v9.2.1](https://github.com/alexseitsinger/react-render-controller/compare/v9.2.0...v9.2.1) (2020-02-04)
+
+### Bug Fixes
+- Re-applies controllerName to API. ([749267c](https://github.com/alexseitsinger/react-render-controller/commit/749267ccac1231ba518d0bb36bbf9bfa76f3b9d2))
+
+
 <a name="v9.2.0"></a>
 ## [v9.2.0](https://github.com/alexseitsinger/react-render-controller/compare/v9.1.0...v9.2.0) (2020-02-04)
 
