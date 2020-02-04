@@ -112,14 +112,13 @@ export class RenderController extends React.Component<
     this.state = {
       isControllerSeen: isSeen,
     }
-    console.log("controllerName: ", controllerName, " isSeen: ", isSeen)
+    debugMessage(`controllerName: ${controllerName}, isSeen: ${isSeen}`)
 
     this.check = createChecker({
       controllerName,
       delay: 2200,
       check: () => !hasBeenMounted(controllerName),
       complete: () => {
-        console.log("is complete")
         if (this.isMountedNow) {
           return
         }
