@@ -17,7 +17,15 @@ module.exports = {
       {
         test: /\.(j|t)sx?$/,
         include: [path.resolve("./src")],
-        use: ["babel-loader", "ts-loader"],
+        use: [
+          "babel-loader",
+          {
+            loader: "ts-loader",
+            options: {
+              configFile: "tsconfig.dev.json",
+            },
+          },
+        ],
       },
     ],
   },
