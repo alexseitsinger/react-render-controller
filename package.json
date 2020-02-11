@@ -1,6 +1,6 @@
 {
   "name": "@alexseitsinger/react-render-controller",
-  "version": "9.2.2",
+  "version": "9.2.3",
   "description": "A render controller for components that use data.",
   "main": "index.js",
   "types": "dist/types/index.d.ts",
