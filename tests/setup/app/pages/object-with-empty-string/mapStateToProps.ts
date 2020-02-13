@@ -1,4 +1,4 @@
-import { LocationsReducerState } from "@alexseitsinger/redux-locations/dist/locations/reducer"
+import { LocationsReducerState } from "@alexseitsinger/redux-locations/dist/types/locations/reducer"
 
 import { ReducerState as RootReducerState } from "tests/setup/app/reducer"
 

@@ -24,5 +24,7 @@ export const setData = (): SetDataAction => ({
 })
 
 export const getData = (): ThunkAction => (dispatch: ThunkDispatch): void => {
-  dispatch(setData())
+  setTimeout(() => {
+    dispatch(setData())
+  }, 100)
 }

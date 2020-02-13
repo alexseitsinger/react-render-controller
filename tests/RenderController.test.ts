@@ -1,9 +1,15 @@
 import waitForExpect from "wait-for-expect"
 
+import { setConfig } from "src"
+
 import setup from "./setup"
 import { FailedRender, FirstRender, SuccessfulRender } from "./setup/components"
 
 jest.setTimeout(20000)
+
+setConfig({
+  debugMessages: false,
+})
 
 // Add tests for:
 // - Assert that isControllerSeen is checked and only changed once via

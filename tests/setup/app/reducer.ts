@@ -1,5 +1,5 @@
 import { locationsReducer } from "@alexseitsinger/redux-locations"
-import { LocationsReducerState } from "@alexseitsinger/redux-locations/dist/locations/reducer"
+import { LocationsReducerState } from "@alexseitsinger/redux-locations/dist/types/locations/reducer"
 import { connectRouter } from "connected-react-router"
 import { History as BrowserHistory, MemoryHistory } from "history"
 import { combineReducers } from "redux"
