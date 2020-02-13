@@ -3,13 +3,18 @@ import { debugMessage } from "src/utils/debug"
 
 import { getControllerTargetName } from "./general"
 
+const sectionName = "counting"
+
 interface LoadCounts {
   [key: string]: number;
 }
 
 const loadCounts: LoadCounts = {}
 export function resetLoadCount(targetName: string): number {
-  debugMessage(`Resetting load count for target '${targetName}'`)
+  debugMessage({
+    message: `Resetting load count for target '${targetName}'`,
+    sectionName,
+  })
   loadCounts[targetName] = 0
   return getLoadCount(targetName)
 }
@@ -19,7 +24,10 @@ export function getLoadCount(targetName: string): number {
     resetLoadCount(targetName)
   }
   const result = loadCounts[targetName]
-  debugMessage(`Load count for target '${targetName}': ${result}`)
+  debugMessage({
+    message: `Load count for target '${targetName}': ${result}`,
+    sectionName,
+  })
   return result
 }
 
@@ -52,9 +60,10 @@ export function assertFirstLoad(
   targets: RenderControllerTarget[]
 ): boolean {
   const result = totalTargetsAttemptedLoading(controllerName, targets) === 0
-  debugMessage(
-    `Is first load for controller '${controllerName}' with ${targets.length} targets? ${result}`
-  )
+  debugMessage({
+    message: `Is first load for controller '${controllerName}' with ${targets.length} targets? ${result}`,
+    sectionName,
+  })
   return result
 }
 
@@ -63,15 +72,19 @@ export function haveTargetsAttemptedLoading(
   targets: RenderControllerTarget[]
 ): boolean {
   const total = totalTargetsAttemptedLoading(controllerName, targets)
-  const result = total === targets.length
-  debugMessage(
-    `Have all ${targets.length} targets attempted loading? ${result}`
-  )
+  const result = total >= targets.length
+  debugMessage({
+    message: `Have all of ${controllerName}'s ${targets.length} targets attempted loading? ${result}`,
+    sectionName,
+  })
   return result
 }
 
 export function hasTargetAttemptedLoading(targetName: string): boolean {
   const result = getLoadCount(targetName) > 0
-  debugMessage(`Has target '${targetName}' attempted loading? ${result}`)
+  debugMessage({
+    message: `Has target '${targetName}' attempted loading? ${result}`,
+    sectionName,
+  })
   return result
 }

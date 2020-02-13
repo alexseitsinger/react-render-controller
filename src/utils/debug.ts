@@ -17,24 +17,21 @@ export const setConfig = (newConfig: Config): void => {
   }
 }
 
-const bracketCss = ["font-weight: bold"].join(";")
-const messageCss = ["color: white"].join(";")
-const prefixCss = ["color: white"].join(";")
+interface DebugMessage {
+  message: string;
+  sectionName?: string;
+}
 
-function debugMessageFactory(prefix: string) {
-  return (message: string): void => {
+/**
+ * Restrict our debug messages so that we dont pollute server-side logs.
+ */
+function debugMessageFactory(packageName: string) {
+  return ({ message, sectionName }: DebugMessage): void => {
     if (config.debugMessages) {
-      if (isBrowser && isDevelopment) {
-        console.log(
-          `%c[%c${prefix}%c] %c${message}`,
-          bracketCss,
-          prefixCss,
-          bracketCss,
-          messageCss
-        )
-      }
-      if (isTest) {
-        console.log(`[${prefix}] ${message}`)
+      const prefix = `[${packageName}]`
+      const suffix = sectionName !== undefined ? `[${sectionName}]` : ""
+      if ((isBrowser && isDevelopment) || isTest) {
+        console.log(`${prefix}-${suffix} ${message}`)
       }
     }
   }

@@ -4,6 +4,11 @@ import { debounce, isEqual, isFunction } from "underscore"
 
 import { RenderControllerRenderProps } from "src/RenderControllerContext"
 import { RenderControllerWithContextInitialProps } from "src/RenderControllerWithContext"
+import {
+  hasCompleted,
+  setCompleted,
+  setUncompleted,
+} from "src/utils/completing"
 import { debugMessage } from "src/utils/debug"
 import {
   clearSkippedPathnames,
@@ -15,9 +20,10 @@ import { FunctionType } from "./types"
 import { assertFirstLoad } from "./utils/counting"
 import { createChecker, isDefined } from "./utils/general"
 import { assertTargetsHaveData, startLoading } from "./utils/loading"
-import { addMounted, hasMounted, removeMounted } from "./utils/mounted"
-import { addControllerSeen, hasSeen, removeControllerSeen } from "./utils/seen"
+import { hasMounted, setMounted, setUnmounted } from "./utils/mounting"
 import { startUnloading } from "./utils/unloading"
+
+const sectionName = "controller"
 
 export type RenderControllerTargetData = any[] | { [key: string]: any }
 
@@ -45,7 +51,7 @@ export type RenderControllerProps = RenderControllerWithContextInitialProps &
   }
 
 export interface RenderControllerState {
-  isControllerSeen: boolean;
+  isControllerCompleted: boolean;
 }
 
 export class RenderController extends React.Component<
@@ -95,12 +101,12 @@ export class RenderController extends React.Component<
     }
 
     // If this component gets re-mounted and it already has empty data, the
-    // default state for isControllerSeen will be false, so the loading screen
+    // default state for isControllerCompleted will be false, so the loading screen
     // will shopw. To avoid this, we track each mounted component and reset the
     // default state if its already been mounted once.
-    const isSeen = hasSeen(controllerName)
+    const isCompleted = hasCompleted(controllerName)
     this.state = {
-      isControllerSeen: isSeen,
+      isControllerCompleted: isCompleted,
     }
 
     this.check = createChecker({
@@ -126,7 +132,7 @@ export class RenderController extends React.Component<
         //const { isMountedNow } = this
         //const isMountedPreviously = hasMounted(controllerName)
         //if (!isMountedNow) {
-        removeControllerSeen(controllerName)
+        setUncompleted(controllerName)
         //}
       },
     })
@@ -136,17 +142,20 @@ export class RenderController extends React.Component<
     // again, after the data has already been loaded, but this cmponent gets
     // re-rendered.
     this.setControllerSeen = debounce(() => {
-      const { isControllerSeen } = this.state
-      if (isControllerSeen) {
-        debugMessage(`Controller '${controllerName}' is already seen.`)
+      const { isControllerCompleted } = this.state
+      if (isControllerCompleted) {
+        debugMessage({
+          message: `'${controllerName}' is already completed.`,
+          sectionName,
+        })
         return
       }
 
-      addControllerSeen(controllerName)
+      setCompleted(controllerName)
 
       // Toggle the components state to True so our renderFirst() method
       // finished, and is replaced with either renderWith() or renderWithout().
-      this.setState({ isControllerSeen: true })
+      this.setState({ isControllerCompleted: true })
     }, failDelay)
   }
 
@@ -182,7 +191,7 @@ export class RenderController extends React.Component<
     startLoading({
       controllerName,
       targets,
-      setCanceller: this.setCanceller,
+      addCanceller: this.addCanceller,
       setControllerSeen: () => {
         const f = this.setControllerSeen
         if (isDefined(f) && isFunction(f)) {
@@ -192,7 +201,7 @@ export class RenderController extends React.Component<
     })
 
     // Add this controller to the list of mounted controllers.
-    addMounted(controllerName)
+    setMounted(controllerName)
   }
 
   componentDidUpdate(prevProps: RenderControllerProps): void {
@@ -218,8 +227,8 @@ export class RenderController extends React.Component<
     this.isMountedNow = false
 
     // Remove this controllers name from the list of mounbted controllers so
-    // unsetLoadingComplete() can run for this controller.
-    removeMounted(controllerName)
+    // check() can run for this controller (if its finally unmounted).
+    setUnmounted(controllerName)
 
     const f = this.check
     if (isDefined(f) && isFunction(f)) {
@@ -230,7 +239,7 @@ export class RenderController extends React.Component<
     this.runCancellers()
   }
 
-  setCanceller = (f?: FunctionType): void => {
+  addCanceller = (f?: FunctionType): void => {
     if (isDefined(f) && isFunction(f)) {
       this.cancellers.push(f)
     }
@@ -284,21 +293,30 @@ export class RenderController extends React.Component<
 
   render(): ReactNode | null {
     const { controllerName, targets } = this.props
-    const { isControllerSeen } = this.state
+    const { isControllerCompleted } = this.state
     const isFirstLoad = assertFirstLoad(controllerName, targets)
     const isTargetsHaveData = assertTargetsHaveData(targets)
 
-    if (isFirstLoad && !isControllerSeen) {
-      debugMessage(`First render for controller '${controllerName}'`)
+    if (isFirstLoad && !isControllerCompleted) {
+      debugMessage({
+        message: `First render for '${controllerName}'`,
+        sectionName,
+      })
       return this.renderFirst()
     }
 
     if (isTargetsHaveData) {
-      debugMessage(`Rendering controller '${controllerName}' with data`)
+      debugMessage({
+        message: `Rendering '${controllerName}' with data`,
+        sectionName,
+      })
       return this.renderWith()
     }
 
-    debugMessage(`Rendering controller '${controllerName}' without data`)
+    debugMessage({
+      message: `Rendering '${controllerName}' without data`,
+      sectionName,
+    })
     return this.renderWithout()
   }
 }

@@ -3,6 +3,8 @@ import { isEqual } from "underscore"
 import { RenderControllerSkippedPathname } from "src/RenderControllerWithContext"
 import { debugMessage } from "src/utils/debug"
 
+const sectionName = "pathnames"
+
 export const removeLeadingAndTrailingSlashes = (url: string): string => {
   var updated = url
   if (updated.length === 1 && updated === "/") {
@@ -106,7 +108,7 @@ interface CachedPathnames {
 const cached: CachedPathnames = {}
 
 export function getSkippedPathnames(
-  prefix: string,
+  controllerName: string,
   passed: RenderControllerSkippedPathname[],
   currentPathname: string
 ): FinalSkippedPathname[] {
@@ -114,8 +116,8 @@ export function getSkippedPathnames(
    * Create a new array to use.
    */
   let final: FinalSkippedPathname[] = []
-  if (prefix in cached) {
-    final = [...cached[prefix]]
+  if (controllerName in cached) {
+    final = [...cached[controllerName]]
   }
   const prepared = preparePathnames(passed, currentPathname)
   final = [...final, ...prepared]
@@ -129,12 +131,13 @@ export function getSkippedPathnames(
    * If we already have the same values cached already, just re-use that array
    * instead of creating and saving this new one.
    */
-  if (prefix in cached) {
-    const current = cached[prefix]
+  if (controllerName in cached) {
+    const current = cached[controllerName]
     if (isEqual(current, final)) {
-      debugMessage(
-        `Using cached skipped pathnames for '${prefix}' to prevent redundant references.`
-      )
+      debugMessage({
+        message: `Using cached skipped pathnames for controller '${controllerName}' to prevent redundant references.`,
+        sectionName,
+      })
       return current
     }
   }
@@ -143,10 +146,11 @@ export function getSkippedPathnames(
    * Otherwise, save this final array to our local store so it can be re-used
    * again by child controllers.
    */
-  cached[prefix] = final
-  debugMessage(
-    `Saving a copy of skipped pathnames for '${prefix}', so each child render controller can inherit them`
-  )
+  cached[controllerName] = final
+  debugMessage({
+    message: `Saving a copy of skipped pathnames for controller '${controllerName}', so each child controller can inherit them`,
+    sectionName,
+  })
 
   /**
    * Return it for use in the current controller.
@@ -154,9 +158,12 @@ export function getSkippedPathnames(
   return final
 }
 
-export const clearSkippedPathnames = (prefix: string): void => {
-  if (prefix in cached) {
-    debugMessage(`Clearing cached skipped pathnames for '${prefix}'`)
-    delete cached[prefix]
+export const clearSkippedPathnames = (controllerName: string): void => {
+  if (controllerName in cached) {
+    debugMessage({
+      message: `Clearing cached skipped pathnames for '${controllerName}'`,
+      sectionName,
+    })
+    delete cached[controllerName]
   }
 }
