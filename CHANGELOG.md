@@ -1,3 +1,10 @@
+<a name="v10.0.0"></a>
+## [v10.0.0](https://github.com/alexseitsinger/react-render-controller/compare/v9.2.3...v10.0.0) (2020-02-13)
+
+### Code Refactoring
+- Changes skipped pathnames api. ([738f2c3](https://github.com/alexseitsinger/react-render-controller/commit/738f2c3d72e37a52fd7847b5cc14ca204916ac6a))
+
+
 <a name="v9.2.3"></a>
 ## [v9.2.3](https://github.com/alexseitsinger/react-render-controller/compare/v9.2.2...v9.2.3) (2020-02-11)
 
