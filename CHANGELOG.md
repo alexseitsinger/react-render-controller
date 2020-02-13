@@ -1,3 +1,10 @@
+<a name="v10.1.0"></a>
+## [v10.1.0](https://github.com/alexseitsinger/react-render-controller/compare/v10.0.0...v10.1.0) (2020-02-13)
+
+### Code Refactoring
+- Cleans up & renames modules. ([2a6b39a](https://github.com/alexseitsinger/react-render-controller/commit/2a6b39a6cb2a21e4250b68cb7646c5dfa1baca81))
+
+
 <a name="v10.0.0"></a>
 ## [v10.0.0](https://github.com/alexseitsinger/react-render-controller/compare/v9.2.3...v10.0.0) (2020-02-13)
 
