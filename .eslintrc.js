@@ -14,6 +14,9 @@ module.exports = {
       webpack: {
         config: path.resolve("./webpack.config.dev.js"),
       },
+      jest: {
+        jestConfigFile: path.resolve("./jest.config.js"),
+      },
     },
   },
   plugins: [
