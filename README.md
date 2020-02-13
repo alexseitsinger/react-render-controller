@@ -39,8 +39,7 @@ skippedPathnames | An array of objects that unloading should be skipped for.    
 
 ```javascript
 {
-  from: String,
-  to: String,
+  url: String,
   reverse: Boolean,
 }
 ```
@@ -97,8 +96,7 @@ const HomePage = ({
     ]}
     skippedPathnames={[
       {
-        from: "/",
-        to: "/about",
+        url: "/about",
         reverse: true,
       },
     ]}
