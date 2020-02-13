@@ -6,6 +6,10 @@ import {
 
 import { ReducerState as RootReducerState } from "./reducer"
 
+export interface MockedMethods {
+  [key: string]: (...args: any) => void;
+}
+
 export type ThunkAction = RealThunkAction<
   void,
   RootReducerState,

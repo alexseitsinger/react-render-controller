@@ -6,6 +6,7 @@ import { MemoryHistory } from "history"
 
 import { RenderControllerProvider } from "src"
 import { RenderControllerPathnames } from "src/RenderController"
+import { MockedMethods } from "tests/setup/app/types"
 
 import { FailedRender, FirstRender } from "../components"
 
@@ -17,14 +18,13 @@ import ObjectWithEmptyStringPage from "./pages/object-with-empty-string"
 import ObjectWithExcludedFieldsPage from "./pages/object-with-excluded-fields"
 import ObjectWithMixedStringsPage from "./pages/object-with-mixed-strings"
 import ObjectWithNonEmptyStringPage from "./pages/object-with-non-empty-string"
+import SiblingPropChangePage from "./pages/sibling-prop-change"
 import { StoreType } from "./store"
 
-export interface Props {
+export interface AppProps {
   store: StoreType;
   routerHistory: MemoryHistory;
-  mockedMethods: {
-    [key: string]: () => void,
-  };
+  mockedMethods: MockedMethods;
 }
 
 const onRenderWithout = (): ReactElement => <FailedRender />
@@ -34,7 +34,7 @@ export default ({
   store,
   routerHistory,
   mockedMethods,
-}: Props): ReactElement => (
+}: AppProps): ReactElement => (
   <RenderControllerProvider
     onRenderWithout={onRenderWithout}
     onRenderFirst={onRenderFirst}
@@ -49,77 +49,69 @@ export default ({
     <Provider store={store}>
       <ConnectedRouter history={routerHistory}>
         <Route
-          path={"/object-with-excluded-fields"}
+          path={"/sibling-prop-change"}
           exact
           render={(routeProps: RouteProps): ReactElement => (
-            <ObjectWithExcludedFieldsPage
+            <SiblingPropChangePage
               {...routeProps}
               mockedMethods={mockedMethods}
             />
+          )}
+        />
+        <Route
+          path={"/object-with-excluded-fields"}
+          exact
+          render={(routeProps: RouteProps): ReactElement => (
+            <ObjectWithExcludedFieldsPage {...routeProps} />
           )}
         />
         <Route
           path={"/array-with-mixed-strings"}
           exact
           render={(routeProps: RouteProps): ReactElement => (
-            <ArrayWithMixedStringsPage
-              {...routeProps}
-              mockedMethods={mockedMethods}
-            />
+            <ArrayWithMixedStringsPage {...routeProps} />
           )}
         />
         <Route
           path={"/array-with-multiple-empty-strings"}
           exact
           render={(routeProps: RouteProps): ReactElement => (
-            <ArrayWithMultipleEmptyStringsPage
-              {...routeProps}
-              mockedMethods={mockedMethods}
-            />
+            <ArrayWithMultipleEmptyStringsPage {...routeProps} />
           )}
         />
         <Route
           path={"/empty-array"}
           exact
           render={(routeProps: RouteProps): ReactElement => (
-            <EmptyArrayPage {...routeProps} mockedMethods={mockedMethods} />
+            <EmptyArrayPage {...routeProps} />
           )}
         />
         <Route
           path={"/non-empty-array"}
           exact
           render={(routeProps: RouteProps): ReactElement => (
-            <NonEmptyArrayPage {...routeProps} mockedMethods={mockedMethods} />
+            <NonEmptyArrayPage {...routeProps} />
           )}
         />
         <Route
           path={"/object-with-non-empty-string"}
           exact
           render={(routeProps: RouteProps): ReactElement => (
-            <ObjectWithNonEmptyStringPage
-              {...routeProps}
-              mockedMethods={mockedMethods}
-            />
+            <ObjectWithNonEmptyStringPage {...routeProps} />
           )}
         />
         <Route
           path={"/object-with-empty-string"}
           exact
           render={(routeProps: RouteProps): ReactElement => (
-            <ObjectWithEmptyStringPage
-              {...routeProps}
-              mockedMethods={mockedMethods}
-            />
+            <ObjectWithEmptyStringPage {...routeProps} />
           )}
         />
         <Route
           path={"/object-with-mixed-strings"}
           exact
           render={(routeProps: RouteProps): ReactElement => (
-            <ObjectWithMixedStringsPage
-              {...routeProps}
-              mockedMethods={mockedMethods}
-            />
+            <ObjectWithMixedStringsPage {...routeProps} />
           )}
         />
       </ConnectedRouter>

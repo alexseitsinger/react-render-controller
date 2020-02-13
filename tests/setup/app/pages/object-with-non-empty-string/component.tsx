@@ -7,12 +7,7 @@ import { SuccessfulRender } from "../../../components"
 import { PageDispatchProps } from "./mapDispatchToProps"
 import { PageStateProps } from "./mapStateToProps"
 
-type PageProps = PageStateProps &
-  PageDispatchProps & {
-    mockedMethods?: {
-      [key: string]: () => void,
-    },
-  }
+type PageProps = PageStateProps & PageDispatchProps
 
 export default ({ data, getData, setData }: PageProps): ReactElement => {
   return (

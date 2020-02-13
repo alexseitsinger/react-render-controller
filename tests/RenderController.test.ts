@@ -1,6 +1,7 @@
 import waitForExpect from "wait-for-expect"
 
 import { setConfig } from "src"
+import { ToggleButton } from "tests/setup/app/pages/sibling-prop-change/component"
 
 import setup from "./setup"
 import { FailedRender, FirstRender, SuccessfulRender } from "./setup/components"
@@ -12,20 +13,74 @@ setConfig({
 })
 
 // Add tests for:
-// - Assert that isControllerSeen is checked and only changed once via
-// constructor-created setControllerSeen method.
-// - Data is unloaded when currentPathname changes, and then re-loaded when
-// currentPathname changes back.
-// - Doesnt use cached data is the cache is empty.
-// - Uses only unique skippedPathnames from parent controllers + passed.
-// - Re-uses skippedpathnames that are saved, when they are identical, insead of replacing.
-// - Clears skippedPathnames when unmounted perm.
-// - Doesn't re-run getters for nested controllers.
-// - Doesnt unload data with updates to props/state.
+//
+// - Confirm that 'isControllerCompleted' is checked and only changed once via
+//   constructor-created 'setControllerCompleted' method.
+//
+// - Confirm that 'isControllerCompleted' reflects the correct initial value,
+//   based on the stored value from the 'completed' module.
+//
+// - 'data' is unloaded from navigating away, then re-loaded again upon returning.
+//
+// - Clears 'skippedPathnames' when unmounted finally.
+//
+// - Doesn't re-run parent 'getters' from rendering nested controllers.
+//
+// - Confirm that renderFirst() is run each time a new controller(s) is/are
+//   first mounted.
+//
+// - Confirm that 'skippedPathnames' prevents unloading 'data' when navigating
+//   to a matching url.
 
 describe("RenderController", () => {
+  it("should not re-get data when sibling elements props change", async () => {
+    const onSetData = jest.fn()
+    const onGetData = jest.fn()
+    const onSetVisible = jest.fn()
+
+    const { wrapper, store } = setup("/sibling-prop-change", {
+      onSetData,
+      onGetData,
+      onSetVisible,
+    })
+
+    expect(wrapper.find(FirstRender)).toHaveLength(1)
+    expect(store.getState().siblingPropChangePage).toStrictEqual({
+      data: {},
+      isVisible: false,
+    })
+
+    await waitForExpect(() => {
+      wrapper.update()
+
+      expect(store.getState().siblingPropChangePage.data).toStrictEqual({
+        name: "Alex",
+      })
+      expect(wrapper.find(SuccessfulRender)).toHaveLength(1)
+
+      expect(onGetData).toHaveBeenCalledTimes(1)
+      // The setter is only invoked when we're clearing data or forcing.
+      expect(onSetData).toHaveBeenCalledTimes(0)
+      expect(onSetVisible).toHaveBeenCalledTimes(0)
+
+      wrapper
+        .find(ToggleButton)
+        .props()
+        .onClick()
+
+      wrapper.update()
+
+      expect(store.getState().siblingPropChangePage.isVisible).toStrictEqual(
+        true
+      )
+      expect(onGetData).toHaveBeenCalledTimes(1)
+      expect(onSetData).toHaveBeenCalledTimes(0)
+      expect(onSetVisible).toHaveBeenCalledTimes(1)
+    })
+  })
+
   it("should use renderWithout after returning empty object from an object with excluded fields.", async () => {
-    const { wrapper, store } = setup("/object-with-excluded-fields")
+    const { wrapper, store } = setup("/object-with-excluded-fields", {})
 
     expect(wrapper.find(FirstRender)).toHaveLength(1)
     expect(store.getState().objectWithExcludedFieldsPage.data).toStrictEqual({
@@ -45,7 +100,7 @@ describe("RenderController", () => {
   })
 
   it("should use renderWithout after getData returns an object with only empty strings", async () => {
-    const { wrapper, store } = setup("/object-with-empty-string")
+    const { wrapper, store } = setup("/object-with-empty-string", {})
 
     expect(wrapper.find(FirstRender)).toHaveLength(1)
 
@@ -60,7 +115,7 @@ describe("RenderController", () => {
   })
 
   it("should use RenderWithout after getData returns an array multiple empty strings.", async () => {
-    const { wrapper, store } = setup("/array-with-multiple-empty-strings")
+    const { wrapper, store } = setup("/array-with-multiple-empty-strings", {})
 
     expect(wrapper.find(FirstRender)).toHaveLength(1)
 
@@ -75,7 +130,7 @@ describe("RenderController", () => {
   })
 
   it("should use RenderWith after getData returns an array with mixed strings.", async () => {
-    const { wrapper, store } = setup("/array-with-mixed-strings")
+    const { wrapper, store } = setup("/array-with-mixed-strings", {})
 
     expect(wrapper.find(FirstRender)).toHaveLength(1)
 
@@ -91,7 +146,7 @@ describe("RenderController", () => {
   })
 
   it("should use RenderWithout after getData returns an empty array.", async () => {
-    const { wrapper, store } = setup("/empty-array")
+    const { wrapper, store } = setup("/empty-array", {})
 
     expect(wrapper.find(FirstRender)).toHaveLength(1)
 
@@ -104,7 +159,7 @@ describe("RenderController", () => {
   })
 
   it("should use RenderWith after getData returns a non-empty array.", async () => {
-    const { wrapper, store } = setup("/non-empty-array")
+    const { wrapper, store } = setup("/non-empty-array", {})
 
     expect(wrapper.find(FirstRender)).toHaveLength(1)
 
@@ -117,7 +172,7 @@ describe("RenderController", () => {
   })
 
   it("should use RenderWith after getData returns an object with a non-empty string.", async () => {
-    const { wrapper, store } = setup("/object-with-non-empty-string")
+    const { wrapper, store } = setup("/object-with-non-empty-string", {})
 
     expect(wrapper.find(FirstRender)).toHaveLength(1)
 
@@ -132,7 +187,7 @@ describe("RenderController", () => {
   })
 
   it("should use RenderWith after getData returns an object with mixed strings.", async () => {
-    const { wrapper, store } = setup("/object-with-mixed-strings")
+    const { wrapper, store } = setup("/object-with-mixed-strings", {})
 
     //expect(wrapper.find(FirstRender)).toHaveLength(1)
     await waitForExpect(() => {

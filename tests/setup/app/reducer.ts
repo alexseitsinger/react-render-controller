@@ -28,6 +28,9 @@ import objectWithMixedStringsPageReducer, {
 import objectWithNonEmptyStringPageReducer, {
   ReducerState as ObjectWithNonEmptyStringPageReducerState,
 } from "./pages/object-with-non-empty-string/reducer"
+import siblingPropChangePageReducer, {
+  ReducerState as SiblingPropChangePageReducerState,
+} from "./pages/sibling-prop-change/reducer"
 
 export interface ReducerState {
   emptyArrayPage: EmptyArrayPageReducerState;
@@ -38,6 +41,7 @@ export interface ReducerState {
   objectWithEmptyStringPage: ObjectWithEmptyStringPageReducerState;
   objectWithNonEmptyStringPage: ObjectWithNonEmptyStringPageReducerState;
   objectWithExcludedFieldsPage: ObjectWithExcludedFieldsPageReducerState;
+  siblingPropChangePage: SiblingPropChangePageReducerState;
   locations: LocationsReducerState;
 }
 
@@ -56,5 +60,6 @@ export default (
     objectWithEmptyStringPage: objectWithEmptyStringPageReducer,
     objectWithNonEmptyStringPage: objectWithNonEmptyStringPageReducer,
     objectWithExcludedFieldsPage: objectWithExcludedFieldsPageReducer,
+    siblingPropChangePage: siblingPropChangePageReducer,
     locations: locationsReducer,
   })
