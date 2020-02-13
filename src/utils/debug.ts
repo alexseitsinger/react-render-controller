@@ -1,3 +1,7 @@
+const isDevelopment = process.env.NODE_ENV === "development"
+const isTest = process.env.NODE_ENV === "test"
+const isBrowser = typeof window !== "undefined"
+
 interface Config {
   debugMessages: boolean;
 }
@@ -13,10 +17,27 @@ export const setConfig = (newConfig: Config): void => {
   }
 }
 
-export const debugMessage = (message: string): void => {
-  if (process.env.NODE_ENV === "development") {
+const bracketCss = ["font-weight: bold"].join(";")
+const messageCss = ["color: white"].join(";")
+const prefixCss = ["color: white"].join(";")
+
+function debugMessageFactory(prefix: string) {
+  return (message: string): void => {
     if (config.debugMessages) {
-      console.log(message)
+      if (isBrowser && isDevelopment) {
+        console.log(
+          `%c[%c${prefix}%c] %c${message}`,
+          bracketCss,
+          prefixCss,
+          bracketCss,
+          messageCss
+        )
+      }
+      if (isTest) {
+        console.log(`[${prefix}] ${message}`)
+      }
     }
   }
 }
+
+export const debugMessage = debugMessageFactory("render-controller")

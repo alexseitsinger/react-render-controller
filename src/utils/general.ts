@@ -1,13 +1,24 @@
-import { debounce } from "underscore"
+import { debounce, isArray, isEmpty, isObject, isString } from "underscore"
 
-import {
-  RenderControllerSkippedPathname,
-  RenderControllerTarget,
-} from "src/RenderController"
+import { RenderControllerTarget } from "src/RenderController"
 
 interface GetControllerTargetNameArgs {
   target: RenderControllerTarget;
   controllerName: string;
+}
+
+export function isNullish(o?: any): boolean {
+  if (typeof o === "undefined" || o === null) {
+    return true
+  }
+  return false
+}
+
+export function isDefined(o?: any): boolean {
+  if (isNullish(o)) {
+    return false
+  }
+  return true
 }
 
 export const getControllerTargetName = ({
@@ -15,74 +26,6 @@ export const getControllerTargetName = ({
   target,
 }: GetControllerTargetNameArgs): string => {
   return `[${controllerName}]__[${target.name}]`
-}
-
-export const removeLeadingAndTrailingSlashes = (url: string): string => {
-  var updated = url
-  if (updated.length === 1 && updated === "/") {
-    return updated
-  }
-  updated = updated.replace(/^\//, "")
-  updated = updated.replace(/\/$/, "")
-  return updated
-}
-
-export const prepareSkippedPathnames = (
-  skippedPathnames: RenderControllerSkippedPathname[]
-): RenderControllerSkippedPathname[] => {
-  const prepared: RenderControllerSkippedPathname[] = []
-
-  skippedPathnames.forEach(obj => {
-    prepared.push({
-      from: obj.from,
-      to: obj.to,
-    })
-
-    if (obj.reverse !== undefined && obj.reverse === true) {
-      prepared.push({
-        from: obj.to,
-        to: obj.from,
-      })
-    }
-  })
-
-  return prepared
-}
-
-export const isMatchingPaths = (
-  skippedPathname: string,
-  currentPathname: string
-): boolean => {
-  const skipped = removeLeadingAndTrailingSlashes(skippedPathname)
-  const current = removeLeadingAndTrailingSlashes(currentPathname)
-
-  if (skipped === current) {
-    return true
-  }
-
-  let currentBits: string[]
-  if (current === "/") {
-    currentBits = ["/"]
-  } else {
-    currentBits = current.split("/")
-  }
-  currentBits = currentBits.filter(bit => bit.length > 0)
-
-  const isTrue = (result: boolean): boolean => result === true
-
-  return skipped
-    .split("/")
-    .map((skippedBit, i) => {
-      if (skippedBit === "*") {
-        return true
-      }
-      const isMatching =
-        currentBits.length > 0 &&
-        currentBits[i] !== undefined &&
-        currentBits[i] === skippedBit
-      return isMatching === true
-    })
-    .every(isTrue)
 }
 
 type Function = () => void
@@ -165,4 +108,39 @@ export const createChecker = ({
   }
 
   return checkerCache[controllerName]
+}
+
+export const hasValue = (o?: any): boolean => {
+  if (o === undefined || o === null) {
+    return false
+  }
+  if (isString(o) === true) {
+    return o.length > 0
+  }
+  if (isArray(o) === true) {
+    if (o.length === 0) {
+      return false
+    }
+    const results = o.map((e: any): boolean => hasValue(e))
+    const includes = results.includes(true)
+    const every = results.every((r: boolean): boolean => r === true)
+    if (includes === true || every === true) {
+      return true
+    }
+    return false
+  }
+  if (isObject(o) === true) {
+    const keys = Object.keys(o)
+    if (keys.length === 0) {
+      return false
+    }
+    const results = keys.map((k: any): boolean => hasValue(o[k]))
+    const includes = results.includes(true)
+    const every = results.every((r: boolean): boolean => r === true)
+    if (includes === true || every === true) {
+      return true
+    }
+    return false
+  }
+  return isEmpty(o) === false
 }

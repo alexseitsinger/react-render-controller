@@ -1,18 +1,22 @@
-//import { debounce } from "underscore"
+import { debugMessage } from "src/utils/debug"
 
 let mounted: string[] = []
 
-export const hasBeenMounted = (controllerName: string): boolean => {
-  return mounted.includes(controllerName)
+export function hasMounted(controllerName: string): boolean {
+  const result = mounted.includes(controllerName)
+  debugMessage(`Is controller '${controllerName}' mounted? ${result}`)
+  return result
 }
 
-export const addMounted = (controllerName: string): void => {
-  if (hasBeenMounted(controllerName)) {
+export function addMounted(controllerName: string): void {
+  if (hasMounted(controllerName)) {
     return
   }
+  debugMessage(`Setting controller '${controllerName}' as mounted`)
   mounted = [...mounted, controllerName]
 }
 
-export const removeMounted = (controllerName: string): void => {
+export function removeMounted(controllerName: string): void {
+  debugMessage(`Setting controller '${controllerName}' as unmounted`)
   mounted = mounted.filter(n => n !== controllerName)
 }

@@ -1,16 +1,13 @@
-import { isArray, isFunction, isObject } from "underscore"
-
 import {
   RenderControllerPathnames,
-  RenderControllerSkippedPathname,
   RenderControllerTarget,
 } from "src/RenderController"
+import { debugMessage } from "src/utils/debug"
+import { FinalSkippedPathname, isMatchingPaths } from "src/utils/pathnames"
 
 import { resetLoadCount } from "./counting"
 import {
   getControllerTargetName,
-  isMatchingPaths,
-  prepareSkippedPathnames,
 } from "./general"
 
 const pathnames = {
@@ -24,49 +21,51 @@ interface Unloaders {
 
 const unloaders: Unloaders = {}
 
-type ShouldUnloadArgs = RenderControllerPathnames & {
-  skippedPathnames: RenderControllerSkippedPathname[],
+type ShouldUnload = RenderControllerPathnames & {
+  skippedPathnames: FinalSkippedPathname[],
 }
 
 const shouldUnload = ({
   lastPathname,
   currentPathname,
   skippedPathnames,
-}: ShouldUnloadArgs): boolean => {
-  // Prepare our pathnames inc ase reverse or toEither or fromEither is  used.
-  const prepared = prepareSkippedPathnames(skippedPathnames)
-
+}: ShouldUnload): boolean => {
   // Check if any of hte prepared pathnames are skipped.
-  const isSkipped = prepared
-    .map((obj: RenderControllerSkippedPathname) => {
+  const isSkipped = skippedPathnames
+    .map((obj: FinalSkippedPathname) => {
       const isLast = isMatchingPaths(obj.from, lastPathname)
       const isCurrent = isMatchingPaths(obj.to, currentPathname)
       return isLast && isCurrent
     })
     .includes(true)
 
-  // If the pathname is labeled as skipped or its the same pathanme, then dont
-  // unload.
-  if (isSkipped) {
-    return false
-  }
+  debugMessage(
+    `Is unloading skipped for navigation from '${lastPathname}' to '${currentPathname}'? ${isSkipped}`
+  )
 
-  // Otherwise, do unloading.
-  return true
+  return !isSkipped
 }
 
-interface AddUnloaderArgs {
-  skippedPathnames: RenderControllerSkippedPathname[];
-  handler: () => void;
-  targetName: string;
+interface AddUnloader {
+  skippedPathnames: FinalSkippedPathname[];
+  target: RenderControllerTarget;
+  controllerName: string;
 }
 
 const addUnloader = ({
   skippedPathnames,
-  handler,
-  targetName,
-}: AddUnloaderArgs): void => {
+  target,
+  controllerName,
+}: AddUnloader): void => {
+  const targetName = getControllerTargetName({
+    controllerName,
+    target,
+  })
+
   if (targetName in unloaders) {
+    debugMessage(
+      `Not adding unloader for target '${targetName}' because one already exists`,
+    )
     return
   }
 
@@ -74,21 +73,26 @@ const addUnloader = ({
     lastPathname,
     currentPathname,
   }: RenderControllerPathnames): void => {
+    debugMessage(
+      `Running an unloader for navigation from '${lastPathname}' to '${currentPathname}'`
+    )
     const should = shouldUnload({
       lastPathname,
       currentPathname,
       skippedPathnames,
     })
-
     if (should) {
-      handler()
-      resetLoadCount(targetName)
       delete unloaders[targetName]
+      debugMessage(
+        `Setting empty data for target '${targetName}'`,
+      )
+      target.setter(target.empty)
+      resetLoadCount(targetName)
     }
   }
 }
 
-interface RunUnloadersArgs {
+interface RunUnloaders {
   lastPathname: string;
   currentPathname: string;
 }
@@ -96,11 +100,12 @@ interface RunUnloadersArgs {
 const runUnloaders = ({
   lastPathname,
   currentPathname,
-}: RunUnloadersArgs): void => {
+}: RunUnloaders): void => {
   // If we use multiple renderControllers on the same page, each one will invoke
   // the others unloaders unless we have this call to prevent unnecessary
   // repeated loading/unloading.
   if (pathnames.current === currentPathname) {
+    debugMessage("Not running unloaders because navigated to same page")
     return
   }
 
@@ -119,9 +124,9 @@ const runUnloaders = ({
   pathnames.current = currentPathname
 }
 
-interface StartUnloadingArgs {
+interface StartUnloading {
   targets: RenderControllerTarget[];
-  skippedPathnames: RenderControllerSkippedPathname[];
+  skippedPathnames: FinalSkippedPathname[];
   controllerName: string;
   lastPathname: string;
   currentPathname: string;
@@ -133,31 +138,19 @@ export const startUnloading = ({
   skippedPathnames,
   lastPathname,
   currentPathname,
-}: StartUnloadingArgs): void => {
+}: StartUnloading): void => {
+  debugMessage(
+    `Starting unloading for navigation from '${lastPathname}' to '${currentPathname}'`
+  )
   runUnloaders({ lastPathname, currentPathname })
 
-  const prepareTarget = (target: RenderControllerTarget): void => {
-    const targetName = getControllerTargetName({
+  const addNewUnloader = (target: RenderControllerTarget): void => {
+    addUnloader({
       controllerName,
       target,
-    })
-
-    const handler = (): void => {
-      if (
-        isFunction(target.setter) &&
-        (isObject(target.empty) || isArray(target.empty))
-      ) {
-        target.setter(target.empty)
-        resetLoadCount(targetName)
-      }
-    }
-
-    addUnloader({
       skippedPathnames,
-      handler,
-      targetName,
     })
   }
 
-  targets.forEach(prepareTarget)
+  targets.forEach(addNewUnloader)
 }

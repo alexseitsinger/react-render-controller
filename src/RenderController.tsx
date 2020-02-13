@@ -1,30 +1,23 @@
-import React, { ReactElement, ReactNode } from "react"
+import React, { ReactNode } from "react"
 //import PropTypes from "prop-types"
 import { debounce, isEqual, isFunction } from "underscore"
 
 import { RenderControllerRenderProps } from "src/RenderControllerContext"
-import { RenderControllerWithContextProps } from "src/RenderControllerWithContext"
+import { RenderControllerWithContextInitialProps } from "src/RenderControllerWithContext"
 import { debugMessage } from "src/utils/debug"
-import { clearSkippedPathnames } from "src/utils/skipped"
+import {
+  clearSkippedPathnames,
+  FinalSkippedPathname,
+} from "src/utils/pathnames"
 
 //import { resetAttempted } from "src/utils/attempted"
 import { FunctionType } from "./types"
-import { checkForFirstLoad } from "./utils/counting"
-import { createChecker } from "./utils/general"
-import { checkTargetsLoaded, startLoading } from "./utils/loading"
-import { addMounted, hasBeenMounted, removeMounted } from "./utils/mounted"
-import {
-  addControllerSeen,
-  hasBeenSeen,
-  removeControllerSeen,
-} from "./utils/seen"
+import { assertFirstLoad } from "./utils/counting"
+import { createChecker, isDefined } from "./utils/general"
+import { assertTargetsHaveData, startLoading } from "./utils/loading"
+import { addMounted, hasMounted, removeMounted } from "./utils/mounted"
+import { addControllerSeen, hasSeen, removeControllerSeen } from "./utils/seen"
 import { startUnloading } from "./utils/unloading"
-
-export interface RenderControllerSkippedPathname {
-  from: string;
-  to: string;
-  reverse?: boolean;
-}
 
 export type RenderControllerTargetData = any[] | { [key: string]: any }
 
@@ -45,13 +38,10 @@ export interface RenderControllerPathnames {
   currentPathname: string;
 }
 
-export type RenderControllerProps = RenderControllerWithContextProps &
+export type RenderControllerProps = RenderControllerWithContextInitialProps &
   RenderControllerPathnames &
   RenderControllerRenderProps & {
-    skippedPathnames: RenderControllerSkippedPathname[],
-    controllerName: string,
-    renderFirst?: () => ReactElement,
-    renderWithout?: () => ReactElement,
+    skippedPathnames: FinalSkippedPathname[],
   }
 
 export interface RenderControllerState {
@@ -73,19 +63,19 @@ export class RenderController extends React.Component<
   // Once a component has been mounted, we toggle a local state variable to
   // change the rendered output from renderFirst() to either renderWith() or
   // renderWithout()
-  setControllerSeen: undefined | FunctionType = undefined
+  setControllerSeen: FunctionType
 
   // Each time one of these components is unmounted, it invokes a debounced
   // method to run functions following its unmounting. However, if the component
   // is remounted before the timeout completes, this handler method is
   // cancelled.
-  handleUnmount: undefined | FunctionType = undefined
+  handleUnmount: FunctionType
 
   // Prevents the handleUnmount method from actually running. This is invoked
   // during mounting each time the component is mounted.
-  cancelHandleUnmount: undefined | FunctionType = undefined
+  cancelHandleUnmount: FunctionType
 
-  check: undefined | (() => void)
+  check: () => void
 
   constructor(props: RenderControllerProps) {
     super(props)
@@ -98,7 +88,7 @@ export class RenderController extends React.Component<
 
     const realSetState = this.setState.bind(this)
     this.setState = (...args): void => {
-      if (this.isMountedNow === false) {
+      if (!this.isMountedNow) {
         return
       }
       realSetState(...args)
@@ -108,16 +98,15 @@ export class RenderController extends React.Component<
     // default state for isControllerSeen will be false, so the loading screen
     // will shopw. To avoid this, we track each mounted component and reset the
     // default state if its already been mounted once.
-    const isSeen = hasBeenSeen(controllerName)
+    const isSeen = hasSeen(controllerName)
     this.state = {
       isControllerSeen: isSeen,
     }
-    debugMessage(`controllerName: ${controllerName}, isSeen: ${isSeen}`)
 
     this.check = createChecker({
       controllerName,
       delay: 2200,
-      check: () => !hasBeenMounted(controllerName),
+      check: () => !hasMounted(controllerName),
       complete: () => {
         if (this.isMountedNow) {
           return
@@ -125,8 +114,8 @@ export class RenderController extends React.Component<
 
         // When its determined that this pathname combination isnt being used,
         // run some functions to clear our our local caches.
-        const isPrefixMounted = hasBeenMounted(controllerName)
-        if (isPrefixMounted === false) {
+        const isPrefixMounted = hasMounted(controllerName)
+        if (!isPrefixMounted) {
           clearSkippedPathnames(controllerName)
         }
 
@@ -135,9 +124,8 @@ export class RenderController extends React.Component<
         // handler from removing itself while its about to be
         // re-used/re-rendered again.
         //const { isMountedNow } = this
-        //const isMountedPreviously = hasBeenMounted(controllerName)
+        //const isMountedPreviously = hasMounted(controllerName)
         //if (!isMountedNow) {
-        debugMessage(`Removing controllerSeen (${controllerName})`)
         removeControllerSeen(controllerName)
         //}
       },
@@ -150,10 +138,10 @@ export class RenderController extends React.Component<
     this.setControllerSeen = debounce(() => {
       const { isControllerSeen } = this.state
       if (isControllerSeen) {
+        debugMessage(`Controller '${controllerName}' is already seen.`)
         return
       }
 
-      debugMessage(`-> Setting isControllerSeen to true. (${controllerName})`)
       addControllerSeen(controllerName)
 
       // Toggle the components state to True so our renderFirst() method
@@ -197,7 +185,7 @@ export class RenderController extends React.Component<
       setCanceller: this.setCanceller,
       setControllerSeen: () => {
         const f = this.setControllerSeen
-        if (f !== undefined && isFunction(f)) {
+        if (isDefined(f) && isFunction(f)) {
           f()
         }
       },
@@ -211,15 +199,14 @@ export class RenderController extends React.Component<
     const { targets } = this.props
 
     const f = this.setControllerSeen
-    if (f !== undefined && isFunction(f)) {
+    if (isDefined(f) && isFunction(f)) {
       f()
     }
 
     // If we have pending loads, and then we navigate away from that controller
     // before the load completes, the data will clear, and then load again.
     // To avoid this, cancel any pending loads everytime our targets change.
-    const isTargetsSame = isEqual(targets, prevProps.targets)
-    if (isTargetsSame === false) {
+    if (!isEqual(targets, prevProps.targets)) {
       this.runCancellers()
     }
   }
@@ -234,8 +221,9 @@ export class RenderController extends React.Component<
     // unsetLoadingComplete() can run for this controller.
     removeMounted(controllerName)
 
-    if (this.check !== undefined && isFunction(this.check)) {
-      this.check()
+    const f = this.check
+    if (isDefined(f) && isFunction(f)) {
+      f()
     }
 
     // Before any unmounting, cancel any pending loads.
@@ -243,7 +231,7 @@ export class RenderController extends React.Component<
   }
 
   setCanceller = (f?: FunctionType): void => {
-    if (f !== undefined && isFunction(f)) {
+    if (isDefined(f) && isFunction(f)) {
       this.cancellers.push(f)
     }
   }
@@ -263,7 +251,7 @@ export class RenderController extends React.Component<
       return renderFirst()
     }
 
-    if (onRenderFirst !== undefined && isFunction(onRenderFirst)) {
+    if (isDefined(onRenderFirst) && isFunction(onRenderFirst)) {
       return onRenderFirst()
     }
 
@@ -277,7 +265,7 @@ export class RenderController extends React.Component<
       return renderWithout()
     }
 
-    if (onRenderWithout !== undefined && isFunction(onRenderWithout)) {
+    if (isDefined(onRenderWithout) && isFunction(onRenderWithout)) {
       return onRenderWithout()
     }
 
@@ -287,7 +275,7 @@ export class RenderController extends React.Component<
   renderWith = (): ReactNode => {
     const { renderWith, children } = this.props
 
-    if (renderWith !== undefined && isFunction(renderWith)) {
+    if (isDefined(renderWith) && isFunction(renderWith)) {
       return renderWith()
     }
 
@@ -297,20 +285,20 @@ export class RenderController extends React.Component<
   render(): ReactNode | null {
     const { controllerName, targets } = this.props
     const { isControllerSeen } = this.state
-    const isFirstLoad = checkForFirstLoad({
-      controllerName,
-      targets,
-    })
-    const isTargetsLoaded = checkTargetsLoaded(targets)
+    const isFirstLoad = assertFirstLoad(controllerName, targets)
+    const isTargetsHaveData = assertTargetsHaveData(targets)
 
-    if (isTargetsLoaded) {
-      return this.renderWith()
-    }
-
-    if (isFirstLoad && isControllerSeen === false) {
+    if (isFirstLoad && !isControllerSeen) {
+      debugMessage(`First render for controller '${controllerName}'`)
       return this.renderFirst()
     }
 
+    if (isTargetsHaveData) {
+      debugMessage(`Rendering controller '${controllerName}' with data`)
+      return this.renderWith()
+    }
+
+    debugMessage(`Rendering controller '${controllerName}' without data`)
     return this.renderWithout()
   }
 }

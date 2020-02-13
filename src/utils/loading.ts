@@ -1,11 +1,14 @@
-import { isArray, isEmpty, isObject, isString } from "underscore"
+import { isArray, isObject } from "underscore"
 
 import { RenderControllerTarget } from "src/RenderController"
-import { getControllerTargetName } from "src/utils/general"
+import {
+  haveTargetsAttemptedLoading,
+  updateLoadCount,
+} from "src/utils/counting"
+import { getControllerTargetName, hasValue } from "src/utils/general"
 
 import { FunctionType } from "../types"
 
-import { areAttempted, resetAttempted, setAttempted } from "./attempted"
 import { debugMessage } from "./debug"
 
 interface Loaders {
@@ -14,47 +17,14 @@ interface Loaders {
 
 const loaders: Loaders = {}
 
-const hasValue = (o?: any): boolean => {
-  if (o === undefined || o === null) {
-    return false
-  }
-  if (isString(o) === true) {
-    return o.length > 0
-  }
-  if (isArray(o) === true) {
-    if (o.length === 0) {
-      return false
-    }
-    const results = o.map((e: any): boolean => hasValue(e))
-    const includes = results.includes(true)
-    const every = results.every((r: boolean): boolean => r === true)
-    if (includes === true || every === true) {
-      return true
-    }
-    return false
-  }
-  if (isObject(o) === true) {
-    const keys = Object.keys(o)
-    if (keys.length === 0) {
-      return false
-    }
-    const results = keys.map((k: any): boolean => hasValue(o[k]))
-    const includes = results.includes(true)
-    const every = results.every((r: boolean): boolean => r === true)
-    if (includes === true || every === true) {
-      return true
-    }
-    return false
-  }
-  return isEmpty(o) === false
-}
-
-const targetHasData = (target: RenderControllerTarget): boolean => {
+function assertTargetHasData(target: RenderControllerTarget): boolean {
   const excluded = isArray(target.excluded) ? target.excluded : []
   const { data } = target
 
   if (isArray(data)) {
-    return hasValue(data.filter(s => excluded.includes(s) === false))
+    const result = hasValue(data.filter(s => excluded.includes(s) === false))
+    debugMessage(`Is target '${target.name}' loaded?: ${result}`)
+    return result
   }
   if (isObject(data)) {
     const newData = {
@@ -67,18 +37,27 @@ const targetHasData = (target: RenderControllerTarget): boolean => {
       }
     })
 
-    return hasValue(newData)
+    const result = hasValue(newData)
+    debugMessage(`Is target '${target.name}' loaded? ${result}`)
+    return result
   }
 
-  return hasValue(data)
+  const result = hasValue(data)
+  debugMessage(`Is target '${target.name}' loaded? ${result}`)
+  return result
 }
 
-export const checkTargetsLoaded = (
+export function assertTargetsHaveData(
   targets: RenderControllerTarget[]
-): boolean => targets.map(targetHasData).every(b => b === true)
+): boolean {
+  const result = targets.map(assertTargetHasData).every(b => b === true)
+  debugMessage(`Are all ${targets.length} targets received data? ${result}`)
+  return result
+}
 
-const clearLoaders = (): void => {
+const clearOldLoaders = (): void => {
   const keys = Object.keys(loaders)
+  debugMessage(`Clearing ${keys.length} loaders`)
   while (keys.length > 0) {
     const k = keys.shift()
     if (k !== undefined) {
@@ -87,36 +66,50 @@ const clearLoaders = (): void => {
   }
 }
 
-const addLoader = (
-  targetName: string,
-  handler: () => void,
-  callback: () => void
-): (() => void) | undefined => {
-  var isLoadCancelled = false
+function addLoader(
+  controllerName: string,
+  target: RenderControllerTarget,
+  targets: RenderControllerTarget[],
+  setControllerSeen: () => void
+): (() => void) | undefined {
+  let isLoadCancelled = false
+
+  const targetName = getControllerTargetName({
+    controllerName,
+    target,
+  })
 
   if (targetName in loaders) {
+    debugMessage(`A loader already exists for target '${targetName}'`)
     return
   }
 
+  debugMessage(`Adding a loader for target '${targetName}'`)
+
   loaders[targetName] = (): void => {
     delete loaders[targetName]
-    if (isLoadCancelled === true) {
-      debugMessage(`  -> Load is cancelled for ${targetName}`)
+    if (isLoadCancelled) {
+      debugMessage(`Loading was cancelled for ${targetName}`)
       return
     }
-    handler()
-    callback()
+    debugMessage(`Loading target '${targetName}'`)
+    loadDataForTarget(target)
+    updateLoadCount(targetName)
+    const isAttempted = haveTargetsAttemptedLoading(controllerName, targets)
+    if (isAttempted) {
+      setControllerSeen()
+    }
   }
 
   return (): void => {
-    debugMessage(`  -> Cancelling load for ${targetName}`)
+    debugMessage(`Cancelling load for ${targetName}`)
     isLoadCancelled = true
   }
 }
 
 const startRunningLoaders = (): void => {
-  debugMessage(`startRunningLoaders()`)
   const keys = Object.keys(loaders)
+  debugMessage(`Running ${keys.length} loaders`)
   while (keys.length > 0) {
     const key = keys.shift()
     if (key !== undefined) {
@@ -125,10 +118,16 @@ const startRunningLoaders = (): void => {
   }
 }
 
-const loadTarget = (target: RenderControllerTarget): void => {
-  if (targetHasData(target)) {
+function loadDataForTarget(target: RenderControllerTarget): void {
+  debugMessage(`Attempting to load target '${target.name}'`)
+
+  if (assertTargetHasData(target)) {
+    debugMessage(`Target '${target.name}' already has data loaded`)
     if (target.forced !== undefined && target.forced === true) {
       if (target.attempted !== undefined) {
+        debugMessage(
+          `Loading is forced for target '${target.name}', so running getter`
+        )
         target.attempted = true
         target.getter()
         return
@@ -141,7 +140,7 @@ const loadTarget = (target: RenderControllerTarget): void => {
      * doesn't. Therefore, to avoid this problem, when data exists already,
      * re-set it using the setter.
      */
-    debugMessage(`  -> Re-setting data for target (${target.name})`)
+    debugMessage(`Re-setting previous data for target '${target.name}'`)
     target.setter(target.data)
     return
   }
@@ -159,7 +158,7 @@ const loadTarget = (target: RenderControllerTarget): void => {
   // return
   // }
   //
-  debugMessage(`  -> Getting new data for target. (${target.name})`)
+  debugMessage(`Getting fresh data for target '${target.name}'`)
   target.getter()
 }
 
@@ -176,25 +175,18 @@ export const startLoading = ({
   setCanceller,
   setControllerSeen,
 }: StartLoadingArgs): void => {
-  clearLoaders()
+  debugMessage(
+    `Starting loading for controller '${controllerName}' with ${targets.length} targets`
+  )
+  clearOldLoaders()
 
-  const prepareTarget = (target: RenderControllerTarget): void => {
-    const targetName = getControllerTargetName({
+  const addNewLoader = (target: RenderControllerTarget): void => {
+    const canceller = addLoader(
       controllerName,
       target,
-    })
-    const loadHandler = (): void => {
-      loadTarget(target)
-    }
-    const loadHandlerCallback = (): void => {
-      setAttempted(controllerName, target.name)
-      const isAttempted = areAttempted(controllerName, targets)
-      if (isAttempted) {
-        setControllerSeen()
-        resetAttempted(controllerName)
-      }
-    }
-    const canceller = addLoader(targetName, loadHandler, loadHandlerCallback)
+      targets,
+      setControllerSeen
+    )
     if (canceller !== undefined) {
       setCanceller(canceller)
     }
@@ -207,7 +199,7 @@ export const startLoading = ({
   while (arr.length > 0) {
     const target = arr.shift()
     if (target !== undefined) {
-      prepareTarget(target)
+      addNewLoader(target)
     }
   }
 

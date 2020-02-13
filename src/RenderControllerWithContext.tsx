@@ -1,51 +1,67 @@
 import React, { ReactElement } from "react"
 import { isArray } from "underscore"
 
-import {
-  RenderController,
-  RenderControllerSkippedPathname,
-  RenderControllerTarget,
-} from "src/RenderController"
+import { RenderController, RenderControllerTarget } from "src/RenderController"
 import {
   Context,
   RenderControllerRenderProps,
 } from "src/RenderControllerContext"
 import { ChildrenType, RenderFunctionType } from "src/types"
-import { getSkippedPathnames } from "src/utils/skipped"
+import { isDefined } from "src/utils/general"
+import { FinalSkippedPathname, getSkippedPathnames } from "src/utils/pathnames"
 
-export type RenderControllerWithContextProps = {
-  children?: ChildrenType,
-  renderWith?: RenderFunctionType,
-  renderWithout?: RenderFunctionType,
-  renderFirst?: RenderFunctionType,
-  skippedPathnames?: RenderControllerSkippedPathname[],
-  targets: RenderControllerTarget[],
-  controllerName: string,
-} & RenderControllerRenderProps
+const defaultProps = {
+  skippedPathnames: [],
+}
+
+type DefaultProps = Readonly<typeof defaultProps>
+
+export interface RenderControllerSkippedPathname {
+  url: string;
+  reverse?: boolean;
+}
+
+export interface RenderControllerWithContextInitialProps {
+  children?: ChildrenType;
+  renderWith?: RenderFunctionType;
+  renderWithout?: RenderFunctionType;
+  renderFirst?: RenderFunctionType;
+  targets: RenderControllerTarget[];
+  controllerName: string;
+}
+
+export type RenderControllerWithContextProps = RenderControllerWithContextInitialProps &
+  RenderControllerRenderProps &
+  Partial<DefaultProps> & {
+    skippedPathnames?: RenderControllerSkippedPathname[],
+  }
 
 export function RenderControllerWithContext(
   props: RenderControllerWithContextProps
 ): ReactElement {
   const { skippedPathnames, controllerName } = props
-  /**
-   * Ensure we always pass an array, empty or not, for the passed
-   * skippedPathnames.
-   */
-  let passedSkippedPathnames: RenderControllerSkippedPathname[] = []
-  if (skippedPathnames !== undefined && isArray(skippedPathnames) === true) {
-    passedSkippedPathnames = [...skippedPathnames]
-  }
 
   return (
     <Context.Consumer>
       {({ onRenderFirst, onRenderWithout, getPathnames }): ReactElement => {
         const { lastPathname, currentPathname } = getPathnames()
+
+        /**
+         * Ensure we always pass an array, empty or not, for the passed
+         * skippedPathnames.
+         */
+        let defaultSkippedPathnames: RenderControllerSkippedPathname[] = []
+        if (isDefined(skippedPathnames) && isArray(skippedPathnames)) {
+          defaultSkippedPathnames = [...skippedPathnames]
+        }
+
         /**
          * Combine skipped pathnames from parent controllers.
          */
-        const finalSkippedPathnames = getSkippedPathnames(
+        const finalSkippedPathnames: FinalSkippedPathname[] = getSkippedPathnames(
           controllerName,
-          passedSkippedPathnames
+          defaultSkippedPathnames,
+          currentPathname
         )
 
         /**
@@ -66,3 +82,5 @@ export function RenderControllerWithContext(
     </Context.Consumer>
   )
 }
+
+RenderControllerWithContext.defaultProps = defaultProps
