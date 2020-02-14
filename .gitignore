@@ -1,3 +1,4 @@
+*.core
 build/
 dist/
 .yalc/
@@ -62,5 +63,3 @@ typings/
 
 # dotenv environment variables file
 .env
-
-
