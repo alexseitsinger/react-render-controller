@@ -1,4 +1,4 @@
-import { isArray, isEqual, isObject } from "underscore"
+import { isArray, isEmpty, isEqual, isObject } from "underscore"
 
 import { RenderControllerTarget } from "src/RenderController"
 import {
@@ -44,7 +44,6 @@ function assertTargetHasData(target: RenderControllerTarget): boolean {
     const newData = {
       ...data,
     }
-
     Object.keys(data).forEach(key => {
       if (excluded.includes(key)) {
         delete newData[key]
@@ -210,40 +209,28 @@ function loadDataForTarget(
     return
   }
 
-  updateLoadCount(targetName)
-
-  //
-  // if (doesTargetHaveData(target) === true) {
-  // if (shouldBeCached(fullName, target) === true) {
-  //     setCachedData(fullName, target.data)
-  // }
-  // }
-  //
-  // const cached = getCachedData(fullName)
-  // if (isDataEmpty(cached) === false) {
-  // target.setter(cached)
-  // return
-  // }
-  //
   debugMessage({
     message: `Getting fresh data for target '${targetName}'`,
     sectionName,
   })
+
   target.getter()
+
+  updateLoadCount(targetName)
 }
 
 interface StartLoadingArgs {
   targets: RenderControllerTarget[];
   controllerName: string;
   addCanceller: (f: () => void) => void;
-  setControllerSeen: () => void;
+  setControllerCompleted: () => void;
 }
 
 export const startLoading = ({
   controllerName,
   targets,
   addCanceller,
-  setControllerSeen,
+  setControllerCompleted,
 }: StartLoadingArgs): void => {
   debugMessage({
     message: `Starting loading for controller '${controllerName}' with ${targets.length} targets`,
@@ -255,7 +242,7 @@ export const startLoading = ({
     const callback = (): void => {
       const isAttempted = haveTargetsAttemptedLoading(controllerName, targets)
       if (isAttempted) {
-        setControllerSeen()
+        setControllerCompleted()
       }
     }
     const canceller = addLoader(controllerName, target, callback)

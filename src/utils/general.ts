@@ -111,13 +111,13 @@ export const createChecker = ({
 }
 
 export const hasValue = (o?: any): boolean => {
-  if (o === undefined || o === null) {
+  if (isNullish(o)) {
     return false
   }
-  if (isString(o) === true) {
+  if (isString(o)) {
     return o.length > 0
   }
-  if (isArray(o) === true) {
+  if (isArray(o)) {
     if (o.length === 0) {
       return false
     }
@@ -129,7 +129,7 @@ export const hasValue = (o?: any): boolean => {
     }
     return false
   }
-  if (isObject(o) === true) {
+  if (isObject(o)) {
     const keys = Object.keys(o)
     if (keys.length === 0) {
       return false
@@ -137,7 +137,7 @@ export const hasValue = (o?: any): boolean => {
     const results = keys.map((k: any): boolean => hasValue(o[k]))
     const includes = results.includes(true)
     const every = results.every((r: boolean): boolean => r === true)
-    if (includes === true || every === true) {
+    if (includes || every) {
       return true
     }
     return false

@@ -41,12 +41,14 @@ const shouldUnload = ({
     })
     .includes(true)
 
+  const result = !isSkipped
+
   debugMessage({
-    message: `Is unloading skipped for navigation from '${lastPathname}' to '${currentPathname}'? ${isSkipped}`,
+    message: `Should unload for navigating from '${lastPathname}' to '${currentPathname}'? ${result}`,
     sectionName,
   })
 
-  return !isSkipped
+  return result
 }
 
 interface AddUnloader {
@@ -72,6 +74,11 @@ const addUnloader = ({
   })
     return
   }
+
+  debugMessage({
+    message: `Adding an unloader for '${targetName}'`,
+    sectionName,
+  })
 
   unloaders[targetName] = ({
     lastPathname,

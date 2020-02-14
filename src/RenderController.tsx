@@ -69,7 +69,7 @@ export class RenderController extends React.Component<
   // Once a component has been mounted, we toggle a local state variable to
   // change the rendered output from renderFirst() to either renderWith() or
   // renderWithout()
-  setControllerSeen: FunctionType
+  setControllerCompleted: FunctionType
 
   // Each time one of these components is unmounted, it invokes a debounced
   // method to run functions following its unmounting. However, if the component
@@ -115,6 +115,10 @@ export class RenderController extends React.Component<
       check: () => !hasMounted(controllerName),
       complete: () => {
         if (this.isMountedNow) {
+          debugMessage({
+            message: `Controller is currently mounted, so cancelling unmount process for '${controllerName}'`,
+            sectionName,
+          })
           return
         }
 
@@ -141,7 +145,7 @@ export class RenderController extends React.Component<
     // controllers seen. This prevents the renderFirst() method from displaying
     // again, after the data has already been loaded, but this cmponent gets
     // re-rendered.
-    this.setControllerSeen = debounce(() => {
+    this.setControllerCompleted = debounce(() => {
       const { isControllerCompleted } = this.state
       if (isControllerCompleted) {
         debugMessage({
@@ -168,6 +172,11 @@ export class RenderController extends React.Component<
       controllerName,
     } = this.props
 
+    debugMessage({
+      message: `Mounting controller '${controllerName}'`,
+      sectionName,
+    })
+
     /**
      * Make sure we set the local flag to true, so our setState method works.
      */
@@ -192,8 +201,8 @@ export class RenderController extends React.Component<
       controllerName,
       targets,
       addCanceller: this.addCanceller,
-      setControllerSeen: () => {
-        const f = this.setControllerSeen
+      setControllerCompleted: () => {
+        const f = this.setControllerCompleted
         if (isDefined(f) && isFunction(f)) {
           f()
         }
@@ -205,9 +214,14 @@ export class RenderController extends React.Component<
   }
 
   componentDidUpdate(prevProps: RenderControllerProps): void {
-    const { targets } = this.props
+    const { targets, controllerName } = this.props
 
-    const f = this.setControllerSeen
+    debugMessage({
+      message: `Updating controller '${controllerName}'`,
+      sectionName,
+    })
+
+    const f = this.setControllerCompleted
     if (isDefined(f) && isFunction(f)) {
       f()
     }
