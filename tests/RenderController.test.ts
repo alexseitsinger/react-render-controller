@@ -9,7 +9,15 @@ import { FailedRender, FirstRender, SuccessfulRender } from "./setup/components"
 jest.setTimeout(20000)
 
 setConfig({
-  debugMessages: false,
+  debugLevels: {
+    pathnames: 0,
+    controller: 0,
+    completing: 0,
+    counting: 0,
+    loading: 0,
+    unloading: 0,
+    mounting: 0,
+  },
 })
 
 // Add tests for:
