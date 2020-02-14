@@ -2,15 +2,13 @@ import {
   RenderControllerPathnames,
   RenderControllerTarget,
 } from "src/RenderController"
-import { debugMessage } from "src/utils/debug"
+import { unloadingMessage } from "src/utils/debug"
 import { FinalSkippedPathname, isMatchingPaths } from "src/utils/pathnames"
 
 import { resetLoadCount } from "./counting"
 import {
   getControllerTargetName,
 } from "./general"
-
-const sectionName = "unloading"
 
 const pathnames = {
   last: "/",
@@ -43,9 +41,9 @@ const shouldUnload = ({
 
   const result = !isSkipped
 
-  debugMessage({
-    message: `Should unload for navigating from '${lastPathname}' to '${currentPathname}'? ${result}`,
-    sectionName,
+  unloadingMessage({
+    text: `Should unload for navigating from '${lastPathname}' to '${currentPathname}'? ${result}`,
+    level: 2,
   })
 
   return result
@@ -68,40 +66,47 @@ const addUnloader = ({
   })
 
   if (targetName in unloaders) {
-    debugMessage({
-      message: `Not adding unloader for target '${targetName}' because one already exists`,
-      sectionName,
-  })
+    unloadingMessage({
+      text: `Not adding unloader for target '${targetName}' because one already exists`,
+      level: 3,
+    })
     return
   }
 
-  debugMessage({
-    message: `Adding an unloader for '${targetName}'`,
-    sectionName,
+  unloadingMessage({
+    text: `Adding an unloader for '${targetName}'`,
+    level: 1,
   })
 
   unloaders[targetName] = ({
     lastPathname,
     currentPathname,
   }: RenderControllerPathnames): void => {
-    debugMessage({
-      message: `Running an unloader for navigation from '${lastPathname}' to '${currentPathname}'`,
-      sectionName,
-    })
     const should = shouldUnload({
       lastPathname,
       currentPathname,
       skippedPathnames,
     })
-    if (should) {
-      delete unloaders[targetName]
-      debugMessage({
-        message: `Setting empty data for target '${targetName}'`,
-        sectionName,
+
+    if (!should) {
+      unloadingMessage({
+        text: `Skipping unloader for navigation from '${lastPathname}' to '${currentPathname}'`,
+        level: 3,
       })
-      target.setter(target.empty)
-      resetLoadCount(targetName)
+      return
     }
+
+    unloadingMessage({
+      text: `Running unloader for navigation from '${lastPathname}' to '${currentPathname}'`,
+      level: 1,
+    })
+    delete unloaders[targetName]
+    unloadingMessage({
+      text: `Setting empty data for target '${targetName}'`,
+      level: 3,
+    })
+    target.setter(target.empty)
+    resetLoadCount(targetName)
   }
 }
 
@@ -118,14 +123,18 @@ const runUnloaders = ({
   // the others unloaders unless we have this call to prevent unnecessary
   // repeated loading/unloading.
   if (pathnames.current === currentPathname) {
-    debugMessage({
-      message: "Not running unloaders because navigated to same page",
-      sectionName,
+    unloadingMessage({
+      text: "Not running unloaders because navigated to same page",
+      level: 2,
     })
     return
   }
 
   const keys = Object.keys(unloaders)
+  unloadingMessage({
+    text: `Trying ${keys.length} unloaders.`,
+    level: 1,
+  })
   while (keys.length > 0) {
     const k = keys.shift()
     if (k !== undefined) {
@@ -155,10 +164,6 @@ export const startUnloading = ({
   lastPathname,
   currentPathname,
 }: StartUnloading): void => {
-  debugMessage({
-    message: `Starting unloading for navigation from '${lastPathname}' to '${currentPathname}'`,
-    sectionName,
-  })
   runUnloaders({ lastPathname, currentPathname })
 
   const addNewUnloader = (target: RenderControllerTarget): void => {

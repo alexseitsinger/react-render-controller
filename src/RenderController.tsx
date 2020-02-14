@@ -9,7 +9,7 @@ import {
   setCompleted,
   setUncompleted,
 } from "src/utils/completing"
-import { debugMessage } from "src/utils/debug"
+import { controllerMessage } from "src/utils/debug"
 import {
   clearSkippedPathnames,
   FinalSkippedPathname,
@@ -22,8 +22,6 @@ import { createChecker, isDefined } from "./utils/general"
 import { assertTargetsHaveData, startLoading } from "./utils/loading"
 import { hasMounted, setMounted, setUnmounted } from "./utils/mounting"
 import { startUnloading } from "./utils/unloading"
-
-const sectionName = "controller"
 
 export type RenderControllerTargetData = any[] | { [key: string]: any }
 
@@ -115,9 +113,9 @@ export class RenderController extends React.Component<
       check: () => !hasMounted(controllerName),
       complete: () => {
         if (this.isMountedNow) {
-          debugMessage({
-            message: `Controller is currently mounted, so cancelling unmount process for '${controllerName}'`,
-            sectionName,
+          controllerMessage({
+            text: `Controller is currently mounted, so cancelling unmount process for '${controllerName}'`,
+            level: 3,
           })
           return
         }
@@ -148,9 +146,9 @@ export class RenderController extends React.Component<
     this.setControllerCompleted = debounce(() => {
       const { isControllerCompleted } = this.state
       if (isControllerCompleted) {
-        debugMessage({
-          message: `'${controllerName}' is already completed.`,
-          sectionName,
+        controllerMessage({
+          text: `'${controllerName}' is already completed.`,
+          level: 3,
         })
         return
       }
@@ -172,9 +170,9 @@ export class RenderController extends React.Component<
       controllerName,
     } = this.props
 
-    debugMessage({
-      message: `Mounting controller '${controllerName}'`,
-      sectionName,
+    controllerMessage({
+      text: `Mounting controller '${controllerName}'`,
+      level: 1,
     })
 
     /**
@@ -216,9 +214,9 @@ export class RenderController extends React.Component<
   componentDidUpdate(prevProps: RenderControllerProps): void {
     const { targets, controllerName } = this.props
 
-    debugMessage({
-      message: `Updating controller '${controllerName}'`,
-      sectionName,
+    controllerMessage({
+      text: `Updating controller '${controllerName}'`,
+      level: 1,
     })
 
     const f = this.setControllerCompleted
@@ -312,24 +310,24 @@ export class RenderController extends React.Component<
     const isTargetsHaveData = assertTargetsHaveData(targets)
 
     if (isFirstLoad && !isControllerCompleted) {
-      debugMessage({
-        message: `First render for '${controllerName}'`,
-        sectionName,
+      controllerMessage({
+        text: `First render for '${controllerName}'`,
+        level: 1,
       })
       return this.renderFirst()
     }
 
     if (isTargetsHaveData) {
-      debugMessage({
-        message: `Rendering '${controllerName}' with data`,
-        sectionName,
+      controllerMessage({
+        text: `Rendering '${controllerName}' with data`,
+        level: 1,
       })
       return this.renderWith()
     }
 
-    debugMessage({
-      message: `Rendering '${controllerName}' without data`,
-      sectionName,
+    controllerMessage({
+      text: `Rendering '${controllerName}' without data`,
+      level: 1,
     })
     return this.renderWithout()
   }

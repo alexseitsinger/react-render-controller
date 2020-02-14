@@ -1,9 +1,7 @@
 import { isEqual } from "underscore"
 
 import { RenderControllerSkippedPathname } from "src/RenderControllerWithContext"
-import { debugMessage } from "src/utils/debug"
-
-const sectionName = "pathnames"
+import { pathnamesMessage } from "src/utils/debug"
 
 export const removeLeadingAndTrailingSlashes = (url: string): string => {
   var updated = url
@@ -134,9 +132,9 @@ export function getSkippedPathnames(
   if (controllerName in cached) {
     const current = cached[controllerName]
     if (isEqual(current, final)) {
-      debugMessage({
-        message: `Using cached skipped pathnames for controller '${controllerName}' to prevent redundant references.`,
-        sectionName,
+      pathnamesMessage({
+        text: `Using cached skipped pathnames for controller '${controllerName}' to prevent redundant references.`,
+        level: 2,
       })
       return current
     }
@@ -147,9 +145,9 @@ export function getSkippedPathnames(
    * again by child controllers.
    */
   cached[controllerName] = final
-  debugMessage({
-    message: `Saving a copy of skipped pathnames for controller '${controllerName}', so each child controller can inherit them`,
-    sectionName,
+  pathnamesMessage({
+    text: `Saving a copy of skipped pathnames for controller '${controllerName}', so each child controller can inherit them`,
+    level: 2,
   })
 
   /**
@@ -160,9 +158,9 @@ export function getSkippedPathnames(
 
 export const clearSkippedPathnames = (controllerName: string): void => {
   if (controllerName in cached) {
-    debugMessage({
-      message: `Clearing cached skipped pathnames for '${controllerName}'`,
-      sectionName,
+    pathnamesMessage({
+      text: `Clearing cached skipped pathnames for '${controllerName}'`,
+      level: 1,
     })
     delete cached[controllerName]
   }

@@ -1,19 +1,18 @@
 import { RenderControllerTarget } from "src/RenderController"
-import { debugMessage } from "src/utils/debug"
+import { countingMessage } from "src/utils/debug"
 
 import { getControllerTargetName } from "./general"
-
-const sectionName = "counting"
 
 interface LoadCounts {
   [key: string]: number;
 }
 
 const loadCounts: LoadCounts = {}
+
 export function resetLoadCount(targetName: string): number {
-  debugMessage({
-    message: `Resetting load count for target '${targetName}'`,
-    sectionName,
+  countingMessage({
+    text: `Resetting load count for target '${targetName}'`,
+    level: 3,
   })
   loadCounts[targetName] = 0
   return getLoadCount(targetName)
@@ -24,9 +23,9 @@ export function getLoadCount(targetName: string): number {
     resetLoadCount(targetName)
   }
   const result = loadCounts[targetName]
-  debugMessage({
-    message: `Load count for target '${targetName}': ${result}`,
-    sectionName,
+  countingMessage({
+    text: `Load count for target '${targetName}': ${result}`,
+    level: 2,
   })
   return result
 }
@@ -60,9 +59,9 @@ export function assertFirstLoad(
   targets: RenderControllerTarget[]
 ): boolean {
   const result = totalTargetsAttemptedLoading(controllerName, targets) === 0
-  debugMessage({
-    message: `Is first load for controller '${controllerName}' with ${targets.length} targets? ${result}`,
-    sectionName,
+  countingMessage({
+    text: `Is first load for controller '${controllerName}' with ${targets.length} targets? ${result}`,
+    level: 2,
   })
   return result
 }
@@ -73,18 +72,18 @@ export function haveTargetsAttemptedLoading(
 ): boolean {
   const total = totalTargetsAttemptedLoading(controllerName, targets)
   const result = total >= targets.length
-  debugMessage({
-    message: `Have all of ${controllerName}'s ${targets.length} targets attempted loading? ${result}`,
-    sectionName,
+  countingMessage({
+    text: `Have all of ${controllerName}'s ${targets.length} targets attempted loading? ${result}`,
+    level: 2,
   })
   return result
 }
 
 export function hasTargetAttemptedLoading(targetName: string): boolean {
   const result = getLoadCount(targetName) > 0
-  debugMessage({
-    message: `Has target '${targetName}' attempted loading? ${result}`,
-    sectionName,
+  countingMessage({
+    text: `Has target '${targetName}' attempted loading? ${result}`,
+    level: 2,
   })
   return result
 }

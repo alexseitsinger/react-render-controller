@@ -1,14 +1,12 @@
-import { debugMessage } from "src/utils/debug"
-
-const sectionName = "mounting"
+import { mountingMessage } from "src/utils/debug"
 
 let mounted: string[] = []
 
 export function hasMounted(controllerName: string): boolean {
   const result = mounted.includes(controllerName)
-  debugMessage({
-    message: `Is controller '${controllerName}' mounted? ${result}`,
-    sectionName,
+  mountingMessage({
+    text: `Is controller '${controllerName}' mounted? ${result}`,
+    level: 2,
   })
   return result
 }
@@ -17,17 +15,17 @@ export function setMounted(controllerName: string): void {
   if (hasMounted(controllerName)) {
     return
   }
-  debugMessage({
-    message: `Setting controller '${controllerName}' as mounted`,
-    sectionName,
+  mountingMessage({
+    text: `Setting controller '${controllerName}' as mounted`,
+    level: 2,
   })
   mounted = [...mounted, controllerName]
 }
 
 export function setUnmounted(controllerName: string): void {
-  debugMessage({
-    message: `Setting controller '${controllerName}' as unmounted`,
-    sectionName,
+  mountingMessage({
+    text: `Setting controller '${controllerName}' as unmounted`,
+    level: 3,
   })
   mounted = mounted.filter(n => n !== controllerName)
 }

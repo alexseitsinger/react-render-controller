@@ -1,4 +1,4 @@
-import { isArray, isEmpty, isEqual, isObject } from "underscore"
+import { isArray, isEqual, isObject } from "underscore"
 
 import { RenderControllerTarget } from "src/RenderController"
 import {
@@ -10,9 +10,7 @@ import { getControllerTargetName, hasValue } from "src/utils/general"
 
 import { FunctionType } from "../types"
 
-import { debugMessage } from "./debug"
-
-const sectionName = "loading"
+import { loadingMessage } from "./debug"
 
 // Save copies of the loaded data, each time, so we can easilly check if its
 // changed or not.
@@ -34,9 +32,9 @@ function assertTargetHasData(target: RenderControllerTarget): boolean {
 
   if (isArray(data)) {
     const result = hasValue(data.filter(s => excluded.includes(s) === false))
-    debugMessage({
-      message: `Does target '${target.name}' have data?: ${result}`,
-      sectionName,
+    loadingMessage({
+      text: `Does target '${target.name}' have data?: ${result}`,
+      level: 2,
     })
     return result
   }
@@ -51,17 +49,17 @@ function assertTargetHasData(target: RenderControllerTarget): boolean {
     })
 
     const result = hasValue(newData)
-    debugMessage({
-      message: `Does target '${target.name}' have data? ${result}`,
-      sectionName,
+    loadingMessage({
+      text: `Does target '${target.name}' have data? ${result}`,
+      level: 2,
     })
     return result
   }
 
   const result = hasValue(data)
-  debugMessage({
-    message: `Does target '${target.name}' have data? ${result}`,
-    sectionName,
+  loadingMessage({
+    text: `Does target '${target.name}' have data? ${result}`,
+    level: 2,
   })
   return result
 }
@@ -70,18 +68,18 @@ export function assertTargetsHaveData(
   targets: RenderControllerTarget[]
 ): boolean {
   const result = targets.map(assertTargetHasData).every(b => b === true)
-  debugMessage({
-    message: `Do all ${targets.length} target(s) have data? ${result}`,
-    sectionName,
+  loadingMessage({
+    text: `Do all ${targets.length} target(s) have data? ${result}`,
+    level: 2,
   })
   return result
 }
 
 const clearOldLoaders = (): void => {
   const keys = Object.keys(loaders)
-  debugMessage({
-    message: `Clearing ${keys.length} loaders`,
-    sectionName,
+  loadingMessage({
+    text: `Clearing ${keys.length} loaders`,
+    level: 1,
   })
   while (keys.length > 0) {
     const k = keys.shift()
@@ -104,49 +102,58 @@ function addLoader(
   })
 
   if (targetName in loaders) {
-    debugMessage({
-      message: `A loader already exists for target '${targetName}'`,
-      sectionName,
+    loadingMessage({
+      text: `A loader already exists for target '${targetName}'`,
+      level: 3,
     })
     return
   }
 
   if (hasTargetAttemptedLoading(targetName)) {
-    debugMessage({
-      message: `Target '${targetName}' has already attempted loading.`,
-      sectionName,
+    loadingMessage({
+      text: `Target '${targetName}' has already attempted loading.`,
+      level: 3,
     })
     return
   }
 
-  debugMessage({
-    message: `Adding a loader for target '${targetName}'`,
-    sectionName,
+  loadingMessage({
+    text: `Adding a loader for target '${targetName}'`,
+    level: 1,
   })
 
   loaders[targetName] = (): void => {
     delete loaders[targetName]
     if (isLoadCancelled) {
-      debugMessage({
-        message: `Loading was cancelled for ${targetName}`,
-        sectionName,
+      loadingMessage({
+        text: `Loading was cancelled for ${targetName}`,
+        level: 3,
       })
       return
     }
-    debugMessage({ message: `Loading target '${targetName}'`, sectionName })
+    loadingMessage({
+      text: `Running loader for target '${targetName}'`,
+      level: 1,
+    })
     loadDataForTarget(target, targetName)
     callback()
   }
 
   return (): void => {
-    debugMessage({ message: `Cancelling load for ${targetName}`, sectionName })
+    loadingMessage({
+      text: `Cancelling loader for target '${targetName}'`,
+      level: 1,
+    })
     isLoadCancelled = true
   }
 }
 
 const startRunningLoaders = (): void => {
   const keys = Object.keys(loaders)
-  debugMessage({ message: `Running ${keys.length} loaders`, sectionName })
+  loadingMessage({
+    text: `Running ${keys.length} loaders`,
+    level: 1,
+  })
   while (keys.length > 0) {
     const key = keys.shift()
     if (key !== undefined) {
@@ -159,21 +166,16 @@ function loadDataForTarget(
   target: RenderControllerTarget,
   targetName: string
 ): void {
-  debugMessage({
-    message: `Attempting to load target '${targetName}'`,
-    sectionName,
-  })
-
   if (assertTargetHasData(target)) {
-    debugMessage({
-      message: `Target '${target.name}' already has data loaded.`,
-      sectionName,
+    loadingMessage({
+      text: `Target '${target.name}' already has data.`,
+      level: 3,
     })
     if (target.forced !== undefined && target.forced === true) {
       if (target.attempted !== undefined) {
-        debugMessage({
-          message: `Loading is forced for target '${targetName}', so running getter`,
-          sectionName,
+        loadingMessage({
+          text: `Loading is forced for target '${targetName}', so running getter`,
+          level: 3,
         })
         target.attempted = true
         target.getter()
@@ -190,16 +192,16 @@ function loadDataForTarget(
      */
     if (hasValue(target.data)) {
       if (!(targetName in records)) {
-        debugMessage({
-          message: `Recording data for target '${targetName}' for future resets`,
-          sectionName,
+        loadingMessage({
+          text: `Recording data for target '${targetName}' for future resets`,
+          level: 3,
         })
         records[targetName] = target.data
       }
       if (!isEqual(records[targetName], target.data)) {
-        debugMessage({
-          message: `Re-setting previous data for target '${targetName}'`,
-          sectionName,
+        loadingMessage({
+          text: `Re-setting previous data for target '${targetName}'`,
+          level: 3,
         })
         records[targetName] = target.data
         target.setter(target.data)
@@ -209,9 +211,9 @@ function loadDataForTarget(
     return
   }
 
-  debugMessage({
-    message: `Getting fresh data for target '${targetName}'`,
-    sectionName,
+  loadingMessage({
+    text: `Getting data for target '${targetName}'`,
+    level: 1,
   })
 
   target.getter()
@@ -232,10 +234,6 @@ export const startLoading = ({
   addCanceller,
   setControllerCompleted,
 }: StartLoadingArgs): void => {
-  debugMessage({
-    message: `Starting loading for controller '${controllerName}' with ${targets.length} targets`,
-    sectionName,
-  })
   clearOldLoaders()
 
   const addNewLoader = (target: RenderControllerTarget): void => {
