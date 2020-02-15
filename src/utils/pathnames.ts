@@ -1,7 +1,8 @@
 import { isEqual } from "underscore"
 
-import { RenderControllerSkippedPathname } from "src/RenderControllerWithContext"
-import { pathnamesMessage } from "src/utils/debug"
+import { RenderControllerSkippedPathname } from "../RenderControllerWithContext"
+
+import { pathnamesMessage } from "./debug"
 
 export const removeLeadingAndTrailingSlashes = (url: string): string => {
   var updated = url

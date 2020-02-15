@@ -1,20 +1,11 @@
 import React, { ReactElement } from "react"
 import { isArray } from "underscore"
 
-import { RenderController, RenderControllerTarget } from "src/RenderController"
-import {
-  Context,
-  RenderControllerRenderProps,
-} from "src/RenderControllerContext"
-import { ChildrenType, RenderFunctionType } from "src/types"
-import { isDefined } from "src/utils/general"
-import { FinalSkippedPathname, getSkippedPathnames } from "src/utils/pathnames"
-
-const defaultProps = {
-  skippedPathnames: [],
-}
-
-type DefaultProps = Readonly<typeof defaultProps>
+import { RenderController, RenderControllerTarget } from "./RenderController"
+import { Context, RenderControllerRenderProps } from "./RenderControllerContext"
+import { ChildrenType, RenderFunctionType } from "./types"
+import { isDefined } from "./utils/general"
+import { FinalSkippedPathname, getSkippedPathnames } from "./utils/pathnames"
 
 export interface RenderControllerSkippedPathname {
   url: string;
@@ -31,8 +22,7 @@ export interface RenderControllerWithContextInitialProps {
 }
 
 export type RenderControllerWithContextProps = RenderControllerWithContextInitialProps &
-  RenderControllerRenderProps &
-  Partial<DefaultProps> & {
+  RenderControllerRenderProps & {
     skippedPathnames?: RenderControllerSkippedPathname[],
   }
 
@@ -82,5 +72,3 @@ export function RenderControllerWithContext(
     </Context.Consumer>
   )
 }
-
-RenderControllerWithContext.defaultProps = defaultProps
