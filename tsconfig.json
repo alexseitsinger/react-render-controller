@@ -27,14 +27,12 @@
     "paths": {
       "src": ["src"],
       "src/*": ["src/*"],
-      "types": ["index.d.ts"],
       "tests/*": ["tests/*"]
     }
   },
   "include": [
     "src",
-    "tests",
-    "**/*.d.ts"
+    "tests"
   ],
   "exclude": [
     "node_modules",

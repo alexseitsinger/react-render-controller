@@ -29,14 +29,9 @@
     "baseUrl": ".",
     "paths": {
       "src": ["src"],
-      "src/*": ["src/*"],
-      "types": ["index.d.ts"]
+      "src/*": ["src/*"]
     }
   },
-  "include": [
-    "src",
-    "**/*.d.ts"
-  ],
   "exclude": [
     "node_modules",
     ".yalc",

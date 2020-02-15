@@ -11,12 +11,11 @@
     "removeComments": true,
     "resolveJsonModule": true,
     "strictNullChecks": true,
-    "sourceMap": true,
+    "sourceMap": false,
 
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
 
-    "allowJs": true,
     "jsx": "react",
 
     "lib": ["dom", "es2015"],
@@ -27,9 +26,8 @@
     "baseUrl": ".",
     "paths": {
       "src": ["src"],
-      "tests/*": ["tests/*"],
       "src/*": ["src/*"],
-      "types": ["index.d.ts"]
+      "tests/*": ["tests/*"]
     }
   },
   "include": ["src", "tests"],
