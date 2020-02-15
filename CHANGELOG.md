@@ -1,3 +1,12 @@
+<a name="v10.2.0"></a>
+## [v10.2.0](https://github.com/alexseitsinger/react-render-controller/compare/v10.1.0...v10.2.0) (2020-02-15)
+
+### Code Refactoring
+- Refactors. ([6501225](https://github.com/alexseitsinger/react-render-controller/commit/65012254012dbbfcb0c2c2b77994e2e8c13ed65b))
+- Updates debug messages. ([dc199c4](https://github.com/alexseitsinger/react-render-controller/commit/dc199c4cc0f7c76ada2b3ff9c7434bbd140c86ea))
+- Uses relative paths for ts defs. ([e4186b0](https://github.com/alexseitsinger/react-render-controller/commit/e4186b06671a26104b05d9c1a5ed6c486256ca79))
+
+
 <a name="v10.1.0"></a>
 ## [v10.1.0](https://github.com/alexseitsinger/react-render-controller/compare/v10.0.0...v10.1.0) (2020-02-13)
 
