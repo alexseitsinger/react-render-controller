@@ -258,7 +258,11 @@ export class RenderController extends React.Component<
   }
 
   renderFirst = (): ReactNode | null => {
-    const { renderFirst, onRenderFirst } = this.props
+    const { renderBoth, renderFirst, onRenderFirst } = this.props
+
+    if (isFunction(renderBoth)) {
+      return renderBoth()
+    }
 
     if (isFunction(renderFirst)) {
       return renderFirst()
@@ -272,7 +276,11 @@ export class RenderController extends React.Component<
   }
 
   renderWithout = (): ReactNode | null => {
-    const { renderWithout, onRenderWithout } = this.props
+    const { renderBoth, renderWithout, onRenderWithout } = this.props
+
+    if (isFunction(renderBoth)) {
+      return renderBoth()
+    }
 
     if (isFunction(renderWithout)) {
       return renderWithout()

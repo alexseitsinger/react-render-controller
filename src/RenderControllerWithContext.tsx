@@ -14,6 +14,7 @@ export interface RenderControllerSkippedPathname {
 
 export interface RenderControllerWithContextInitialProps {
   children?: ChildrenType;
+  renderBoth?: RenderFunctionType;
   renderWith?: RenderFunctionType;
   renderWithout?: RenderFunctionType;
   renderFirst?: RenderFunctionType;
