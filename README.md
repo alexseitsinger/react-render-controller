@@ -18,6 +18,7 @@ targets          | An array of target objects                                   
 renderFirst      | The function used to render output before the data loading is attempted                     | No           | undefined
 renderWith       | The function used to render the output once the data has been loaded                        | No           | undefined
 renderWithout    | The function used to render the output when data loading failed to produce non-empty result | No           | undefined
+renderBoth       | The function used to render instead of both renderWith and renderWithout                    | No           | undefined
 skippedPathnames | An array of objects that unloading should be skipped for.                                   | No           | undefined
 
 #### Shapes
