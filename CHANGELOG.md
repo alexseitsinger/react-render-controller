@@ -1,3 +1,13 @@
+<a name="v10.3.0"></a>
+## [v10.3.0](https://github.com/alexseitsinger/react-render-controller/compare/v10.2.0...v10.3.0) (2020-02-17)
+
+### Bug Fixes
+- Fixes renderBoth. ([2142c32](https://github.com/alexseitsinger/react-render-controller/commit/2142c3236b32af240845706c2df6fb03962f42d8))
+
+### Features
+- Adds renderBoth method. ([0843458](https://github.com/alexseitsinger/react-render-controller/commit/084345853998289164bdfc425ea4b7963ed1a06a))
+
+
 <a name="v10.2.0"></a>
 ## [v10.2.0](https://github.com/alexseitsinger/react-render-controller/compare/v10.1.0...v10.2.0) (2020-02-15)
 
